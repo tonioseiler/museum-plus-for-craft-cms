@@ -18,9 +18,42 @@
 {% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\museumplusforcraftcms\\MuseumplusForCraftcmsAsset") %}
 
 {{ forms.textField({
-    label: 'Some Field',
-    instructions: 'Enter some setting here.',
-    id: 'someAttribute',
-    name: 'someAttribute',
-    value: settings['someAttribute']})
+    label: 'Control Panel Title',
+    instructions: 'How the plugin will be called in the Control Panel',
+    id: 'cpTitle',
+    name: 'cpTitle',
+    value: settings['cpTitle']})
+}}
+
+{{ forms.textField({
+    label: 'Classifier',
+    instructions: '',
+    id: 'classifier',
+    name: 'classifier',
+    value: settings['classifier']})
+}}
+
+{{ forms.textField({
+    label: 'Hostname',
+    instructions: '',
+    id: 'hostname',
+    name: 'hostname',
+    value: settings['hostname']})
+}}
+
+{{ forms.textField({
+    label: 'Username',
+    instructions: '',
+    id: 'username',
+    name: 'username',
+    value: settings['username']})
+}}
+
+{{ forms.textField({
+    label: 'Password',
+    instructions: '',
+    id: 'password',
+    name: 'password',
+    type: 'password',
+    value: settings['password']})
 }}

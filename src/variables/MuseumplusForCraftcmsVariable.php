@@ -10,7 +10,7 @@
 
 namespace furbo\museumplusforcraftcms\variables;
 
-use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
+use furbo\museumplusforcraftcms\MuseumplusForCraftCms;
 
 use Craft;
 
@@ -32,25 +32,16 @@ class MuseumplusForCraftcmsVariable
     // =========================================================================
 
     /**
-     * Whatever you want to output to a Twig template can go into a Variable method.
-     * You can have as many variable functions as you want.  From any Twig template,
-     * call it like this:
      *
-     *     {{ craft.museumplusForCraftcms.exampleVariable }}
-     *
-     * Or, if your variable requires parameters from Twig:
-     *
-     *     {{ craft.museumplusForCraftcms.exampleVariable(twigValue) }}
+     *     {{ craft.museumplusForCraftcms.cpTitle }} or
+     *     {{ craft.museumplusForCraftcms.cpTitle(twigValue) }}
      *
      * @param null $optional
      * @return string
      */
-    public function exampleVariable($optional = null)
+    public function cpTitle($optional = null)
     {
-        $result = "And away we go to the Twig template...";
-        if ($optional) {
-            $result = "I'm feeling optional today...";
-        }
-        return $result;
+        $settings = MuseumplusForCraftCms::$plugin->getSettings();
+        return $settings['cpTitle'];
     }
 }

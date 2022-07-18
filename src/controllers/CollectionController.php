@@ -46,7 +46,7 @@ class CollectionController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['index', 'do-something'];
+    protected array|int|bool $allowAnonymous = ['index', 'do-something'];
 
     // Public Methods
     // =========================================================================
@@ -70,7 +70,14 @@ class CollectionController extends Controller
      *
      * @return mixed
      */
-    public function actionDoSomething()
+    public function actionEdit()
+    {
+        $result = 'Welcome to the CollectionController actionDoSomething() method';
+
+        return $result;
+    }
+
+    public function actionUpdate()
     {
         $result = 'Welcome to the CollectionController actionDoSomething() method';
 

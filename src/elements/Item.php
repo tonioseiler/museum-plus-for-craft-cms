@@ -16,6 +16,8 @@ use Craft;
 use craft\base\Element;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
+use craft\models\FieldLayout;
+use craft\models\TagGroup;
 
 /**
  *  Element
@@ -61,17 +63,12 @@ use craft\elements\db\ElementQueryInterface;
  * @package   MuseumplusForCraftcms
  * @since     1.0.0
  */
-class  extends Element
+class Item  extends Element
 {
     // Public Properties
     // =========================================================================
 
-    /**
-     * Some attribute
-     *
-     * @var string
-     */
-    public $someAttribute = 'Some Default';
+    public $data = null;
 
     // Static Methods
     // =========================================================================
@@ -104,7 +101,7 @@ class  extends Element
      */
     public static function hasTitles(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -123,52 +120,6 @@ class  extends Element
         return true;
     }
 
-    /**
-     * Creates an [[ElementQueryInterface]] instance for query purpose.
-     *
-     * The returned [[ElementQueryInterface]] instance can be further customized by calling
-     * methods defined in [[ElementQueryInterface]] before `one()` or `all()` is called to return
-     * populated [[ElementInterface]] instances. For example,
-     *
-     * ```php
-     * // Find the entry whose ID is 5
-     * $entry = Entry::find()->id(5)->one();
-     *
-     * // Find all assets and order them by their filename:
-     * $assets = Asset::find()
-     *     ->orderBy('filename')
-     *     ->all();
-     * ```
-     *
-     * If you want to define custom criteria parameters for your elements, you can do so by overriding
-     * this method and returning a custom query class. For example,
-     *
-     * ```php
-     * class Product extends Element
-     * {
-     *     public static function find()
-     *     {
-     *         // use ProductQuery instead of the default ElementQuery
-     *         return new ProductQuery(get_called_class());
-     *     }
-     * }
-     * ```
-     *
-     * You can also set default criteria parameters on the ElementQuery if you don’t have a need for
-     * a custom query class. For example,
-     *
-     * ```php
-     * class Customer extends ActiveRecord
-     * {
-     *     public static function find()
-     *     {
-     *         return parent::find()->limit(50);
-     *     }
-     * }
-     * ```
-     *
-     * @return ElementQueryInterface The newly created [[ElementQueryInterface]] instance.
-     */
     public static function find(): ElementQueryInterface
     {
         return new ElementQuery(get_called_class());
@@ -202,12 +153,9 @@ class  extends Element
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
-        return [
-            ['someAttribute', 'string'],
-            ['someAttribute', 'default', 'value' => 'Some Default'],
-        ];
+        return [];
     }
 
     /**
@@ -225,28 +173,9 @@ class  extends Element
      *
      * @return FieldLayout|null
      */
-    public function getFieldLayout()
+    public function getFieldLayout(): FieldLayout
     {
-        $tagGroup = $this->getGroup();
-
-        if ($tagGroup) {
-            return $tagGroup->getFieldLayout();
-        }
-
-        return null;
-    }
-
-    public function getGroup()
-    {
-        if ($this->groupId === null) {
-            throw new InvalidConfigException('Tag is missing its group ID');
-        }
-
-        if (($group = Craft::$app->getTags()->getTagGroupById($this->groupId)) === null) {
-            throw new InvalidConfigException('Invalid tag group ID: '.$this->groupId);
-        }
-
-        return $group;
+        return \Craft::$app->fields->getLayoutByType(Item::class);
     }
 
     // Indexes, etc.
@@ -278,6 +207,12 @@ class  extends Element
         return $html;
     }
 
+    public function getCpEditUrl(): ?string
+    {
+        return 'collection/'.$this->id;
+    }
+
+
     // Events
     // -------------------------------------------------------------------------
 
@@ -300,8 +235,26 @@ class  extends Element
      *
      * @return void
      */
-    public function afterSave(bool $isNew)
+    public function afterSave(bool $isNew): void
     {
+
+        if ($isNew) {
+            Craft::$app->db->createCommand()
+                ->insert('{{%items}}', [
+                    'id' => $this->id,
+                    'data' => $this->data
+                ])
+                ->execute();
+        } else {
+            Craft::$app->db->createCommand()
+                ->update('{{%items}}', [
+                    'data' => $this->data
+                ], ['id' => $this->id])
+                ->execute();
+        }
+
+        parent::afterSave($isNew);
+
     }
 
     /**
@@ -319,7 +272,7 @@ class  extends Element
      *
      * @return void
      */
-    public function afterDelete()
+    public function afterDelete(): void
     {
     }
 
@@ -342,7 +295,7 @@ class  extends Element
      *
      * @return void
      */
-    public function afterMoveInStructure(int $structureId)
+    public function afterMoveInStructure(int $structureId): void
     {
     }
 }

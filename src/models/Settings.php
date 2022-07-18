@@ -39,7 +39,15 @@ class Settings extends Model
      *
      * @var string
      */
-    public $someAttribute = 'Some Default';
+    public $cpTitle = 'Collection';
+
+    public $classifier = '';
+
+    public $hostname = '';
+
+    public $username = '';
+
+    public $password = '';
 
     // Public Methods
     // =========================================================================
@@ -54,11 +62,10 @@ class Settings extends Model
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            ['someAttribute', 'string'],
-            ['someAttribute', 'default', 'value' => 'Some Default'],
+            ['cpTitle', 'string']
         ];
     }
 }

@@ -11,8 +11,8 @@
         "museumplus for craftcms"
     ],
     "support": {
-        "docs": "???",
-        "issues": "???"
+        "docs": "https://furbo.ch",
+        "issues": "https://furbo.ch"
     },
     "license": "MIT",
     "authors": [
@@ -22,7 +22,7 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.0.0"
+        "craftcms/cms": "^4.0.0"
     },
     "autoload": {
         "psr-4": {
@@ -39,6 +39,17 @@
         "components": {
             "collection": "furbo\\museumplusforcraftcms\\services\\Collection"
         },
-        "class": "furbo\\museumplusforcraftcms\\MuseumplusForCraftcms"
+        "class": "furbo\\museumplusforcraftcms\\MuseumplusForCraftCms"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require-dev": {
+        "craftcms/rector": "dev-main"
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        }
     }
 }

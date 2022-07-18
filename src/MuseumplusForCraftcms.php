@@ -16,6 +16,7 @@ use furbo\museumplusforcraftcms\models\Settings;
 use furbo\museumplusforcraftcms\fields\MuseumplusForCraftcmsField as MuseumplusForCraftcmsFieldField;
 use furbo\museumplusforcraftcms\utilities\Collection as CollectionUtility;
 use furbo\museumplusforcraftcms\widgets\Collection as CollectionWidget;
+use furbo\museumplusforcraftcms\elements\Item;
 
 use Craft;
 use craft\base\Plugin;
@@ -51,7 +52,7 @@ use yii\base\Event;
  * @property  Settings $settings
  * @method    Settings getSettings()
  */
-class MuseumplusForCraftcms extends Plugin
+class MuseumplusForCraftCms extends Plugin
 {
     // Static Properties
     // =========================================================================
@@ -72,21 +73,21 @@ class MuseumplusForCraftcms extends Plugin
      *
      * @var string
      */
-    public $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.0.0';
 
     /**
      * Set to `true` if the plugin should have a settings view in the control panel.
      *
      * @var bool
      */
-    public $hasCpSettings = true;
+    public bool $hasCpSettings = true;
 
     /**
      * Set to `true` if the plugin should have its own section (main nav item) in the control panel.
      *
      * @var bool
      */
-    public $hasCpSection = true;
+    public bool $hasCpSection = true;
 
     // Public Methods
     // =========================================================================
@@ -126,7 +127,7 @@ class MuseumplusForCraftcms extends Plugin
             UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function (RegisterUrlRulesEvent $event) {
-                $event->rules['cpActionTrigger1'] = 'museum-plus-for-craft-cms/collection/do-something';
+                $event->rules = array_merge($event->rules, $this->getCpRoutes());
             }
         );
 
@@ -135,6 +136,7 @@ class MuseumplusForCraftcms extends Plugin
             Elements::class,
             Elements::EVENT_REGISTER_ELEMENT_TYPES,
             function (RegisterComponentTypesEvent $event) {
+                $event->types[] = Item::class;
             }
         );
 
@@ -223,7 +225,7 @@ class MuseumplusForCraftcms extends Plugin
      *
      * @return \craft\base\Model|null
      */
-    protected function createSettingsModel()
+    protected function createSettingsModel(): ?\craft\base\Model
     {
         return new Settings();
     }
@@ -234,7 +236,7 @@ class MuseumplusForCraftcms extends Plugin
      *
      * @return string The rendered settings HTML
      */
-    protected function settingsHtml(): string
+    protected function settingsHtml(): ?string
     {
         return Craft::$app->view->renderTemplate(
             'museum-plus-for-craft-cms/settings',
@@ -242,5 +244,29 @@ class MuseumplusForCraftcms extends Plugin
                 'settings' => $this->getSettings()
             ]
         );
+    }
+
+    protected function getCpRoutes(): array
+    {
+        return [
+            'collection' => ['template' => 'museum-plus-for-craft-cms/collection'],
+            'collection/<id:\d+>' => 'museum-plus-for-craft-cms/collection/edit'
+        ];
+    }
+
+    public function getCpNavItem(): ?array
+    {
+        $cpNavItem = parent::getCpNavItem();
+
+        $settings = self::$plugin->getSettings();
+
+        $cpNavItem['label'] = $settings['cpTitle'];
+        $cpNavItem['url'] = 'collection';
+
+        $cpNavItem['subnav'] = [];
+
+        $cpNavItem['subnav']['items'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Items'), 'url' => 'collection'];
+
+        return $cpNavItem;
     }
 }

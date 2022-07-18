@@ -39,7 +39,9 @@ class Collection extends Utility
      */
     public static function displayName(): string
     {
-        return Craft::t('museum-plus-for-craft-cms', 'Collection');
+        $settings = MuseumplusForCraftCms::$plugin->getSettings();
+        return $settings['cpTitle'];
+        //return Craft::t('museum-plus-for-craft-cms', 'Collection');
     }
 
     /**
@@ -59,7 +61,7 @@ class Collection extends Utility
      *
      * @return string|null The path to the utility SVG icon
      */
-    public static function iconPath()
+    public static function iconPath(): ?string
     {
         return Craft::getAlias("@furbo/museumplusforcraftcms/assetbundles/collectionutility/dist/img/Collection-icon.svg");
     }
