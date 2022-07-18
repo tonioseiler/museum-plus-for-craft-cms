@@ -1,0 +1,44 @@
+{
+    "name": "furbo/museum-plus-for-craft-cms",
+    "description": "Allows to import MuseumsPlus Collection data to Craft CMS and publish data. Additioanl Web Specific Data can be added to the imported data.",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "museumplus for craftcms"
+    ],
+    "support": {
+        "docs": "???",
+        "issues": "???"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Furbo GmbH",
+            "homepage": "https://furbo.ch"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "furbo\\museumplusforcraftcms\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "MuseumPlus for CraftCMS",
+        "handle": "museum-plus-for-craft-cms",
+        "developer": "Furbo GmbH",
+        "developerUrl": "https://furbo.ch",
+        "documentationUrl": "???",
+        "changelogUrl": "???",
+        "components": {
+            "collection": "furbo\\museumplusforcraftcms\\services\\Collection"
+        },
+        "class": "furbo\\museumplusforcraftcms\\MuseumplusForCraftcms"
+    }
+}

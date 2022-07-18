@@ -1,0 +1,26 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * MuseumPlus for CraftCMS plugin for Craft CMS
+ *
+ * MuseumplusForCraftcmsField Field Settings
+ *
+ * @author    Furbo GmbH
+ * @copyright Copyright (c) 2022 Furbo GmbH
+ * @link      https://furbo.ch
+ * @package   MuseumplusForCraftcms
+ * @since     1.0.0
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\museumplusforcraftcms\\MuseumplusForCraftcmsAsset") %}
+
+{{ forms.textField({
+    label: 'Some Attribute',
+    instructions: 'Enter some attribute here.',
+    id: 'someAttribute',
+    name: 'someAttribute',
+    value: field['someAttribute']})
+}}

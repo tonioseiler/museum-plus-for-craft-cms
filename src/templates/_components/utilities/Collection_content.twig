@@ -1,0 +1,24 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * MuseumPlus for CraftCMS plugin for Craft CMS
+ *
+ * Collection Utility Content
+ *
+ * @author    Furbo GmbH
+ * @copyright Copyright (c) 2022 Furbo GmbH
+ * @link      https://furbo.ch
+ * @package   MuseumplusForCraftcms
+ * @since     1.0.0
+ */
+#}
+
+<h1>Collection</h1>
+
+{% set iconUrl = view.getAssetManager().getPublishedUrl('@furbo/museumplusforcraftcms/assetbundles/collectionutility/dist', true) ~ '/img/Collection-icon.svg' %}
+
+<img src="{{ iconUrl }}" height="64" width="64" />
+
+<p>Your Utility content goes here</p>
+
+<p>{{ someVar }}</p>
