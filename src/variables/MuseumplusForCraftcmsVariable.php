@@ -44,4 +44,31 @@ class MuseumplusForCraftcmsVariable
         $settings = MuseumplusForCraftCms::$plugin->getSettings();
         return $settings['cpTitle'];
     }
+
+    public function getObjectGroups() {
+        $objectGroups = MuseumplusForCraftcms::$plugin->collection->getObjectGroups();
+        $ret = [];
+        foreach ($objectGroups as $og) {
+            $title = $og->OgrNameTxt;
+            if (strlen($title)) {
+                $title = substr($title, 0, 60). '...';
+            }
+            $ret[$og->id] = $title;
+        }
+        return $ret;
+    }
+
+    public function getExhibitions() {
+        $exhibitions = MuseumplusForCraftcms::$plugin->collection->getExhibitions();
+        $ret = [];
+        foreach ($exhibitions as $ex) {
+            $title = $ex->ExhExhibitionTitleVrt;
+            if (strlen($title)) {
+                $title = substr($title, 0, 60). '...';
+            }
+
+            $ret[$ex->id] = $title;
+        }
+        return $ret;
+    }
 }

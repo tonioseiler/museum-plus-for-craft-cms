@@ -25,6 +25,8 @@
     value: settings['cpTitle']})
 }}
 
+<hr />
+
 {{ forms.textField({
     label: 'Classifier',
     instructions: '',
@@ -57,3 +59,33 @@
     type: 'password',
     value: settings['password']})
 }}
+
+<hr />
+
+<div class="field">
+    <div class="heading"><label id="settings-objectGroups-label" for="settings-objectGroups">Object Groups</label></div>
+    <div id="settings-objectGroups-instructions" class="instructions"><p>Select the Object Groups you want to import</p></div>
+
+    {{ forms.multiSelect({
+        id: 'objectGroups',
+        name: 'objectGroups',
+        options: craft.museumplusForCraftcms.getObjectGroups(),
+        values: settings['objectGroups']})
+    }}
+
+</div>
+
+<hr />
+
+<div class="field">
+    <div class="heading"><label id="settings-exhibitions-label" for="settings-exhibitions">Exhibitions</label></div>
+    <div id="settings-cpTitle-instructions" class="instructions"><p>Select the Exhibitions you want to import</p></div>
+
+    {{ forms.multiSelect({
+        id: 'exhibitions',
+        name: 'exhibitions',
+        options: craft.museumplusForCraftcms.getExhibitions(),
+        values: settings['exhibitions']})
+    }}
+
+</div>

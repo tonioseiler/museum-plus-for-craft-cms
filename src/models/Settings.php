@@ -49,6 +49,10 @@ class Settings extends Model
 
     public $password = '';
 
+    public $objectGroups = [];
+
+    public $exhibitions = [];
+
     // Public Methods
     // =========================================================================
 
