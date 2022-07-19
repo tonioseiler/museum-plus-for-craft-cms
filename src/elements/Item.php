@@ -70,6 +70,8 @@ class Item  extends Element
 
     public $data = null;
 
+    public $collectionId = null;
+
     // Static Methods
     // =========================================================================
 

@@ -17,75 +17,98 @@
 
 {% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\museumplusforcraftcms\\MuseumplusForCraftcmsAsset") %}
 
-{{ forms.textField({
-    label: 'Control Panel Title',
-    instructions: 'How the plugin will be called in the Control Panel',
-    id: 'cpTitle',
-    name: 'cpTitle',
-    value: settings['cpTitle']})
-}}
+{% set tabs = {
+    settings: {
+        label: 'Settings',
+        url: '#settings',
+    },
+    additionalFields: {
+        label: 'Fields',
+        url: '#additionalFields',
+    },
+} %}
 
-<hr />
+<div id="fields">
+    <div id="settings">
+        {{ forms.textField({
+            label: 'Control Panel Title',
+            instructions: 'How the plugin will be called in the Control Panel',
+            id: 'cpTitle',
+            name: 'cpTitle',
+            value: settings['cpTitle']})
+        }}
 
-{{ forms.textField({
-    label: 'Classifier',
-    instructions: '',
-    id: 'classifier',
-    name: 'classifier',
-    value: settings['classifier']})
-}}
+        <hr />
 
-{{ forms.textField({
-    label: 'Hostname',
-    instructions: '',
-    id: 'hostname',
-    name: 'hostname',
-    value: settings['hostname']})
-}}
+        {{ forms.textField({
+            label: 'Classifier',
+            instructions: '',
+            id: 'classifier',
+            name: 'classifier',
+            value: settings['classifier']})
+        }}
 
-{{ forms.textField({
-    label: 'Username',
-    instructions: '',
-    id: 'username',
-    name: 'username',
-    value: settings['username']})
-}}
+        {{ forms.textField({
+            label: 'Hostname',
+            instructions: '',
+            id: 'hostname',
+            name: 'hostname',
+            value: settings['hostname']})
+        }}
 
-{{ forms.textField({
-    label: 'Password',
-    instructions: '',
-    id: 'password',
-    name: 'password',
-    type: 'password',
-    value: settings['password']})
-}}
+        {{ forms.textField({
+            label: 'Username',
+            instructions: '',
+            id: 'username',
+            name: 'username',
+            value: settings['username']})
+        }}
 
-<hr />
+        {{ forms.textField({
+            label: 'Password',
+            instructions: '',
+            id: 'password',
+            name: 'password',
+            type: 'password',
+            value: settings['password']})
+        }}
 
-<div class="field">
-    <div class="heading"><label id="settings-objectGroups-label" for="settings-objectGroups">Object Groups</label></div>
-    <div id="settings-objectGroups-instructions" class="instructions"><p>Select the Object Groups you want to import</p></div>
+        <hr />
 
-    {{ forms.multiSelect({
-        id: 'objectGroups',
-        name: 'objectGroups',
-        options: craft.museumplusForCraftcms.getObjectGroups(),
-        values: settings['objectGroups']})
-    }}
+        <div class="field">
+            <div class="heading"><label id="settings-objectGroups-label" for="settings-objectGroups">Object Groups</label></div>
+            <div id="settings-objectGroups-instructions" class="instructions"><p>Select the Object Groups you want to import</p></div>
 
-</div>
+            {{ forms.multiSelect({
+                id: 'objectGroups',
+                name: 'objectGroups',
+                options: craft.museumplusForCraftcms.getObjectGroups(),
+                values: settings['objectGroups']})
+            }}
 
-<hr />
+        </div>
 
-<div class="field">
-    <div class="heading"><label id="settings-exhibitions-label" for="settings-exhibitions">Exhibitions</label></div>
-    <div id="settings-cpTitle-instructions" class="instructions"><p>Select the Exhibitions you want to import</p></div>
+        <hr />
 
-    {{ forms.multiSelect({
-        id: 'exhibitions',
-        name: 'exhibitions',
-        options: craft.museumplusForCraftcms.getExhibitions(),
-        values: settings['exhibitions']})
-    }}
+        <div class="field">
+            <div class="heading"><label id="settings-exhibitions-label" for="settings-exhibitions">Exhibitions</label></div>
+            <div id="settings-cpTitle-instructions" class="instructions"><p>Select the Exhibitions you want to import</p></div>
 
+            {{ forms.multiSelect({
+                id: 'exhibitions',
+                name: 'exhibitions',
+                options: craft.museumplusForCraftcms.getExhibitions(),
+                values: settings['exhibitions']})
+            }}
+
+        </div>
+    </div>
+
+    <div id="additionalFields">
+        {{ forms.fieldLayoutDesignerField({
+            fieldLayout: craft.app.fields.getLayoutByType(
+                'furbo\\museumplusforcraftcms\\elements\\Item'
+            ),
+        }) }}
+    </div>
 </div>
