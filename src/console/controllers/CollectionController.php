@@ -11,6 +11,7 @@
 namespace furbo\museumplusforcraftcms\console\controllers;
 
 use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
+use furbo\museumplusforcraftcms\elements\MuseumplusItem;
 
 use Craft;
 use yii\console\Controller;
@@ -54,13 +55,46 @@ class CollectionController extends Controller
      *
      * @return mixed
      */
-    public function actionImport()
-    {
-        $result = 'something';
+     public function actionImport()
+     {
+         $settings = MuseumplusForCraftcms::$plugin->getSettings();
+         $collection = MuseumplusForCraftcms::$plugin->collection;
 
-        echo "Welcome to the console CollectionController actionIndex() method\n";
+         foreach ($settings['objectGroups'] as $objectGroupId) {
+             $objects = $collection->getObjectsByObjectGroup($objectGroupId);
+             foreach ($objects as $o) {
+                 $this->createOrUpdateItem($o);
+             }
+         }
 
-        return $result;
+
+         return null;
+     }
+
+
+
+    private function createOrUpdateItem($object) {
+        $collectionId = $object->id;
+
+        $item = MuseumplusItem::find()
+            ->where(['collectionId' => $collectionId])
+            ->one();
+        if (empty($item)) {
+            //create new
+            $item = new MuseumplusItem();
+            $item->collectionId = $collectionId;
+            $item->data = json_encode($object, true);
+            $success = Craft::$app->elements->saveElement($item);
+        } else {
+            //update
+            $item->data = json_encode($object, true);
+            $success = Craft::$app->elements->saveElement($item);
+        }
+        echo '.';
+        return true;
+
+
+
     }
 
 }

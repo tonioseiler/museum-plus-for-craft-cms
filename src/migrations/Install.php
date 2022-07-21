@@ -15,12 +15,12 @@ class Install extends Migration
      */
     public function safeUp(): bool
     {
-        if (!$this->db->tableExists('{{%items}}')) {
+        if (!$this->db->tableExists('{{%museumplus_items}}')) {
             // create the items table
-            $this->createTable('{{%items}}', [
+            $this->createTable('{{%museumplus_items}}', [
                 'id' => $this->integer()->notNull(),
                 'data' => $this->text()->null(),
-                'collectionId' => integer()->notNull(),
+                'collectionId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid(),
@@ -30,7 +30,7 @@ class Install extends Migration
             // give it a foreign key to the elements table
             $this->addForeignKey(
                 $this->db->getForeignKeyName(),
-                '{{%items}}',
+                '{{%museumplus_items}}',
                 'id',
                 '{{%elements}}',
                 'id',

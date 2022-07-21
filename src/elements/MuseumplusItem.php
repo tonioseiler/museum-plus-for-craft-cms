@@ -11,6 +11,7 @@
 namespace furbo\museumplusforcraftcms\elements;
 
 use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
+use furbo\museumplusforcraftcms\elements\db\MuseumplusItemQuery;
 
 use Craft;
 use craft\base\Element;
@@ -20,14 +21,14 @@ use craft\models\FieldLayout;
 use craft\models\TagGroup;
 
 /**
- *  Element Item
+ *  Element MuseumplusItem
  *
  *
  * @author    Furbo GmbH
  * @package   MuseumplusForCraftcms
  * @since     1.0.0
  */
-class Item  extends Element
+class MuseumplusItem  extends Element
 {
     // Public Properties
     // =========================================================================
@@ -86,11 +87,6 @@ class Item  extends Element
         return true;
     }
 
-    public static function find(): ElementQueryInterface
-    {
-        return new ElementQuery(get_called_class());
-    }
-
     /**
      * Defines the sources that elements of this type may belong to.
      *
@@ -141,7 +137,7 @@ class Item  extends Element
      */
     public function getFieldLayout(): FieldLayout
     {
-        return \Craft::$app->fields->getLayoutByType(Item::class);
+        return \Craft::$app->fields->getLayoutByType(MuseumplusItem::class);
     }
 
     // Indexes, etc.
@@ -206,7 +202,7 @@ class Item  extends Element
 
         if ($isNew) {
             Craft::$app->db->createCommand()
-                ->insert('{{%items}}', [
+                ->insert('{{%museumplus_items}}', [
                     'id' => $this->id,
                     'collectionId' => $this->collectionId,
                     'data' => $this->data
@@ -214,7 +210,7 @@ class Item  extends Element
                 ->execute();
         } else {
             Craft::$app->db->createCommand()
-                ->update('{{%items}}', [
+                ->update('{{%museumplus_items}}', [
                     'data' => $this->data,
                     'collectionId' => $this->collectionId,
                 ], ['id' => $this->id])
@@ -265,5 +261,10 @@ class Item  extends Element
      */
     public function afterMoveInStructure(int $structureId): void
     {
+    }
+
+    public static function find(): ElementQueryInterface
+    {
+        return new MuseumplusItemQuery(static::class);
     }
 }

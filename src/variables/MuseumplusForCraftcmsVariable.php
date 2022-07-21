@@ -51,7 +51,7 @@ class MuseumplusForCraftcmsVariable
             $ret = [];
             foreach ($objectGroups as $og) {
                 $title = $og->OgrNameTxt;
-                if (strlen($title)) {
+                if (strlen($title) > 60) {
                     $title = substr($title, 0, 60). '...';
                 }
                 $ret[$og->id] = $title;
@@ -68,7 +68,7 @@ class MuseumplusForCraftcmsVariable
             $ret = [];
             foreach ($exhibitions as $ex) {
                 $title = $ex->ExhExhibitionTitleVrt;
-                if (strlen($title)) {
+                if (strlen($title) > 60) {
                     $title = substr($title, 0, 60). '...';
                 }
 

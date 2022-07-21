@@ -11,9 +11,12 @@
 namespace furbo\museumplusforcraftcms\services;
 
 use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
+use furbo\museumplusforcraftcms\elements\MuseumplusItem;
 
 use Craft;
 use craft\base\Component;
+use craft\helpers\App;
+
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
@@ -33,6 +36,8 @@ use GuzzleHttp\Psr7\Request;
 class Collection extends Component
 {
 
+    const QUERY_LIMIT = 10000;
+
     private $client = null;
 
     private $classifier = null;
@@ -41,9 +46,7 @@ class Collection extends Component
 
     public function getObjectDetail($objectId)
     {
-
         $this->init();
-
         $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/'.$objectId.'/', $this->requestHeaders);
         $res = $this->client->sendAsync($request)->wait();
         dd($res->getBody());
@@ -58,7 +61,7 @@ class Collection extends Component
             <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
               <modules>
               <module name="Object">
-                <search limit="1000" offset="0">
+                <search limit="'.self::QUERY_LIMIT.'" offset="0">
                   <expert>
                     <and>
                       <equalsField fieldPath="ObjObjectGroupsRef" operand="'.$groupId.'" />
@@ -70,24 +73,39 @@ class Collection extends Component
             </application>';
         $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/search/', $this->requestHeaders, $body);
         $res = $this->client->sendAsync($request)->wait();
-        dd($res->getBody());
+        $objects = $this->createDataFromResponse($res);
+        return $objects;
     }
 
     public function getObjectsByExhibition($exhibitionId)
     {
 
+        dd('sorry, not implpemented');
+
         $this->init();
 
-        //TODO: find exhibition title first
+        // find exhibition title first
+        $exhibitions = $this->getExhibitions();
+        dd($exhibitions);
+        $title = null;
+        foreach ($exhibitions as $exhibition) {
+            if ($exhibition->id == $exhibitionId) {
+                $title = $exhibition->ExhExhibitionTitleVrt;
+            }
+        }
+
+        if (empty($title)) {
+            return [];
+        }
 
         $body = '<?xml version="1.0" encoding="UTF-8"?>
             <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
               <modules>
               <module name="Object">
-                <search limit="1000" offset="0">
+                <search limit="'.self::QUERY_LIMIT.'" offset="0">
                   <expert>
                     <and>
-                      <equalsField fieldPath="ObjExhibitionsVrt" operand="Afrikanische Meister, Museum Rietberg, Zürich" />
+                      <equalsField fieldPath="ObjExhibitionsVrt" operand="'.$title.'" />
                     </and>
                   </expert>
                 </search>
@@ -96,7 +114,8 @@ class Collection extends Component
             </application>';
         $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/search/', $this->requestHeaders, $body);
         $res = $this->client->sendAsync($request)->wait();
-        dd($res->getBody());
+        $objects = $this->createDataFromResponse($res);
+        return $objects;
 
     }
 
@@ -109,7 +128,7 @@ class Collection extends Component
             <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
               <modules>
                 <module name="ObjectGroup">
-                  <search limit="1000" offset="0">
+                  <search limit="'.self::QUERY_LIMIT.'" offset="0">
                     <select>
                       <field fieldPath="__id"/>
                       <field fieldPath="OgrNameTxt"/>
@@ -147,7 +166,7 @@ class Collection extends Component
             <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
               <modules>
                 <module name="Exhibition">
-                  <search limit="1000" offset="0">
+                  <search limit="'.self::QUERY_LIMIT.'" offset="0">
                     <select>
                       <field fieldPath="__id"/>
                       <field fieldPath="ExhExhibitionTitleVrt"/>
@@ -178,6 +197,7 @@ class Collection extends Component
 
     public function init():void {
         parent::init();
+        App::maxPowerCaptain();
         if (empty($this->client)) {
 
             $settings = MuseumplusForCraftcms::$plugin->getSettings();
@@ -223,6 +243,8 @@ class Collection extends Component
         $this->addFieldValuesToObject($object, $tmp, 'systemField');
         $this->addFieldValuesToObject($object, $tmp, 'dataField');
         $this->addFieldValuesToObject($object, $tmp, 'virtualField');
+
+        //$object->rawData = $xmlObject->asXML();
 
         return $object;
     }
