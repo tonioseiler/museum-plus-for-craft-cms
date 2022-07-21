@@ -68,7 +68,7 @@ class MuseumplusItem  extends Element
      */
     public static function hasTitles(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -102,7 +102,7 @@ class MuseumplusItem  extends Element
                'key' => '*',
                'label' => Craft::t('app', 'All'),
                'criteria' => [],
-               'hasThumbs' => true
+               'hasThumbs' => false
            ]
         ];
         return $sources;
@@ -277,16 +277,8 @@ class MuseumplusItem  extends Element
     protected static function defineTableAttributes(): array
     {
         return [
-            'title' => \Craft::t('app', 'Title')
+            'title' => 'Title',
+            'collectionId' => 'Collection Id'
         ];
     }
-
-    protected static function defineSortOptions(): array
-{
-    return [
-        'title' => \Craft::t('app', 'Title')
-    ];
-}
-
-
 }
