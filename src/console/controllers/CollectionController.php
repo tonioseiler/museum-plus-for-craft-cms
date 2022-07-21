@@ -83,11 +83,11 @@ class CollectionController extends Controller
             //create new
             $item = new MuseumplusItem();
             $item->collectionId = $collectionId;
-            $item->data = json_encode($object, true);
+            $item->data = json_encode($object);
             $success = Craft::$app->elements->saveElement($item);
         } else {
             //update
-            $item->data = json_encode($object, true);
+            $item->data = json_encode($object);
             $success = Craft::$app->elements->saveElement($item);
         }
         echo '.';

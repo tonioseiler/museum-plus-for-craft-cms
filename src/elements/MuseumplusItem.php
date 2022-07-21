@@ -267,4 +267,20 @@ class MuseumplusItem  extends Element
     {
         return new MuseumplusItemQuery(static::class);
     }
+
+    protected static function defineTableAttributes(): array
+    {
+        return [
+            'title' => \Craft::t('app', 'Title')
+        ];
+    }
+
+    protected static function defineSortOptions(): array
+{
+    return [
+        'title' => \Craft::t('app', 'Title')
+    ];
+}
+
+
 }

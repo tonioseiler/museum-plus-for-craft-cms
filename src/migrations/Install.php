@@ -38,8 +38,6 @@ class Install extends Migration
                 null
             );
         }
-
-
         return true;
     }
 

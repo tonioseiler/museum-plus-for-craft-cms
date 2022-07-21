@@ -1,9 +1,5 @@
 {% extends '_layouts/elementindex.twig' %}
 
-{% set title = craft.museumplusForCraftcms.cpTitle~' - Items' %}
-
-{% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\museumplusforcraftcms\\MuseumplusForCraftcmsAsset") %}
-{% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\collectioncpsection\\CollectionCPSectionAsset") %}
-
-
 {% set elementType = 'furbo\\museumplusforcraftcms\\elements\\MuseumplusItem' %}
+
+{% set title = craft.museumplusForCraftcms.cpTitle~' - Items' %}
