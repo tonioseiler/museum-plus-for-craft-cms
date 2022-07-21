@@ -189,10 +189,12 @@ class MuseumplusForCraftCms extends Plugin
             }
         );
 
+        // Executed After Settings are saved
         Event::on(
             Plugin::class,
-            Plugin::EVENT_BEFORE_SAVE_SETTINGS,
+            Plugin::EVENT_AFTER_SAVE_SETTINGS,
             function (Event $event) {
+                //save field layout
                 $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost('settings');
                 $fieldLayout->type = Item::class;
                 Craft::$app->getFields()->saveLayout($fieldLayout);
