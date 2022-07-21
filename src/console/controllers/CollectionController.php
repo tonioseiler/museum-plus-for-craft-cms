@@ -54,7 +54,7 @@ class CollectionController extends Controller
      *
      * @return mixed
      */
-    public function actionIndex()
+    public function actionImport()
     {
         $result = 'something';
 
@@ -63,20 +63,4 @@ class CollectionController extends Controller
         return $result;
     }
 
-    /**
-     * Handle museum-plus-for-craft-cms/collection/do-something console commands
-     *
-     * The first line of this method docblock is displayed as the description
-     * of the Console Command in ./craft help
-     *
-     * @return mixed
-     */
-    public function actionDoSomething()
-    {
-        $result = 'something';
-
-        echo "Welcome to the console CollectionController actionDoSomething() method\n";
-
-        return $result;
-    }
 }

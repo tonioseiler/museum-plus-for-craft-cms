@@ -189,7 +189,7 @@ class MuseumplusForCraftCms extends Plugin
             }
         );
 
-        // Executed After Settings are saved
+        // Executed after settings are saved
         Event::on(
             Plugin::class,
             Plugin::EVENT_AFTER_SAVE_SETTINGS,

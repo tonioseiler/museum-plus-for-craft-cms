@@ -1,46 +1,9 @@
-{# @var craft \craft\web\twig\variables\CraftVariable #}
-{#
-/**
- * MuseumPlus for CraftCMS plugin for Craft CMS 3.x
- *
- * MuseumPlus for CraftCMS index.twig
- *
- * @author    Furbo GmbH
- * @copyright Copyright (c) 2022 Furbo GmbH
- * @link      https://furbo.ch
- * @package   MuseumplusForCraftcms
- * @since     1.0.0
- */
-#}
+{% extends '_layouts/elementindex.twig' %}
 
-{% extends "_layouts/cp" %}
-{% import "_includes/forms" as forms %}
+{% set title = craft.museumplusForCraftcms.cpTitle~' - Items' %}
 
 {% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\museumplusforcraftcms\\MuseumplusForCraftcmsAsset") %}
 {% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\collectioncpsection\\CollectionCPSectionAsset") %}
 
-{# Link for the ? icon at the bottom of the page #}
-{% set docsUrl = "???" %}
 
-{# The title of this CP section #}
-{% set title = craft.museumplusForCraftcms.cpTitle~' - Items' %}
-
-{# The URL to this plugin's base CP section #}
-{% set pluginCpUrl = url('museum-plus-for-craft-cms') %}
-
-{# Get a URL to an image in our AssetBundle #}
-{% set iconUrl = view.getAssetManager().getPublishedUrl('@furbo/museumplusforcraftcms/assetbundles/collectioncpsection/dist', true) ~ '/img/Collection-icon.svg' %}
-
-{# Content that should appear in the page header#}
-{% set extraPageHeaderHtml %}
-    <div class="buttons">
-        <a href="{{ pluginCpUrl }}" class="btn submit add icon">{{ "Click Me!"|t('museum-plus-for-craft-cms') }}</a>
-    </div>
-{% endset %}
-
-{# The content of the CP Section#}
-{% set content %}
-    <h2>{{ "Collection CP Section body goes here"|t('museum-plus-for-craft-cms') }}</h2>
-    <img src="{{ iconUrl }}" height="64" width="64" />
-    <p class="textline"></p>
-{% endset %}
+{% set elementType = 'furbo\\museumplusforcraftcms\\elements\\Item' %}

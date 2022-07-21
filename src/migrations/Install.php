@@ -20,6 +20,7 @@ class Install extends Migration
             $this->createTable('{{%items}}', [
                 'id' => $this->integer()->notNull(),
                 'data' => $this->text()->null(),
+                'collectionId' => integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid(),
