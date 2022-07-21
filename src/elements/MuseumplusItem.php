@@ -68,7 +68,7 @@ class MuseumplusItem  extends Element
      */
     public static function hasTitles(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -97,8 +97,14 @@ class MuseumplusItem  extends Element
      */
     protected static function defineSources(string $context = null): array
     {
-        $sources = [];
-
+        $sources = [
+           [
+               'key' => '*',
+               'label' => Craft::t('app', 'All'),
+               'criteria' => [],
+               'hasThumbs' => true
+           ]
+        ];
         return $sources;
     }
 
