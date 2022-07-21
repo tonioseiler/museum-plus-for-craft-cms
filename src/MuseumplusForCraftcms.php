@@ -189,6 +189,16 @@ class MuseumplusForCraftCms extends Plugin
             }
         );
 
+        Event::on(
+            Plugin::class,
+            Plugin::EVENT_BEFORE_SAVE_SETTINGS,
+            function (Event $event) {
+                $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost('settings');
+                $fieldLayout->type = Item::class;
+                Craft::$app->getFields()->saveLayout($fieldLayout);
+            }
+        );
+
 /**
  * Logging in Craft involves using one of the following methods:
  *
