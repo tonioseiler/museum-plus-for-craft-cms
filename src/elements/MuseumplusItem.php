@@ -68,7 +68,7 @@ class MuseumplusItem  extends Element
      */
     public static function hasTitles(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -277,8 +277,19 @@ class MuseumplusItem  extends Element
     protected static function defineTableAttributes(): array
     {
         return [
-            'title' => 'Title',
-            'collectionId' => 'Collection Id'
+            'title' => 'Title'
         ];
+    }
+
+    public function __get($name)
+    {
+        $data = json_decode($this->data, true);
+        if ($name == 'attributes') {
+            return $data;
+        } else if (array_key_exists($name, $data)) {
+            return $data[$name];
+        } else {
+            return null;
+        }
     }
 }

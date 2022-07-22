@@ -58,7 +58,7 @@
                 <div class="heading"><label id="settings-objectGroups-label" for="settings-objectGroups">Object Groups</label></div>
                 <div id="settings-objectGroups-instructions" class="instructions"><p>Select the Object Groups you want to import</p></div>
 
-                {{ forms.multiSelect({
+                {{ forms.checkboxSelect({
                     id: 'objectGroups',
                     name: 'objectGroups',
                     options: craft.museumplusForCraftcms.getObjectGroups(),

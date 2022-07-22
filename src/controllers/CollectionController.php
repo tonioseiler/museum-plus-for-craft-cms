@@ -11,6 +11,7 @@
 namespace furbo\museumplusforcraftcms\controllers;
 
 use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
+use furbo\museumplusforcraftcms\elements\MuseumplusItem;
 
 use Craft;
 use craft\web\Controller;
@@ -64,17 +65,45 @@ class CollectionController extends Controller
         return $result;
     }
 
-    /**
-     * Handle a request going to our plugin's actionDoSomething URL,
-     * e.g.: actions/museum-plus-for-craft-cms/collection/do-something
-     *
-     * @return mixed
-     */
-    public function actionEdit()
+    public function actionEdit(int $itemId = null)
     {
-        $result = 'Welcome to the CollectionController actionDoSomething() method';
+        $request = Craft::$app->getRequest();
 
-        return $result;
+        $variables = [];
+
+        // Get the item
+        // ---------------------------------------------------------------------
+        $item = MuseumplusItem::find()
+             ->id($itemId)
+             ->one();
+
+        // Set the variables
+        // ---------------------------------------------------------------------
+
+        $variables['item'] = $item;
+
+
+        // Determine which actions should be available
+        // ---------------------------------------------------------------------
+
+        $variables['actions'] = [];
+
+        // Full page form variables
+
+        $variables['continueEditingUrl'] = 'collection/{id}';
+        $variables['saveShortcutRedirect'] = $variables['continueEditingUrl'];
+
+        // Get the site
+        // ---------------------------------------------------------------------
+
+        $variables['siteIds'] = Craft::$app->getSites()->getEditableSiteIds();
+        $variables['enabledSiteIds'] = [];
+        foreach (Craft::$app->getSites()->getEditableSiteIds() as $site) {
+            $variables['enabledSiteIds'][] = $site;
+        }
+
+        // Render the template
+        return $this->renderTemplate('museum-plus-for-craft-cms/collection/edit', $variables);
     }
 
     public function actionUpdate()

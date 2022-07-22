@@ -24,7 +24,8 @@ class MuseumplusItemQuery extends ElementQuery
 
         // select the collection id column
         $this->query->select([
-            'museumplus_items.collectionId'
+            'museumplus_items.collectionId',
+            'museumplus_items.data'
         ]);
 
         if ($this->collectionId) {
