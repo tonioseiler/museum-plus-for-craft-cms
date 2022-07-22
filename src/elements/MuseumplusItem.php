@@ -71,17 +71,7 @@ class MuseumplusItem  extends Element
         return true;
     }
 
-    /**
-     * Returns whether elements of this type have statuses.
-     *
-     * If this returns `true`, the element index template will show a Status menu
-     * by default, and your elements will get status indicator icons next to them.
-     *
-     * Use [[statuses()]] to customize which statuses the elements might have.
-     *
-     * @return bool Whether elements of this type have statuses.
-     * @see statuses()
-     */
+
     public static function isLocalized(): bool
     {
         return true;
@@ -110,10 +100,10 @@ class MuseumplusItem  extends Element
 
     // Public Methods
     // =========================================================================
-    public function rules(): array
+    /*public function rules(): array
     {
         return [];
-    }
+    }*/
 
     /**
      * Returns whether the current user can edit the element.

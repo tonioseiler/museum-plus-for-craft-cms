@@ -89,8 +89,6 @@ class CollectionController extends Controller
         // Set the title
         $item->title = $request->getBodyParam('title', $item->title);
 
-        dd($request);
-
         //set the custom fields
         $fieldsLocation = $request->getParam('fieldsLocation', 'fields');
         $item->setFieldValuesFromRequest($fieldsLocation);
@@ -102,8 +100,6 @@ class CollectionController extends Controller
                     'errors' => $item->getErrors(),
                 ]);
             }
-
-            dd($item->getErrors());
 
             Craft::$app->getSession()->setError(Craft::t('museum-plus-for-craft-cms', 'Couldn’t save item.'));
 
