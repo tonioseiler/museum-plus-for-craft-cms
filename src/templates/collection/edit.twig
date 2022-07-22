@@ -2,6 +2,8 @@
 {% import "_includes/forms" as forms %}
 
 {% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\museumplusforcraftcms\\MuseumplusForCraftcmsAsset") %}
+{% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\collectioncpsection\\CollectionCPSectionAsset") %}
+
 
 {# The title of this CP section #}
 {% set title = "Collection Item" %}
@@ -27,18 +29,6 @@
 
     <div class="btngroup">
         <input type="submit" class="btn submit" value="{{ 'Save'|t('app') }}">
-
-        <div class="btn submit menubtn"></div>
-        <div class="menu">
-            <ul>
-                <li>
-                    <a class="formsubmit" data-redirect="{{ continueEditingUrl|hash }}">
-                        {{ forms.optionShortcutLabel('S') }}
-                        {{ "Save and continue editing"|t('app') }}
-                    </a>
-                </li>
-            </ul>
-        </div>
     </div>
 
 {% endblock %}
@@ -58,12 +48,11 @@
 
 {# The content of the CP Section#}
 {% block content %}
-    {{ actionInput('museum-plus-for-craft-cms/collection/save') }}
-    {{ redirectInput('museum-plus-for-craft-cms/collection') }}
 
-    {% if item is defined and item.id %}
-        <input type="hidden" name="itemId" value="{{ item.id }}">
-    {% endif %}
+    {# hidden inputs #}
+    {{ actionInput('museum-plus-for-craft-cms/collection/update') }}
+    {{ redirectInput('museum-plus-for-craft-cms/collection') }}
+    <input type="hidden" name="itemId" value="{{ item.id }}">
 
     <div id="fields">
         <div id="tab--museumplusforcraftcms-data" class="flex-fields" data-id="tab--museumplusforcraftcms-data" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-data">
@@ -80,19 +69,25 @@
             {% for key,value in item.attributes %}
                 <div id="fields-{{key}}-field" class="field width-100">
                     <div class="heading">
-                        <label id="fields-{{key}}-label" for="fields-test3">{{key|t('museumplusforcraftcms')}}</label>
+                        <label id="fields-{{key}}-label" for="fields-{{key}}">{{key|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                        <div id="fields-{{key}}-attribute" class="code small light copytextbtn" role="button" tabindex="0">
+                            <input type="text" value="{{key}}" readonly="" size="17" tabindex="-1">
+                        </div>
                     </div>
-                    <div class="ltr">
-                        {% if value is not empty %}
-                            <p>{{value|raw}}</p>
+                    <div class="input ltr">
+                        {% if value|length < 60 %}
+                            <input type="text" id="fields-{{key}}" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[{{key}}]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{value is iterable ? value|join(',') : value}}">
                         {% else %}
-                            <p>–</p>
+                            <textarea id="fields-{{key}}" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[{{key}}]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{value|nl2br}}</textarea>
                         {% endif %}
                     </div>
                 </div>
             {% endfor %}
         </div>
+
         {{ fieldsHtml|raw }}
+
     </div>
 {% endblock %}
 

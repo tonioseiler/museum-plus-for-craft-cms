@@ -82,7 +82,7 @@ class CollectionController extends Controller
             $item = new MuseumplusItem();
             $item->collectionId = $collectionId;
             $item->data = json_encode($object);
-            $item->title = $object['ObjObjectTitleVrt'];
+            $item->title = $object->ObjObjectTitleVrt;
             $success = Craft::$app->elements->saveElement($item);
         } else {
             //update

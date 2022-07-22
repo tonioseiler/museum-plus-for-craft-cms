@@ -22,4 +22,5 @@
  */
 return [
     'MuseumPlus for CraftCMS plugin loaded' => 'MuseumPlus for CraftCMS plugin loaded',
+    'hasAttachments' => 'Item has attachments'
 ];

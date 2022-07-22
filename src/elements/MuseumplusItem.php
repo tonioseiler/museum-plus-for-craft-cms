@@ -110,17 +110,6 @@ class MuseumplusItem  extends Element
 
     // Public Methods
     // =========================================================================
-
-    /**
-     * Returns the validation rules for attributes.
-     *
-     * Validation rules are used by [[validate()]] to check if attribute values are valid.
-     * Child classes may override this method to declare different validation rules.
-     *
-     * More info: http://www.yiiframework.com/doc-2.0/guide-input-validation.html
-     *
-     * @return array
-     */
     public function rules(): array
     {
         return [];
@@ -177,8 +166,14 @@ class MuseumplusItem  extends Element
 
     public function getCpEditUrl(): ?string
     {
-        return 'collection/'.$this->id;
+        return 'museum-plus-for-craft-cms/collection/'.$this->id;
     }
+
+    public static function hasStatuses(): bool
+    {
+        return true;
+    }
+
 
 
     // Events
@@ -280,6 +275,12 @@ class MuseumplusItem  extends Element
             'title' => 'Title'
         ];
     }
+
+    protected static function defineSearchableAttributes(): array
+    {
+        return ['data'];
+    }
+
 
     public function __get($name)
     {

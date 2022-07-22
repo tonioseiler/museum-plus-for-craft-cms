@@ -9,3 +9,12 @@
  * @package   MuseumplusForCraftcms
  * @since     1.0.0
  */
+
+#tab--museumplusforcraftcms-data {
+
+}
+
+#tab--museumplusforcraftcms-data .disabled {
+    opacity: 1;
+    background-color: rgb(242,242,252);
+}

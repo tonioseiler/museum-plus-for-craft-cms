@@ -114,13 +114,11 @@ class MuseumplusForCraftCms extends Plugin
         }
 
         // Register our site routes
-        Event::on(
+        /*Event::on(
             UrlManager::class,
             UrlManager::EVENT_REGISTER_SITE_URL_RULES,
-            function (RegisterUrlRulesEvent $event) {
-                $event->rules['siteActionTrigger1'] = 'museum-plus-for-craft-cms/collection';
-            }
-        );
+            function (RegisterUrlRulesEvent $event) {}
+        );*/
 
         // Register our CP routes
         Event::on(
@@ -261,8 +259,8 @@ class MuseumplusForCraftCms extends Plugin
     protected function getCpRoutes(): array
     {
         return [
-            'collection' => ['template' => 'museum-plus-for-craft-cms/collection'],
-            'collection/<id:\d+>' => 'museum-plus-for-craft-cms/collection/edit'
+            'museum-plus-for-craft-cms/museum-plus-for-craft-cms/collection' => ['template' => 'museum-plus-for-craft-cms/collection'],
+            'museum-plus-for-craft-cms/collection/<itemId:\d+>' => 'museum-plus-for-craft-cms/collection/edit'
         ];
     }
 
@@ -273,11 +271,11 @@ class MuseumplusForCraftCms extends Plugin
         $settings = self::$plugin->getSettings();
 
         $cpNavItem['label'] = $settings['cpTitle'];
-        $cpNavItem['url'] = 'collection';
+        $cpNavItem['url'] = 'museum-plus-for-craft-cms/collection';
 
         $cpNavItem['subnav'] = [];
 
-        $cpNavItem['subnav']['items'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Items'), 'url' => 'collection'];
+        $cpNavItem['subnav']['items'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Items'), 'url' => 'museum-plus-for-craft-cms/collection'];
 
         return $cpNavItem;
     }

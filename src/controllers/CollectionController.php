@@ -1,12 +1,12 @@
 <?php
 /**
- * MuseumPlus for CraftCMS plugin for Craft CMS 3.x
- *
- * Allows to import MuseumsPlus Collection data to Craft CMS and publish data. Additioanl Web Specific Data can be added to the imported data.
- *
- * @link      https://furbo.ch
- * @copyright Copyright (c) 2022 Furbo GmbH
- */
+* MuseumPlus for CraftCMS plugin for Craft CMS 3.x
+*
+* Allows to import MuseumsPlus Collection data to Craft CMS and publish data. Additioanl Web Specific Data can be added to the imported data.
+*
+* @link      https://furbo.ch
+* @copyright Copyright (c) 2022 Furbo GmbH
+*/
 
 namespace furbo\museumplusforcraftcms\controllers;
 
@@ -17,25 +17,12 @@ use Craft;
 use craft\web\Controller;
 
 /**
- * Collection Controller
- *
- * Generally speaking, controllers are the middlemen between the front end of
- * the CP/website and your plugin’s services. They contain action methods which
- * handle individual tasks.
- *
- * A common pattern used throughout Craft involves a controller action gathering
- * post data, saving it on a model, passing the model off to a service, and then
- * responding to the request appropriately depending on the service method’s response.
- *
- * Action methods begin with the prefix “action”, followed by a description of what
- * the method does (for example, actionSaveIngredient()).
- *
- * https://craftcms.com/docs/plugins/controllers
- *
- * @author    Furbo GmbH
- * @package   MuseumplusForCraftcms
- * @since     1.0.0
- */
+* Collection Controller
+*
+* @author    Furbo GmbH
+* @package   MuseumplusForCraftcms
+* @since     1.0.0
+*/
 class CollectionController extends Controller
 {
 
@@ -43,29 +30,16 @@ class CollectionController extends Controller
     // =========================================================================
 
     /**
-     * @var    bool|array Allows anonymous access to this controller's actions.
-     *         The actions must be in 'kebab-case'
-     * @access protected
-     */
-    protected array|int|bool $allowAnonymous = ['index', 'do-something'];
+    * @var    bool|array Allows anonymous access to this controller's actions.
+    *         The actions must be in 'kebab-case'
+    * @access protected
+    */
+    protected array|int|bool $allowAnonymous = [];
 
     // Public Methods
     // =========================================================================
 
-    /**
-     * Handle a request going to our plugin's index action URL,
-     * e.g.: actions/museum-plus-for-craft-cms/collection
-     *
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        $result = 'Welcome to the CollectionController actionIndex() method';
-
-        return $result;
-    }
-
-    public function actionEdit(int $itemId = null)
+    public function actionEdit(int $itemId)
     {
         $request = Craft::$app->getRequest();
 
@@ -74,8 +48,8 @@ class CollectionController extends Controller
         // Get the item
         // ---------------------------------------------------------------------
         $item = MuseumplusItem::find()
-             ->id($itemId)
-             ->one();
+            ->id($itemId)
+            ->one();
 
         // Set the variables
         // ---------------------------------------------------------------------
@@ -88,10 +62,7 @@ class CollectionController extends Controller
 
         $variables['actions'] = [];
 
-        // Full page form variables
-
-        $variables['continueEditingUrl'] = 'collection/{id}';
-        $variables['saveShortcutRedirect'] = $variables['continueEditingUrl'];
+        $variables['fullPageForm'] = true;
 
         // Get the site
         // ---------------------------------------------------------------------
@@ -108,8 +79,62 @@ class CollectionController extends Controller
 
     public function actionUpdate()
     {
-        $result = 'Welcome to the CollectionController actionDoSomething() method';
+        $this->requirePostRequest();
+        $request = Craft::$app->getRequest();
+        $itemId = $request->getBodyParam('itemId');
+        $item = MuseumplusItem::find()
+            ->id($itemId)
+            ->one();
 
-        return $result;
+        // Set the title
+        $item->title = $request->getBodyParam('title', $item->title);
+
+        dd($request);
+
+        //set the custom fields
+        $fieldsLocation = $request->getParam('fieldsLocation', 'fields');
+        $item->setFieldValuesFromRequest($fieldsLocation);
+
+        // Save it
+        if (!Craft::$app->getElements()->saveElement($item)) {
+            if ($request->getAcceptsJson()) {
+                return $this->asJson([
+                    'errors' => $item->getErrors(),
+                ]);
+            }
+
+            dd($item->getErrors());
+
+            Craft::$app->getSession()->setError(Craft::t('museum-plus-for-craft-cms', 'Couldn’t save item.'));
+
+            Craft::$app->getUrlManager()->setRouteParams([
+                'item' => $item
+            ]);
+
+            return null;
+        }
+
+        if ($request->getAcceptsJson()) {
+            $return = [];
+
+            $return['success'] = true;
+            $return['id'] = $item->id;
+            $return['title'] = $item->title;
+
+            if (!$request->getIsConsoleRequest() && $request->getIsCpRequest()) {
+                $return['cpEditUrl'] = $item->getCpEditUrl();
+            }
+
+            $return['dateCreated'] = DateTimeHelper::toIso8601($item->dateCreated);
+            $return['dateUpdated'] = DateTimeHelper::toIso8601($item->dateUpdated);
+
+            return $this->asJson($return);
+        }
+
+        Craft::$app->getSession()->setNotice(Craft::t('museum-plus-for-craft-cms', 'Item saved.'));
+
+        return $this->redirectToPostedUrl($item);
+
     }
+
 }
