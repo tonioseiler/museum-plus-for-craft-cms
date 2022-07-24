@@ -9,7 +9,7 @@ use furbo\museumplusforcraftcms\elements\MuseumplusItem;
 class MuseumplusItemQuery extends ElementQuery
 {
     public $collectionId;
-
+    
     public function collectionId($value)
     {
         $this->collectionId = $value;
