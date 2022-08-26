@@ -280,7 +280,7 @@ class MuseumplusItem  extends Element
         } else if (array_key_exists($name, $data)) {
             return $data[$name];
         } else {
-            return null;
+            return parent::__get($name);
         }
     }
 }

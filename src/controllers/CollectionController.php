@@ -93,11 +93,13 @@ class CollectionController extends Controller
         $fieldsLocation = $request->getParam('fieldsLocation', 'fields');
         $item->setFieldValuesFromRequest($fieldsLocation);
 
+        //dd($request->getBodyParams());
+
         $item->setScenario(\craft\base\Element::SCENARIO_DEFAULT);
 
         // Save it
-        // TODO: why validation alwaays fails
-        if (!Craft::$app->getElements()->saveElement($item, false)) {
+        // TODO: why does validation always fails
+        if (!Craft::$app->getElements()->saveElement($item, true)) {
             if ($request->getAcceptsJson()) {
                 return $this->asJson([
                     'errors' => $item->getErrors(),
