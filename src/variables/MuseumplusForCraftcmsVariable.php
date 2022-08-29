@@ -79,4 +79,13 @@ class MuseumplusForCraftcmsVariable
             return [];
         }
     }
+
+    public function getVolumes() {
+        $volumes = Craft::$app->volumes->allVolumes;
+        $ret = [];
+        foreach ($volumes as $v) {
+            $ret[$v->id] = $v->name;
+        }
+        return $ret;
+    }
 }

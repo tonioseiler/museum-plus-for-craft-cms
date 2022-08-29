@@ -206,7 +206,7 @@ class Collection extends Component
             $password = $settings['password'];
 
             $options = [
-                'timeout'  => 30.0,
+                'timeout'  => 120.0,
                 'verify' => false,
                 'content-type' => 'application/xml',
                 'auth' => [$username, $password]

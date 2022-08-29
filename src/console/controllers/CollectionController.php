@@ -60,13 +60,27 @@ class CollectionController extends Controller
          $settings = MuseumplusForCraftcms::$plugin->getSettings();
          $collection = MuseumplusForCraftcms::$plugin->collection;
 
+         $objectIds = [];
+
          foreach ($settings['objectGroups'] as $objectGroupId) {
              $objects = $collection->getObjectsByObjectGroup($objectGroupId);
              foreach ($objects as $o) {
+                 $objectIds[$o->id] = $o->id;
                  $this->createOrUpdateItem($o);
              }
          }
-         return null;
+
+         $existingItems = MuseumplusItem::find()
+             ->all();
+
+         foreach ($existingItems as $item) {
+             if (!isset($objectIds[$item->collectionId])) {
+                 $success = Craft::$app->elements->deleteElement($item);
+                 echo 'x';
+             }
+         }
+
+         return true;
      }
 
 

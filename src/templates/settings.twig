@@ -55,6 +55,21 @@
             <hr />
 
             <div class="field">
+                <div class="heading"><label id="settings-attachmentVolumeId-label" for="settings-attachmentVolumeId">Save Attachments</label></div>
+                <div id="settings-attachmentVolumeId-instructions" class="instructions"><p>Where the items attachments should be saved.</p></div>
+
+                {{ forms.select({
+                    id: 'attachmentVolumeId',
+                    name: 'attachmentVolumeId',
+                    options: craft.museumplusForCraftcms.getVolumes(),
+                    value: settings['attachmentVolumeId']})
+                }}
+
+            </div>
+
+            <hr />
+
+            <div class="field">
                 <div class="heading"><label id="settings-objectGroups-label" for="settings-objectGroups">Object Groups</label></div>
                 <div id="settings-objectGroups-instructions" class="instructions"><p>Select the Object Groups you want to import</p></div>
 

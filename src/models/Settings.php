@@ -53,6 +53,8 @@ class Settings extends Model
 
     public $exhibitions = [];
 
+    public $attachmentVolumeId = 0;
+
     // Public Methods
     // =========================================================================
 
