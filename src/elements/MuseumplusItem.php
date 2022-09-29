@@ -262,13 +262,13 @@ class MuseumplusItem  extends Element
     protected static function defineTableAttributes(): array
     {
         return [
-            'title' => 'Title'
+            'collectionId' => 'Museumplus Id'
         ];
     }
 
     protected static function defineSearchableAttributes(): array
     {
-        return ['data'];
+        return ['data', 'collectionId'];
     }
 
     public function getAttachments() {
