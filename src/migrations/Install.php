@@ -19,7 +19,7 @@ class Install extends Migration
             // create the items table
             $this->createTable('{{%museumplus_items}}', [
                 'id' => $this->integer()->notNull(),
-                'data' => $this->text()->null(),
+                'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
@@ -79,7 +79,7 @@ class Install extends Migration
                 null
             );
 
-            
+
 
         }
         return true;

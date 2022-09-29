@@ -239,6 +239,10 @@ class Collection extends Component
         $this->addFieldValuesToObject($object, $tmp, 'systemField');
         $this->addFieldValuesToObject($object, $tmp, 'dataField');
         $this->addFieldValuesToObject($object, $tmp, 'virtualField');
+        $this->addVocabularyValuesToObject($object, $tmp);
+        $this->addRepeatableGroupValuesToObject($object, $tmp);
+        $this->addMultimediaIds($object, $tmp);
+        $this->addObjectRelations($object, $tmp);
 
         //$object->rawData = $xmlObject->asXML();
 
@@ -258,6 +262,91 @@ class Collection extends Component
                     $obj->{$sn} = $sv;
                 }
             }
+        }
+    }
+
+    private function addVocabularyValuesToObject(&$obj, $arr) {
+        if (isset($arr['vocabularyReference'])) {
+            foreach ($arr['vocabularyReference'] as $field) {
+                $sn = $field['@attributes']['name'];
+                $sv = $field['vocabularyReferenceItem']['formattedValue'];
+                $obj->{$sn} = $sv;
+            }
+        }
+    }
+
+    private function addRepeatableGroupValuesToObject(&$obj, $arr) {
+        if (isset($arr['repeatableGroup'])) {
+            foreach ($arr['repeatableGroup'] as $group) {
+                $gn = $group['@attributes']['name'];
+                $groupValues = [];
+                foreach ($group['repeatableGroupItem'] as $groupItem) {
+                    $groupItemObject = new \stdClass();
+
+                    $this->addFieldValuesToObject($groupItemObject, $groupItem, 'systemField');
+                    $this->addFieldValuesToObject($groupItemObject, $groupItem, 'dataField');
+                    $this->addFieldValuesToObject($groupItemObject, $groupItem, 'virtualField');
+                    if ($groupItemObject != new \stdClass())
+                        $groupValues[] = $groupItemObject;
+                }
+                if (!empty($groupValues))
+                    $obj->{$gn} = $groupValues;
+            }
+        }
+    }
+
+    private function addObjectRelations(&$obj, $arr) {
+        if (isset($arr['composite'])) {
+            foreach ($arr['composite'] as $composite) {
+                $relatedObjects = new \stdClass();
+                if (isset($composite['moduleReference'])){
+                    foreach ($composite['moduleReference']['moduleReferenceItem'] as $moduleReferenceItem) {
+                        if (isset($moduleReferenceItem['@attributes']) && isset($moduleReferenceItem['@attributes']['moduleItemId'])) {
+                            $id = $moduleReferenceItem['@attributes']['moduleItemId'];
+                            $fv = $moduleReferenceItem['formattedValue'];
+                            $relatedObjects->{$id} = $fv;
+                        } else {
+                            //dd($moduleReferenceItem);
+                        }
+                    }
+                } else {
+                    if (isset($composite['name'])) {
+                        $cn = $composite['name'];
+                        if ($cn == 'ObjObjectCre') {
+                            if (isset($composite['compositeItem'])) {
+                                foreach ($composite['compositeItem'] as $compositeItem) {
+                                    if (isset($compositeItem['moduleReference'])) {
+                                        foreach ($compositeItem['moduleReference']['moduleReferenceItem'] as $moduleReferenceItem) {
+                                            $id = $moduleReferenceItem['@attributes']['moduleItemId'];
+                                            $fv = $moduleReferenceItem['formattedValue'];
+                                            $relatedObjects->{$id} = $fv;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            $obj->relatedObjects = $relatedObjects;
+        }
+    }
+
+    private function addMultimediaIds(&$obj, $arr) {
+        if (isset($arr['moduleReference'])) {
+            foreach ($arr['moduleReference'] as $ref) {
+                $ids = [];
+                if (isset($ref['moduleReferenceItem'])){
+                    foreach ($ref['moduleReferenceItem'] as $moduleReferenceItem) {
+                        if (isset($moduleReferenceItem['@attributes']) && isset($moduleReferenceItem['@attributes']['moduleItemId'])) {
+                            $ids[] = $moduleReferenceItem['@attributes']['moduleItemId'];
+                        } else {
+                            //dd($moduleReferenceItem);
+                        }
+                    }
+                }
+            }
+            $obj->multiMediaIds = $ids;
         }
     }
 }
