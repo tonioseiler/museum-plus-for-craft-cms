@@ -113,8 +113,8 @@ class CollectionController extends Controller
             */
 
             //assign to
-            Craft::$app->getRelations()->saveRelations($field, $element, $targetIds);
-            
+            //Craft::$app->getRelations()->saveRelations($field, $element, $targetIds);
+
          }
 
 

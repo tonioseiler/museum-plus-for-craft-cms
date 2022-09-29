@@ -36,7 +36,8 @@ use GuzzleHttp\Psr7\Request;
 class Collection extends Component
 {
 
-    const QUERY_LIMIT = 10000;
+    const QUERY_LIMIT = 100;
+    const MAX_ITEMS = 10000000;
 
     private $client = null;
 
@@ -57,23 +58,34 @@ class Collection extends Component
 
         $this->init();
 
-        $body = '<?xml version="1.0" encoding="UTF-8"?>
-            <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
-              <modules>
-              <module name="Object">
-                <search limit="'.self::QUERY_LIMIT.'" offset="0">
-                  <expert>
-                    <and>
-                      <equalsField fieldPath="ObjObjectGroupsRef" operand="'.$groupId.'" />
-                    </and>
-                  </expert>
-                </search>
-              </module>
-            </modules>
-            </application>';
-        $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/search/', $this->requestHeaders, $body);
-        $res = $this->client->sendAsync($request)->wait();
-        $objects = $this->createDataFromResponse($res);
+        $offset = 0;
+        $size = self::MAX_ITEMS;
+        $objects = [];
+
+        while ($offset <= $size) {
+            $body = '<?xml version="1.0" encoding="UTF-8"?>
+                <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
+                  <modules>
+                  <module name="Object">
+                    <search limit="'.self::QUERY_LIMIT.'" offset="'.$offset.'">
+                      <expert>
+                        <and>
+                          <equalsField fieldPath="ObjObjectGroupsRef" operand="'.$groupId.'" />
+                        </and>
+                      </expert>
+                    </search>
+                  </module>
+                </modules>
+                </application>';
+            $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/search/', $this->requestHeaders, $body);
+            $res = $this->client->sendAsync($request)->wait();
+            $tmp = $this->createDataFromResponse($res);
+            $objects = $objects + $tmp['data'];
+            $size = $tmp['size'];
+            $offset += self::QUERY_LIMIT;
+            echo $offset.' / '.$size." downloaded\n";
+        }
+
         return $objects;
     }
 
@@ -82,41 +94,6 @@ class Collection extends Component
 
         dd('sorry, not implpemented');
 
-        $this->init();
-
-        // find exhibition title first
-        $exhibitions = $this->getExhibitions();
-        dd($exhibitions);
-        $title = null;
-        foreach ($exhibitions as $exhibition) {
-            if ($exhibition->id == $exhibitionId) {
-                $title = $exhibition->ExhExhibitionTitleVrt;
-            }
-        }
-
-        if (empty($title)) {
-            return [];
-        }
-
-        $body = '<?xml version="1.0" encoding="UTF-8"?>
-            <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
-              <modules>
-              <module name="Object">
-                <search limit="'.self::QUERY_LIMIT.'" offset="0">
-                  <expert>
-                    <and>
-                      <equalsField fieldPath="ObjExhibitionsVrt" operand="'.$title.'" />
-                    </and>
-                  </expert>
-                </search>
-              </module>
-            </modules>
-            </application>';
-        $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/search/', $this->requestHeaders, $body);
-        $res = $this->client->sendAsync($request)->wait();
-        $objects = $this->createDataFromResponse($res);
-        return $objects;
-
     }
 
 
@@ -124,25 +101,32 @@ class Collection extends Component
     {
         $this->init();
 
-        $body = '<?xml version="1.0" encoding="UTF-8"?>
-            <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
-              <modules>
-                <module name="ObjectGroup">
-                  <search limit="'.self::QUERY_LIMIT.'" offset="0">
-                    <select>
-                      <field fieldPath="__id"/>
-                      <field fieldPath="OgrNameTxt"/>
-                    </select>
-                    <fulltext>*</fulltext>
-                  </search>
-                </module>
-              </modules>
-            </application>';
+        $offset = 0;
+        $size = self::MAX_ITEMS;
+        $objectGroups = [];
 
-        $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/ObjectGroup/search', $this->requestHeaders, $body);
-        $res = $this->client->sendAsync($request)->wait();
-
-        $objectGroups = $this->createDataFromResponse($res);
+        while ($offset <= $size) {
+            $body = '<?xml version="1.0" encoding="UTF-8"?>
+                <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
+                  <modules>
+                    <module name="ObjectGroup">
+                      <search limit="'.self::QUERY_LIMIT.'" offset="'.$offset.'">
+                        <select>
+                          <field fieldPath="__id"/>
+                          <field fieldPath="OgrNameTxt"/>
+                        </select>
+                        <fulltext>*</fulltext>
+                      </search>
+                    </module>
+                  </modules>
+                </application>';
+            $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/ObjectGroup/search', $this->requestHeaders, $body);
+            $res = $this->client->sendAsync($request)->wait();
+            $tmp = $this->createDataFromResponse($res);
+            $objectGroups = $objectGroups + $tmp['data'];
+            $size = $tmp['size'];
+            $offset += self::QUERY_LIMIT;
+        }
 
         //filter out ampty
         $objectGroups = array_filter($objectGroups, function($a) {
@@ -162,26 +146,34 @@ class Collection extends Component
 
         $this->init();
 
-        $body = '<?xml version="1.0" encoding="UTF-8"?>
-            <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
-              <modules>
-                <module name="Exhibition">
-                  <search limit="'.self::QUERY_LIMIT.'" offset="0">
-                    <select>
-                      <field fieldPath="__id"/>
-                      <field fieldPath="ExhExhibitionTitleVrt"/>
-                      <field fieldPath="ExhBeginDateDat"/>
-                      <field fieldPath="ExhDateTxt"/>
-                    </select>
-                    <fulltext>*</fulltext>
-                  </search>
-                </module>
-              </modules>
-            </application>';
-        $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Exhibition/search', $this->requestHeaders, $body);
-        $res = $this->client->sendAsync($request)->wait();
+        $offset = 0;
+        $size = self::MAX_ITEMS;
+        $objectGroups = [];
 
-        $exhibitions = $this->createDataFromResponse($res);
+        while ($offset <= $size) {
+            '<?xml version="1.0" encoding="UTF-8"?>
+                <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
+                  <modules>
+                    <module name="Exhibition">
+                      <search limit="'.self::QUERY_LIMIT.'" offset="'.$offset.'">
+                        <select>
+                          <field fieldPath="__id"/>
+                          <field fieldPath="ExhExhibitionTitleVrt"/>
+                          <field fieldPath="ExhBeginDateDat"/>
+                          <field fieldPath="ExhDateTxt"/>
+                        </select>
+                        <fulltext>*</fulltext>
+                      </search>
+                    </module>
+                  </modules>
+                </application>';
+            $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Exhibition/search', $this->requestHeaders, $body);
+            $res = $this->client->sendAsync($request)->wait();
+            $tmp = $this->createDataFromResponse($res);
+            $exhibitions = $tmp['data'];
+            $size = $tmp['size'];
+            $offset += self::QUERY_LIMIT;
+        }
 
         //filter out ampty
         $exhibitions = array_filter($exhibitions, function($a) {
@@ -206,7 +198,7 @@ class Collection extends Component
             $password = $settings['password'];
 
             $options = [
-                'timeout'  => 120.0,
+                'timeout'  => 300.0,
                 'verify' => false,
                 'content-type' => 'application/xml',
                 'auth' => [$username, $password]
@@ -219,15 +211,19 @@ class Collection extends Component
     }
 
     private function createDataFromResponse($res) {
+        $ret = [
+            'size' => 0,
+            'data' => []
+        ];
         $responseXml = simplexml_load_string($res->getBody()->getContents());
         $totalSize = intval($responseXml->modules->module->attributes()->{'totalSize'}->__toString());
         if (empty($totalSize)) {
-            return [];
+            return $ret;
         } else {
-            $ret = [];
+            $ret['size'] = $totalSize;
             foreach($responseXml->modules->module->moduleItem as $moduleItem) {
                 $obj = $this->createDataObjectFromXML($moduleItem);
-                $ret[] = $obj;
+                $ret['data'][] = $obj;
             }
             return $ret;
         }
