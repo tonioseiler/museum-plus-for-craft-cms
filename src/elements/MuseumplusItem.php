@@ -271,6 +271,26 @@ class MuseumplusItem  extends Element
         return ['data'];
     }
 
+    public function getAttachments() {
+        //TODO: implement
+    }
+
+    public function getMultimediaContents() {
+        //TODO: implement
+    }
+
+    public function getPeople() {
+        //TODO: implement
+    }
+
+    public function getLiterature() {
+        //TODO: implement
+    }
+
+    public function getArchivalien() {
+        //TODO: implement
+    }
+
 
     public function __get($name)
     {

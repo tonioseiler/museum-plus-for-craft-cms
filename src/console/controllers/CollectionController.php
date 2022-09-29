@@ -62,6 +62,7 @@ class CollectionController extends Controller
 
          $objectIds = [];
 
+         //create or update items
          foreach ($settings['objectGroups'] as $objectGroupId) {
              $objects = $collection->getObjectsByObjectGroup($objectGroupId);
              foreach ($objects as $o) {
@@ -70,15 +71,52 @@ class CollectionController extends Controller
              }
          }
 
+         //delete items
          $existingItems = MuseumplusItem::find()
              ->all();
-
          foreach ($existingItems as $item) {
              if (!isset($objectIds[$item->collectionId])) {
                  $success = Craft::$app->elements->deleteElement($item);
                  echo 'x';
              }
          }
+
+         //download attachments
+         foreach ($objectIds as $id) {
+             //get attachment from collection service by id
+             //create asset
+             //$assets = Craft::$app->getAssets();
+             /*$folder = $assets->findFolder(['path' => $path]);
+                if (empty($folder)) {
+                    //create folder
+                    $folder = new \craft\models\VolumeFolder();
+                    $folder->name = $folderPathArr[$i - 1];
+                    $folder->parentId = !empty($parentFolder) ? $parentFolder->id : 1;
+                    $folder->volumeId = 1;
+                    $folder->path = $path;
+
+                    $assets->createFolder($folder);
+                }*/
+            /*
+            // Check the permissions to upload in the resolved folder.
+                $filename = \craft\helpers\Assets::prepareAssetName($uploadedFile->name);
+
+                $asset = new \craft\elements\Asset();
+                $asset->tempFilePath = $tempPath;
+                $asset->filename = $filename;
+                $asset->newFolderId = $folder->id;
+                $asset->volumeId = $folder->volumeId;
+                $asset->avoidFilenameConflicts = true;
+                $asset->setScenario(\craft\elements\Asset::SCENARIO_CREATE);
+
+                Craft::$app->getElements()->saveElement($asset);
+            */
+
+            //assign to
+            Craft::$app->getRelations()->saveRelations($field, $element, $targetIds);
+            
+         }
+
 
          return true;
      }

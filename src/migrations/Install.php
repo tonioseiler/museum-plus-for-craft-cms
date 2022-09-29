@@ -37,6 +37,50 @@ class Install extends Migration
                 'CASCADE',
                 null
             );
+
+
+            $this->createTable('{{%museumplus_literature}}', [
+                'id' => $this->integer()->notNull(),
+                'data' => $this->text()->null(),
+                'collectionId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid(),
+                'PRIMARY KEY(id)',
+            ]);
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName(),
+                '{{%museumplus_literature}}',
+                'id',
+                '{{%elements}}',
+                'id',
+                'CASCADE',
+                null
+            );
+
+            $this->createTable('{{%museumplus_people}}', [
+                'id' => $this->integer()->notNull(),
+                'data' => $this->text()->null(),
+                'collectionId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid(),
+                'PRIMARY KEY(id)',
+            ]);
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName(),
+                '{{%museumplus_people}}',
+                'id',
+                '{{%elements}}',
+                'id',
+                'CASCADE',
+                null
+            );
+
+            
+
         }
         return true;
     }
@@ -46,8 +90,7 @@ class Install extends Migration
      */
     public function safeDown(): bool
     {
-        // Place uninstallation code here...
-
+        $this->dropTable('{{%museumplus_items}}');
         return true;
     }
 }
