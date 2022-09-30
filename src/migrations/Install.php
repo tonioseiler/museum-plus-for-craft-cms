@@ -41,7 +41,7 @@ class Install extends Migration
 
             $this->createTable('{{%museumplus_literature}}', [
                 'id' => $this->integer()->notNull(),
-                'data' => $this->text()->null(),
+                'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
@@ -61,7 +61,7 @@ class Install extends Migration
 
             $this->createTable('{{%museumplus_people}}', [
                 'id' => $this->integer()->notNull(),
-                'data' => $this->text()->null(),
+                'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
