@@ -348,6 +348,9 @@ class Collection extends Component
                 }
             }
             $obj->multiMediaIds = $ids;
+            if (count($ids) > 0) {
+                dd($obj);
+            }
         }
     }
 }

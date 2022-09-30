@@ -76,9 +76,11 @@
                         </div>
                     </div>
                     <div class="input ltr">
+
                     {% if value is iterable %}
+
                         {% for k, v in value %}
-                            {% if value is iterable %}
+                            {% if v is iterable %}
                                 {% for k2, v2 in v %}
                                     {{k2}}: {{v2}}
                                     <br />
