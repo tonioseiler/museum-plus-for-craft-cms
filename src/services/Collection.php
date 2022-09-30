@@ -334,10 +334,11 @@ class Collection extends Component
 
     private function addMultimediaIds(&$obj, $arr) {
         if (isset($arr['moduleReference'])) {
+            $ids = [];
             foreach ($arr['moduleReference'] as $ref) {
-                $ids = [];
                 if (isset($ref['moduleReferenceItem'])){
                     foreach ($ref['moduleReferenceItem'] as $moduleReferenceItem) {
+                        //dd($moduleReferenceItem);
                         if (isset($moduleReferenceItem['@attributes']) && isset($moduleReferenceItem['@attributes']['moduleItemId'])) {
                             $ids[] = $moduleReferenceItem['@attributes']['moduleItemId'];
                         } else {

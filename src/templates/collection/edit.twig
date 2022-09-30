@@ -76,14 +76,29 @@
                         </div>
                     </div>
                     <div class="input ltr">
+                    {% if value is iterable %}
+                        {% for k, v in value %}
+                            {% if value is iterable %}
+                                {% for k2, v2 in v %}
+                                    {{k2}}: {{v2}}
+                                    <br />
+                                {% endfor %}
+                            {% else %}
+                                {{k}}: {{v}}
+                                <br />
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
                         {% if value|length < 60 %}
                             <input type="text" id="fields-{{key}}" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[{{key}}]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{value is iterable ? value|join(',') : value}}">
                         {% else %}
                             <textarea id="fields-{{key}}" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[{{key}}]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{value|nl2br}}</textarea>
                         {% endif %}
+                    {% endif %}
                     </div>
                 </div>
             {% endfor %}
+
         </div>
 
         {{ fieldsHtml|raw }}
