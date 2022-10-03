@@ -271,6 +271,10 @@ class MuseumplusItem  extends Element
         return ['data', 'collectionId'];
     }
 
+    public function getRelatedItems() {
+        //TODO: implement
+    }
+
     public function getAttachments() {
         //TODO: implement
     }
