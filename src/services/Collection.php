@@ -80,11 +80,15 @@ class Collection extends Component
             $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/search/', $this->requestHeaders, $body);
             $res = $this->client->sendAsync($request)->wait();
             $tmp = $this->createDataFromResponse($res);
-            $objects = $objects + $tmp['data'];
+            foreach($tmp['data'] as $d) {
+                $objects[] = $d;
+            }
             $size = $tmp['size'];
             $offset += self::QUERY_LIMIT;
-            echo $offset.' / '.$size." downloaded\n";
+            echo count($objects).' / '.$size." downloaded\n";
         }
+
+        echo count($objects);
 
         return $objects;
     }
