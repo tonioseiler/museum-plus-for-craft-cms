@@ -14,7 +14,13 @@
 
 {% set fieldLayout = item.getFieldLayout() %}
 {% set form = fieldLayout.createForm(item) %}
-{% set firstTab = {
+{% set firstTabs = {
+    "tab--museumplusforcraftcms-data-title": {
+        "tabId": "tab-tab--museumplusforcraftcms-data-title",
+        "label": "Title",
+        "url": "#tab--museumplusforcraftcms-data-title",
+        "class": null
+    },
     "tab--museumplusforcraftcms-data": {
         "tabId": "tab-tab--museumplusforcraftcms-data",
         "label": "Museumplus Data",
@@ -22,7 +28,7 @@
         "class": null
     }
 } %}
-{% set tabs = firstTab|merge(form.getTabMenu()) %}
+{% set tabs = firstTabs|merge(form.getTabMenu()) %}
 {% set fieldsHtml = form.render(false) %}
 
 {% block actionButton %}
@@ -55,7 +61,7 @@
     <input type="hidden" name="itemId" value="{{ item.id }}">
 
     <div id="fields">
-        <div id="tab--museumplusforcraftcms-data" class="flex-fields" data-id="tab--museumplusforcraftcms-data" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-data">
+        <div id="tab--museumplusforcraftcms-data-title" class="flex-fields" data-id="tab--museumplusforcraftcms-data-title" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-data-title">
             {{ forms.textField({
                 label: 'Title'|t(),
                 id: 'title',
@@ -63,44 +69,47 @@
                 value: item.title,
                 instructions: ''
             }) }}
+        </div>
 
-            <h2>Importierte Daten</h2>
+        <div id="tab--museumplusforcraftcms-data" class="flex-fields hidden" data-id="tab--museumplusforcraftcms-data" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-data">
 
-            {% for key,value in item.attributes %}
-                <div id="fields-{{key}}-field" class="field width-100">
-                    <div class="heading">
-                        <label id="fields-{{key}}-label" for="fields-{{key}}">{{key|t('museum-plus-for-craft-cms')}}</label>
-                        <div class="flex-grow"></div>
-                        <div id="fields-{{key}}-attribute" class="code small light copytextbtn" role="button" tabindex="0">
-                            <input type="text" value="{{key}}" readonly="" size="17" tabindex="-1">
+                {% for key,value in item.attributes %}
+                    <div id="fields-{{key}}-field" class="field width-100">
+                        <div class="heading">
+                            <label id="fields-{{key}}-label" for="fields-{{key}}">{{key|t('museum-plus-for-craft-cms')}}</label>
+                            <div class="flex-grow"></div>
+                            <div id="fields-{{key}}-attribute" class="code small light copytextbtn" role="button" tabindex="0">
+                                <input type="text" value="{{key}}" readonly="" size="17" tabindex="-1">
+                            </div>
+                        </div>
+                        <div class="input ltr">
+
+                        {% if value is iterable %}
+
+                            {% for k, v in value %}
+                                {% if v is iterable %}
+                                    {% for k2, v2 in v %}
+                                        {% if key == 'multiMediaObjects' %}
+                                            {{dump(v2)}}
+                                        {% endif %}
+                                        {{k2}}: {{v2}}
+                                        <br />
+                                    {% endfor %}
+                                {% else %}
+                                    {{k}}: {{v}}
+                                    <br />
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% if value|length < 60 %}
+                                <input type="text" id="fields-{{key}}" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[{{key}}]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{value is iterable ? value|join(',') : value}}">
+                            {% else %}
+                                <textarea id="fields-{{key}}" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[{{key}}]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{value|nl2br}}</textarea>
+                            {% endif %}
+                        {% endif %}
                         </div>
                     </div>
-                    <div class="input ltr">
-
-                    {% if value is iterable %}
-
-                        {% for k, v in value %}
-                            {% if v is iterable %}
-                                {% for k2, v2 in v %}
-                                    {{k2}}: {{v2}}
-                                    <br />
-                                {% endfor %}
-                            {% else %}
-                                {{k}}: {{v}}
-                                <br />
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        {% if value|length < 60 %}
-                            <input type="text" id="fields-{{key}}" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[{{key}}]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{value is iterable ? value|join(',') : value}}">
-                        {% else %}
-                            <textarea id="fields-{{key}}" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[{{key}}]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{value|nl2br}}</textarea>
-                        {% endif %}
-                    {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-
+                {% endfor %}
         </div>
 
         {{ fieldsHtml|raw }}

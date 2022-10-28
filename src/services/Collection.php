@@ -50,7 +50,7 @@ class Collection extends Component
         $this->init();
         $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/'.$objectId.'/', $this->requestHeaders);
         $res = $this->client->sendAsync($request)->wait();
-        dd($res->getBody());
+        //dd($res->getBody());
     }
 
     public function getObjectsByObjectGroup($groupId)
@@ -241,7 +241,9 @@ class Collection extends Component
         $this->addFieldValuesToObject($object, $tmp, 'virtualField');
         $this->addVocabularyValuesToObject($object, $tmp);
         $this->addRepeatableGroupValuesToObject($object, $tmp);
-        $this->addMultimediaIds($object, $tmp);
+        $this->addMultimediaReferences($object, $tmp);
+        $this->addObjectGroupReferences($object, $tmp);
+        $this->addLiteratureReferences($object, $tmp);
         $this->addObjectRelations($object, $tmp);
 
         //$object->rawData = $xmlObject->asXML();
@@ -295,7 +297,40 @@ class Collection extends Component
         }
     }
 
+    private function getModuleReferencesByName($arr, $type) {
+        $ret = [];
+        if (isset($arr['moduleReference'])) {
+            foreach ($arr['moduleReference'] as $ref) {
+                if ($ref['@attributes']['name'] == $type) {
+                    if (isset($ref['moduleReferenceItem'])){
+                        if ($ref['@attributes']['size'] == '1') {
+                            if (isset($ref['moduleReferenceItem']) && isset($ref['moduleReferenceItem']['@attributes']['moduleItemId'])) {
+                                $id = $ref['moduleReferenceItem']['@attributes']['moduleItemId'];
+                                $title = $ref['moduleReferenceItem']['formattedValue'];
+                                $ret[$id] = $title;
+                            }
+                        } else {
+                            foreach ($ref['moduleReferenceItem'] as $moduleReferenceItem) {
+                                if (isset($moduleReferenceItem['@attributes']) && isset($moduleReferenceItem['@attributes']['moduleItemId'])) {
+                                    $id = $moduleReferenceItem['@attributes']['moduleItemId'];
+                                    $title = $moduleReferenceItem['formattedValue'];
+                                    $ret[$id] = $title;
+                                } else {
+                                    //dd($moduleReferenceItem);
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $ret;
+    }
+
     private function addObjectRelations(&$obj, $arr) {
+
+        // related objects
         if (isset($arr['composite'])) {
             foreach ($arr['composite'] as $composite) {
                 $relatedObjects = new \stdClass();
@@ -330,27 +365,19 @@ class Collection extends Component
             }
             $obj->relatedObjects = $relatedObjects;
         }
+
+        // obecjt groups
     }
 
-    private function addMultimediaIds(&$obj, $arr) {
-        if (isset($arr['moduleReference'])) {
-            $ids = [];
-            foreach ($arr['moduleReference'] as $ref) {
-                if (isset($ref['moduleReferenceItem'])){
-                    foreach ($ref['moduleReferenceItem'] as $moduleReferenceItem) {
-                        //dd($moduleReferenceItem);
-                        if (isset($moduleReferenceItem['@attributes']) && isset($moduleReferenceItem['@attributes']['moduleItemId'])) {
-                            $ids[] = $moduleReferenceItem['@attributes']['moduleItemId'];
-                        } else {
-                            //dd($moduleReferenceItem);
-                        }
-                    }
-                }
-            }
-            $obj->multiMediaIds = $ids;
-            if (count($ids) > 0) {
-                dd($obj);
-            }
-        }
+    private function addMultimediaReferences(&$obj, $arr) {
+        $obj->multiMediaObjects = $this->getModuleReferencesByName($arr, 'ObjMultimediaRef');
+    }
+
+    private function addObjectGroupReferences(&$obj, $arr) {
+        $obj->objectGroups = $this->getModuleReferencesByName($arr, 'ObjObjectGroupsRef');
+    }
+
+    private function addLiteratureReferences(&$obj, $arr) {
+        $obj->literature = $this->getModuleReferencesByName($arr, 'ObjLiteratureRef');
     }
 }

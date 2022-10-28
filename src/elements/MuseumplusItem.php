@@ -272,7 +272,15 @@ class MuseumplusItem  extends Element
     }
 
     public function getRelatedItems() {
-        //TODO: implement
+        /*$items = [];
+
+        foreach($this->relatedObjects as $collectionId => $title) {
+            $rel = self::find()->collectionId($collectionId)->all();
+            dd($collectionId);
+            dd($rel);
+        }
+
+        dd();*/
     }
 
     public function getAttachments() {
