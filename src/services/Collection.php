@@ -375,6 +375,13 @@ class Collection extends Component
 
     private function addMultimediaReferences(&$obj, $arr) {
         $obj->multiMediaObjects = $this->getModuleReferencesByName($arr, 'ObjMultimediaRef');
+
+        //neu
+        // - objekte in der zwischentabelle löschen mit diesem name
+        // - bei bedarf referenzobjekte erstellen (inkl typ) und eintrag in zwischentabelle machen.
+        // - am schluss muss noch überprüft werden, welche referenzobjekt gar keinen Eintrag mehr in der pivot tabelle haben.
+        
+
     }
 
     private function addObjectGroupReferences(&$obj, $arr) {
