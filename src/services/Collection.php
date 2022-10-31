@@ -56,12 +56,12 @@ class Collection extends Component
     public function getObjectsByObjectGroup($groupId)
     {
 
-        $this->init();
-
-        $offset = 0;
-        $size = self::MAX_ITEMS;
-        $objects = [];
-
+      $this->init();
+      
+      $offset = 0;
+      $size = self::MAX_ITEMS;
+      $objects = [];
+      
         while ($offset <= $size) {
             $body = '<?xml version="1.0" encoding="UTF-8"?>
                 <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
@@ -349,7 +349,7 @@ class Collection extends Component
             }
             $obj->multiMediaIds = $ids;
             if (count($ids) > 0) {
-                dd($obj);
+                //dd($obj);
             }
         }
     }

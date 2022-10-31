@@ -57,9 +57,10 @@ class CollectionController extends Controller
      */
      public function actionImport()
      {
-        $settings = MuseumplusForCraftcms::$plugin->getSettings();
-        $collection = MuseumplusForCraftcms::$plugin->collection;
-
+         $settings = MuseumplusForCraftcms::$plugin->getSettings();
+         $collection = MuseumplusForCraftcms::$plugin->collection;
+         
+         
         $objectIds = [];
 
         //create or update items
@@ -70,6 +71,7 @@ class CollectionController extends Controller
                 $this->createOrUpdateItem($o);
             }
         }
+
 
         //delete items
         $existingItems = MuseumplusItem::find()
@@ -83,6 +85,7 @@ class CollectionController extends Controller
 
         //download attachments
         foreach ($objectIds as $id) {
+            //echo $id['multiMediaIds'];
             //get attachment from collection service by id
             //create asset
             //$assets = Craft::$app->getAssets();
