@@ -50,7 +50,7 @@ class Collection extends Component
         $this->init();
         $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/'.$objectId.'/', $this->requestHeaders);
         $res = $this->client->sendAsync($request)->wait();
-        dd($res->getBody());
+        //dd($res->getBody());
     }
 
     public function getObjectsByObjectGroup($groupId)
@@ -80,13 +80,53 @@ class Collection extends Component
             $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/search/', $this->requestHeaders, $body);
             $res = $this->client->sendAsync($request)->wait();
             $tmp = $this->createDataFromResponse($res);
-            $objects = $objects + $tmp['data'];
+            foreach($tmp['data'] as $d) {
+                $objects[] = $d;
+            }
             $size = $tmp['size'];
             $offset += self::QUERY_LIMIT;
-            echo $offset.' / '.$size." downloaded\n";
+            echo "groupId: " . $groupId . " / " . count($objects).' / '.$size." downloaded\n";
         }
 
+        echo count($objects);
+
         return $objects;
+    }
+
+    public function getAttachmentByObjectId($objectId)
+    {
+        $this->init();
+        try {
+            $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Object/' . $objectId . '/attachment', $this->requestHeaders);
+            $res = $this->client->sendAsync($request)->wait();
+            $responseXml = simplexml_load_string($res->getBody()->getContents());
+            if ($responseXml->modules->module->moduleItem->attachment->attributes()->{"name"}) {
+                $fileName = $responseXml->modules->module->moduleItem->attachment->attributes()->{"name"}->__toString();
+            } else {
+                return false;
+            }
+            if ($responseXml->modules->module->moduleItem->attachment->value) {
+                $base64 = $responseXml->modules->module->moduleItem->attachment->value->__toString();
+            } else {
+                return false;
+            }
+            return $this->base64_to_file($base64, $fileName);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    private function base64_to_file($base64_string, $output_file) {
+        $output_file = Craft::$app->getPath()->getTempPath()."/".$output_file;
+        // open the output file for writing
+        $ifp = fopen( $output_file, 'wb' );
+
+        fwrite( $ifp, base64_decode( $base64_string ) );
+
+        // clean up the file resource
+        fclose( $ifp );
+
+        return $output_file;
     }
 
     public function getObjectsByExhibition($exhibitionId)
@@ -241,7 +281,9 @@ class Collection extends Component
         $this->addFieldValuesToObject($object, $tmp, 'virtualField');
         $this->addVocabularyValuesToObject($object, $tmp);
         $this->addRepeatableGroupValuesToObject($object, $tmp);
-        $this->addMultimediaIds($object, $tmp);
+        $this->addMultimediaReferences($object, $tmp);
+        $this->addObjectGroupReferences($object, $tmp);
+        $this->addLiteratureReferences($object, $tmp);
         $this->addObjectRelations($object, $tmp);
 
         //$object->rawData = $xmlObject->asXML();
@@ -295,7 +337,40 @@ class Collection extends Component
         }
     }
 
+    private function getModuleReferencesByName($arr, $type) {
+        $ret = [];
+        if (isset($arr['moduleReference'])) {
+            foreach ($arr['moduleReference'] as $ref) {
+                if ($ref['@attributes']['name'] == $type) {
+                    if (isset($ref['moduleReferenceItem'])){
+                        if ($ref['@attributes']['size'] == '1') {
+                            if (isset($ref['moduleReferenceItem']) && isset($ref['moduleReferenceItem']['@attributes']['moduleItemId'])) {
+                                $id = $ref['moduleReferenceItem']['@attributes']['moduleItemId'];
+                                $title = $ref['moduleReferenceItem']['formattedValue'];
+                                $ret[$id] = $title;
+                            }
+                        } else {
+                            foreach ($ref['moduleReferenceItem'] as $moduleReferenceItem) {
+                                if (isset($moduleReferenceItem['@attributes']) && isset($moduleReferenceItem['@attributes']['moduleItemId'])) {
+                                    $id = $moduleReferenceItem['@attributes']['moduleItemId'];
+                                    $title = $moduleReferenceItem['formattedValue'];
+                                    $ret[$id] = $title;
+                                } else {
+                                    //dd($moduleReferenceItem);
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $ret;
+    }
+
     private function addObjectRelations(&$obj, $arr) {
+
+        // related objects
         if (isset($arr['composite'])) {
             foreach ($arr['composite'] as $composite) {
                 $relatedObjects = new \stdClass();
@@ -330,27 +405,27 @@ class Collection extends Component
             }
             $obj->relatedObjects = $relatedObjects;
         }
+
+        // obecjt groups
     }
 
-    private function addMultimediaIds(&$obj, $arr) {
-        if (isset($arr['moduleReference'])) {
-            $ids = [];
-            foreach ($arr['moduleReference'] as $ref) {
-                if (isset($ref['moduleReferenceItem'])){
-                    foreach ($ref['moduleReferenceItem'] as $moduleReferenceItem) {
-                        //dd($moduleReferenceItem);
-                        if (isset($moduleReferenceItem['@attributes']) && isset($moduleReferenceItem['@attributes']['moduleItemId'])) {
-                            $ids[] = $moduleReferenceItem['@attributes']['moduleItemId'];
-                        } else {
-                            //dd($moduleReferenceItem);
-                        }
-                    }
-                }
-            }
-            $obj->multiMediaIds = $ids;
-            if (count($ids) > 0) {
-                //dd($obj);
-            }
-        }
+
+    private function addMultimediaReferences(&$obj, $arr) {
+        $obj->multiMediaObjects = $this->getModuleReferencesByName($arr, 'ObjMultimediaRef');
+
+        //neu
+        // - objekte in der zwischentabelle löschen mit diesem name
+        // - bei bedarf referenzobjekte erstellen (inkl typ) und eintrag in zwischentabelle machen.
+        // - am schluss muss noch überprüft werden, welche referenzobjekt gar keinen Eintrag mehr in der pivot tabelle haben.
+        
+
+    }
+
+    private function addObjectGroupReferences(&$obj, $arr) {
+        $obj->objectGroups = $this->getModuleReferencesByName($arr, 'ObjObjectGroupsRef');
+    }
+
+    private function addLiteratureReferences(&$obj, $arr) {
+        $obj->literature = $this->getModuleReferencesByName($arr, 'ObjLiteratureRef');
     }
 }

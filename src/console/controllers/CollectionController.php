@@ -10,6 +10,9 @@
 
 namespace furbo\museumplusforcraftcms\console\controllers;
 
+use craft\elements\Asset;
+use craft\helpers\Assets;
+use craft\models\VolumeFolder;
 use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
 use furbo\museumplusforcraftcms\elements\MuseumplusItem;
 
@@ -57,13 +60,10 @@ class CollectionController extends Controller
      */
      public function actionImport()
      {
-         $settings = MuseumplusForCraftcms::$plugin->getSettings();
-         $collection = MuseumplusForCraftcms::$plugin->collection;
-         
-         
-        $objectIds = [];
+        $settings = MuseumplusForCraftcms::$plugin->getSettings();
+        $collection = MuseumplusForCraftcms::$plugin->collection;
 
-        //create or update items
+        $objectIds = [];
         foreach ($settings['objectGroups'] as $objectGroupId) {
             $objects = $collection->getObjectsByObjectGroup($objectGroupId);
             foreach ($objects as $o) {
@@ -72,59 +72,72 @@ class CollectionController extends Controller
             }
         }
 
-
-        //delete items
-        $existingItems = MuseumplusItem::find()
-            ->all();
+        $existingItems = MuseumplusItem::find()->all();
         foreach ($existingItems as $item) {
             if (!isset($objectIds[$item->collectionId])) {
                 $success = Craft::$app->elements->deleteElement($item);
                 echo 'x';
+            }else{
+                $assetId = $this->createAttachmentFromObjectId($objectIds[$item->collectionId]);
+                if($assetId){
+                    echo "[OK]" . $assetId . PHP_EOL;
+                    $item->assetId = $assetId;
+                    Craft::$app->elements->saveElement($item);
+                }else{
+                    echo "[ERROR]" . PHP_EOL;
+                }
             }
         }
-
-        //download attachments
-        foreach ($objectIds as $id) {
-            //echo $id['multiMediaIds'];
-            //get attachment from collection service by id
-            //create asset
-            //$assets = Craft::$app->getAssets();
-            /*$folder = $assets->findFolder(['path' => $path]);
-            if (empty($folder)) {
-                //create folder
-                $folder = new \craft\models\VolumeFolder();
-                $folder->name = $folderPathArr[$i - 1];
-                $folder->parentId = !empty($parentFolder) ? $parentFolder->id : 1;
-                $folder->volumeId = 1;
-                $folder->path = $path;
-
-                $assets->createFolder($folder);
-            }*/
-        /*
-        // Check the permissions to upload in the resolved folder.
-            $filename = \craft\helpers\Assets::prepareAssetName($uploadedFile->name);
-
-            $asset = new \craft\elements\Asset();
-            $asset->tempFilePath = $tempPath;
-            $asset->filename = $filename;
-            $asset->newFolderId = $folder->id;
-            $asset->volumeId = $folder->volumeId;
-            $asset->avoidFilenameConflicts = true;
-            $asset->setScenario(\craft\elements\Asset::SCENARIO_CREATE);
-
-            Craft::$app->getElements()->saveElement($asset);
-        */
-
-        //assign to
-        //Craft::$app->getRelations()->saveRelations($field, $element, $targetIds);
-
-        }
-
 
         return true;
      }
 
+     private function createAttachmentFromObjectId($id)
+     {
+         $settings = MuseumplusForCraftcms::$plugin->getSettings();
+         $collection = MuseumplusForCraftcms::$plugin->collection;
+         $assets = Craft::$app->getAssets();
+         $folderId = $settings['attachmentVolumeId'];
+         $folder = $assets->findFolder(['id' => $folderId]);
+         $parentFolder = $assets->findFolder(['path' => $folder->path . 'Items/']);
+         $attachment = $collection->getAttachmentByObjectId($id);
 
+         if ($attachment) {
+
+             try {
+                 //create asset
+                 $asset = new Asset();
+                 $asset->tempFilePath = $attachment;
+                 $asset->filename = basename($attachment);
+                 $asset->newFolderId = $parentFolder->id;
+                 $asset->setVolumeId($parentFolder->volumeId);
+                 $asset->setScenario(Asset::SCENARIO_CREATE);
+                 $asset->avoidFilenameConflicts = true;
+
+                 $result = Craft::$app->getElements()->saveElement($asset);
+                 if ($result){
+                     return $asset->id;
+
+                 }else{
+                     return false;
+                 }
+             } catch (\Throwable $e) {
+                return false;
+             }
+         }
+         return false;
+     }
+
+     //TODO: Remove this method
+    public function actionImporti()
+    {
+        $objectIds = [75, 302];
+
+        foreach ($objectIds as $id) {
+            $this->createAttachmentFromObjectId($id);
+        }
+        return true;
+    }
 
     private function createOrUpdateItem($object) {
         $collectionId = $object->id;
@@ -132,6 +145,7 @@ class CollectionController extends Controller
         $item = MuseumplusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
+
         if (empty($item)) {
             //create new
             $item = new MuseumplusItem();

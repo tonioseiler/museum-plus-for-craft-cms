@@ -9,10 +9,18 @@ use furbo\museumplusforcraftcms\elements\MuseumplusItem;
 class MuseumplusItemQuery extends ElementQuery
 {
     public $collectionId;
+    public $assetId;
 
     public function collectionId($value)
     {
         $this->collectionId = $value;
+
+        return $this;
+    }
+
+    public function assetId($value)
+    {
+        $this->assetId = $value;
 
         return $this;
     }
@@ -25,11 +33,16 @@ class MuseumplusItemQuery extends ElementQuery
         // select the collection id column
         $this->query->select([
             'museumplus_items.collectionId',
-            'museumplus_items.data'
+            'museumplus_items.data',
+            'museumplus_items.assetId'
         ]);
 
         if ($this->collectionId) {
             $this->subQuery->andWhere(Db::parseParam('museumplus_items.collectionId', $this->collectionId));
+        }
+
+        if ($this->assetId) {
+            $this->subQuery->andWhere(Db::parseParam('museumplus_items.assetId', $this->assetId));
         }
 
         return parent::beforePrepare();

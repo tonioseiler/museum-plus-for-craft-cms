@@ -37,6 +37,8 @@ class MuseumplusItem  extends Element
 
     public $collectionId = null;
 
+    public $assetId = null;
+
     // Static Methods
     // =========================================================================
 
@@ -196,7 +198,8 @@ class MuseumplusItem  extends Element
                 ->insert('{{%museumplus_items}}', [
                     'id' => $this->id,
                     'collectionId' => $this->collectionId,
-                    'data' => $this->data
+                    'data' => $this->data,
+                    'assetId' => $this->assetId
                 ])
                 ->execute();
         } else {
@@ -204,6 +207,7 @@ class MuseumplusItem  extends Element
                 ->update('{{%museumplus_items}}', [
                     'data' => $this->data,
                     'collectionId' => $this->collectionId,
+                    'assetId' => $this->assetId
                 ], ['id' => $this->id])
                 ->execute();
         }
@@ -272,7 +276,15 @@ class MuseumplusItem  extends Element
     }
 
     public function getRelatedItems() {
-        //TODO: implement
+        /*$items = [];
+
+        foreach($this->relatedObjects as $collectionId => $title) {
+            $rel = self::find()->collectionId($collectionId)->all();
+            dd($collectionId);
+            dd($rel);
+        }
+
+        dd();*/
     }
 
     public function getAttachments() {

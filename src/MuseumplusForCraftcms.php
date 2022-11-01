@@ -10,6 +10,7 @@
 
 namespace furbo\museumplusforcraftcms;
 
+use craft\helpers\App;
 use furbo\museumplusforcraftcms\services\Collection as CollectionService;
 use furbo\museumplusforcraftcms\variables\MuseumplusForCraftcmsVariable;
 use furbo\museumplusforcraftcms\models\Settings;
