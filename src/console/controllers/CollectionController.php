@@ -145,6 +145,7 @@ class CollectionController extends Controller
                      return false;
                  }
              } catch (\Throwable $e) {
+                 echo $e->getMessage();
                 return false;
              }
          }
