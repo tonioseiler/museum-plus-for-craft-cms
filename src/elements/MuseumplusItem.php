@@ -263,10 +263,27 @@ class MuseumplusItem  extends Element
         return new MuseumplusItemQuery(static::class);
     }
 
+    protected function tableAttributeHtml(string $attribute): string
+    {
+        switch ($attribute) {
+            case 'assetId':
+                if($this->assetId) {
+                    $asset = Craft::$app->getAssets()->getAssetById($this->assetId);
+                    if($asset) {
+                        return '<img src="'.$asset->getUrl(['width' => 70]).'" style="max-width: 34px; max-height: 34px;">';
+                    }
+                }
+                return '';
+
+        }
+        return parent::tableAttributeHtml($attribute);
+    }
+
     protected static function defineTableAttributes(): array
     {
         return [
-            'collectionId' => 'Museumplus Id'
+            'collectionId' => 'Museumplus Id',
+            'assetId' => 'Attachment',
         ];
     }
 

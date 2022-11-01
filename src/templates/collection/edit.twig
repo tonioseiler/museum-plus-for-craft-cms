@@ -69,6 +69,22 @@
                 value: item.title,
                 instructions: ''
             }) }}
+            <div class="field" data-attribute="attachment">
+                <div class="heading"><label>Attachment</label></div>
+                <div class="input ltr">
+                    {% set myAssetQuery = craft.assets().id(item.assetId) %}
+                    {% set myAsset = myAssetQuery.one() %}
+                    {% set thumb = {
+                        width: 300,
+                        quality: 75
+                    } %}
+                    {% set myAssetUrl = myAsset.getUrl(thumb) %}
+
+                    <a href="{{ myAsset.getCpEditUrl() }}">
+                        <img src="{{ myAssetUrl }}" width="150" />
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div id="tab--museumplusforcraftcms-data" class="flex-fields hidden" data-id="tab--museumplusforcraftcms-data" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-data">
