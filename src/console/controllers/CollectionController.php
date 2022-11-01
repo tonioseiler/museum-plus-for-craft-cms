@@ -99,11 +99,11 @@ class CollectionController extends Controller
          foreach ($existingItems as $item) {
              $assetId = $this->createAttachmentFromObjectId($item->collectionId);
              if($assetId){
-                 echo "[OK] Id:" . $item->id . " AssetID" . $assetId . PHP_EOL;
+                 echo "[OK] Id: " . $item->id . " AssetID: " . $assetId . PHP_EOL;
                  $item->assetId = $assetId;
                  Craft::$app->elements->saveElement($item);
              }else{
-                 echo "[OK] Id:" . $item->id . " AssetID: NULL" . PHP_EOL;
+                 echo "[OK] Id: " . $item->id . " AssetID: NULL" . PHP_EOL;
              }
          }
         echo "Total: " . count($existingItems) . PHP_EOL;
@@ -119,13 +119,15 @@ class CollectionController extends Controller
      {
         $existingItems = MuseumplusItem::find()->all();
          foreach ($existingItems as $item) {
-             $asset = Asset::find()->id($item->assetId)->one();
-             if($asset){
-                 $success = Craft::$app->elements->deleteElement($asset);
-                 if($success){
-                     echo "[OK] Id:" . $item->id . " AssetID" . $item->assetId . PHP_EOL;
-                 }else{
-                     echo "[ERROR] Id:" . $item->id . " AssetID" . $item->assetId . PHP_EOL;
+             if($item->assetId) {
+                 $asset = Asset::find()->id($item->assetId)->one();
+                 if ($asset) {
+                     $success = Craft::$app->elements->deleteElement($asset);
+                     if ($success) {
+                         echo "[OK] Id:" . $item->id . " AssetID" . $item->assetId . PHP_EOL;
+                     } else {
+                         echo "[ERROR] Id:" . $item->id . " AssetID" . $item->assetId . PHP_EOL;
+                     }
                  }
              }
          }
