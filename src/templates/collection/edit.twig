@@ -72,17 +72,25 @@
             <div class="field" data-attribute="attachment">
                 <div class="heading"><label>Attachment</label></div>
                 <div class="input ltr">
-                    {% set myAssetQuery = craft.assets().id(item.assetId) %}
-                    {% set myAsset = myAssetQuery.one() %}
-                    {% set thumb = {
-                        width: 300,
-                        quality: 75
-                    } %}
-                    {% set myAssetUrl = myAsset.getUrl(thumb) %}
+                    {% if item.assetId %}
+                        {% set myAssetQuery = craft.assets().id(item.assetId) %}
+                        {% set myAsset = myAssetQuery.one() %}
+                        {% if myAsset %}
+                            {% set thumb = {
+                                width: 300,
+                                quality: 75
+                            } %}
+                            {% set myAssetUrl = myAsset.getUrl(thumb) %}
 
-                    <a href="{{ myAsset.getCpEditUrl() }}">
-                        <img src="{{ myAssetUrl }}" width="150" />
-                    </a>
+                            <a href="{{ myAsset.getCpEditUrl() }}">
+                                <img src="{{ myAssetUrl }}" width="150" />
+                            </a>
+                        {% else %}
+                            <p>No asset selected</p>
+                        {% endif %}
+                    {% else %}
+                        <p>No asset selected</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

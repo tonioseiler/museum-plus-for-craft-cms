@@ -99,20 +99,39 @@ class CollectionController extends Controller
          foreach ($existingItems as $item) {
              $assetId = $this->createAttachmentFromObjectId($item->collectionId);
              if($assetId){
-                 echo "[OK]" . $assetId . PHP_EOL;
+                 echo "[OK] Id: " . $item->id . " AssetID: " . $assetId . PHP_EOL;
                  $item->assetId = $assetId;
                  Craft::$app->elements->saveElement($item);
              }else{
-                 echo "[ERROR]" . PHP_EOL;
+                 echo "[OK] Id: " . $item->id . " AssetID: NULL" . PHP_EOL;
              }
          }
-
+        echo "Total: " . count($existingItems) . PHP_EOL;
          return true;
      }
 
      public function actionImportMultimediaObjects()
      {
 
+     }
+
+     public function actionRemoveAttachments()
+     {
+        $existingItems = MuseumplusItem::find()->all();
+         foreach ($existingItems as $item) {
+             if($item->assetId) {
+                 $asset = Asset::find()->id($item->assetId)->one();
+                 if ($asset) {
+                     $success = Craft::$app->elements->deleteElement($asset);
+                     if ($success) {
+                         echo "[OK] Id:" . $item->id . " AssetID" . $item->assetId . PHP_EOL;
+                     } else {
+                         echo "[ERROR] Id:" . $item->id . " AssetID" . $item->assetId . PHP_EOL;
+                     }
+                 }
+             }
+         }
+         return true;
      }
 
      private function createAttachmentFromObjectId($id)
@@ -126,12 +145,18 @@ class CollectionController extends Controller
          $attachment = $collection->getAttachmentByObjectId($id);
 
          if ($attachment) {
-
+             $basename = pathinfo($attachment, PATHINFO_FILENAME);
+             $extension = pathinfo($attachment, PATHINFO_EXTENSION);
+             $filename = $basename . '_' . $id . '.' . $extension;
              try {
                  //create asset
-                 $asset = new Asset();
+                 $asset = Asset::find()->filename($filename)->folderId($parentFolder->id)->one();
+                 if(is_null($asset)){
+                    $asset = new Asset();
+                 }
+
                  $asset->tempFilePath = $attachment;
-                 $asset->filename = basename($attachment);
+                 $asset->filename = $filename;
                  $asset->newFolderId = $parentFolder->id;
                  $asset->setVolumeId($parentFolder->volumeId);
                  $asset->setScenario(Asset::SCENARIO_CREATE);
