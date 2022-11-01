@@ -58,38 +58,61 @@ class CollectionController extends Controller
      *
      * @return mixed
      */
-     public function actionImport()
+     public function actionImportAll()
      {
-        $settings = MuseumplusForCraftcms::$plugin->getSettings();
-        $collection = MuseumplusForCraftcms::$plugin->collection;
+         $this->actionImportData();
+         $this->actionImportAttachments();
+         $this->actionImportMultimediaObjects();
+     }
 
-        $objectIds = [];
-        foreach ($settings['objectGroups'] as $objectGroupId) {
-            $objects = $collection->getObjectsByObjectGroup($objectGroupId);
-            foreach ($objects as $o) {
-                $objectIds[$o->id] = $o->id;
-                $this->createOrUpdateItem($o);
-            }
-        }
+     public function actionImportData()
+     {
+         $settings = MuseumplusForCraftcms::$plugin->getSettings();
+         $collection = MuseumplusForCraftcms::$plugin->collection;
 
-        $existingItems = MuseumplusItem::find()->all();
-        foreach ($existingItems as $item) {
-            if (!isset($objectIds[$item->collectionId])) {
-                $success = Craft::$app->elements->deleteElement($item);
-                echo 'x';
-            }else{
-                $assetId = $this->createAttachmentFromObjectId($objectIds[$item->collectionId]);
-                if($assetId){
-                    echo "[OK]" . $assetId . PHP_EOL;
-                    $item->assetId = $assetId;
-                    Craft::$app->elements->saveElement($item);
-                }else{
-                    echo "[ERROR]" . PHP_EOL;
-                }
-            }
-        }
+         $objectIds = [];
+         foreach ($settings['objectGroups'] as $objectGroupId) {
+             $objects = $collection->getObjectsByObjectGroup($objectGroupId);
+             foreach ($objects as $o) {
+                 $objectIds[$o->id] = $o->id;
+                 $this->createOrUpdateItem($o);
+             }
+         }
 
-        return true;
+         $existingItems = MuseumplusItem::find()->all();
+         foreach ($existingItems as $item) {
+             if (!isset($objectIds[$item->collectionId])) {
+                 $success = Craft::$app->elements->deleteElement($item);
+                 echo 'x';
+             }
+         }
+
+         return true;
+     }
+
+     public function actionImportAttachments()
+     {
+         $settings = MuseumplusForCraftcms::$plugin->getSettings();
+         $collection = MuseumplusForCraftcms::$plugin->collection;
+
+         $existingItems = MuseumplusItem::find()->all();
+         foreach ($existingItems as $item) {
+             $assetId = $this->createAttachmentFromObjectId($item->collectionId);
+             if($assetId){
+                 echo "[OK]" . $assetId . PHP_EOL;
+                 $item->assetId = $assetId;
+                 Craft::$app->elements->saveElement($item);
+             }else{
+                 echo "[ERROR]" . PHP_EOL;
+             }
+         }
+
+         return true;
+     }
+
+     public function actionImportMultimediaObjects()
+     {
+
      }
 
      private function createAttachmentFromObjectId($id)
@@ -127,17 +150,6 @@ class CollectionController extends Controller
          }
          return false;
      }
-
-     //TODO: Remove this method
-    public function actionImporti()
-    {
-        $objectIds = [75, 302];
-
-        foreach ($objectIds as $id) {
-            $this->createAttachmentFromObjectId($id);
-        }
-        return true;
-    }
 
     private function createOrUpdateItem($object) {
         $collectionId = $object->id;
