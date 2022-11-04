@@ -110,6 +110,7 @@ class Collection extends Component
             } else {
                 return false;
             }
+
             return $this->base64_to_file($base64, $fileName);
         } catch (\Exception $e) {
             return false;

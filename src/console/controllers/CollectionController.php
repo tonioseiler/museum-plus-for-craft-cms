@@ -47,8 +47,19 @@ use yii\helpers\Console;
  */
 class CollectionController extends Controller
 {
+    private $settings;
+    private $collection;
+
+
     // Public Methods
     // =========================================================================
+
+    public function __construct($id, $module, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->settings = MuseumplusForCraftcms::$plugin->getSettings();
+        $this->collection = MuseumplusForCraftcms::$plugin->collection;
+    }
 
     /**
      * Handle museum-plus-for-craft-cms/collection console commands
@@ -67,12 +78,10 @@ class CollectionController extends Controller
 
      public function actionImportData()
      {
-         $settings = MuseumplusForCraftcms::$plugin->getSettings();
-         $collection = MuseumplusForCraftcms::$plugin->collection;
 
          $objectIds = [];
-         foreach ($settings['objectGroups'] as $objectGroupId) {
-             $objects = $collection->getObjectsByObjectGroup($objectGroupId);
+         foreach ($this->settings['objectGroups'] as $objectGroupId) {
+             $objects = $this->collection->getObjectsByObjectGroup($objectGroupId);
              foreach ($objects as $o) {
                  $objectIds[$o->id] = $o->id;
                  $this->createOrUpdateItem($o);
@@ -92,11 +101,10 @@ class CollectionController extends Controller
 
      public function actionImportAttachments()
      {
-         $settings = MuseumplusForCraftcms::$plugin->getSettings();
-         $collection = MuseumplusForCraftcms::$plugin->collection;
 
          $existingItems = MuseumplusItem::find()->all();
          foreach ($existingItems as $item) {
+             //TODO: Check last modified is different __lastModified imported
              $assetId = $this->createAttachmentFromObjectId($item->collectionId);
              if($assetId){
                  echo "[OK] Id: " . $item->id . " AssetID: " . $assetId . PHP_EOL;
@@ -136,13 +144,11 @@ class CollectionController extends Controller
 
      private function createAttachmentFromObjectId($id)
      {
-         $settings = MuseumplusForCraftcms::$plugin->getSettings();
-         $collection = MuseumplusForCraftcms::$plugin->collection;
          $assets = Craft::$app->getAssets();
-         $folderId = $settings['attachmentVolumeId'];
+         $folderId = $this->settings['attachmentVolumeId'];
          $folder = $assets->findFolder(['id' => $folderId]);
          $parentFolder = $assets->findFolder(['path' => $folder->path . 'Items/']);
-         $attachment = $collection->getAttachmentByObjectId($id);
+         $attachment = $this->collection->getAttachmentByObjectId($id);
 
          if ($attachment) {
              $basename = pathinfo($attachment, PATHINFO_FILENAME);
@@ -154,6 +160,8 @@ class CollectionController extends Controller
                  if(is_null($asset)){
                     $asset = new Asset();
                  }
+
+                 //dd($asset->dateCreated);
 
                  $asset->tempFilePath = $attachment;
                  $asset->filename = $filename;
