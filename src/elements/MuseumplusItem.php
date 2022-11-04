@@ -10,6 +10,7 @@
 
 namespace furbo\museumplusforcraftcms\elements;
 
+use craft\db\Query;
 use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
 use furbo\museumplusforcraftcms\elements\db\MuseumplusItemQuery;
 
@@ -38,6 +39,8 @@ class MuseumplusItem  extends Element
     public $collectionId = null;
 
     public $assetId = null;
+
+    public $multiMedia = [];
 
     // Static Methods
     // =========================================================================
@@ -212,8 +215,57 @@ class MuseumplusItem  extends Element
                 ->execute();
         }
 
+        Craft::$app->db->createCommand()
+            ->delete('{{%museumplus_items_assets}}', ['itemId' => $this->id])
+            ->execute();
+
+        foreach($this->multiMedia as $multiMedia){
+            Craft::$app->db->createCommand()
+                ->insert('{{%museumplus_items_assets}}', [
+                    'itemId' => $this->id,
+                    'assetId' => $multiMedia,
+                ])->execute();
+        }
+
         parent::afterSave($isNew);
 
+    }
+
+    public function getMultimedia()
+    {
+        $assets = [];
+        $multiMedia = (new Query())
+            ->select(['assetId'])
+            ->from('{{%museumplus_items_assets}}')
+            ->where(['itemId' => $this->id])
+            ->all();
+
+        foreach($multiMedia as $asset){
+            $assets[] = Craft::$app->assets->getAssetById($asset['assetId']);
+        }
+
+        return $assets;
+    }
+
+    public function getAttachment()
+    {
+        if($this->assetId){
+            return Craft::$app->assets->getAssetById($this->assetId);
+        }
+        return false;
+    }
+
+    public function addMultimedia($assetId){
+        Craft::$app->db->createCommand()
+            ->insert('{{%museumplus_items_assets}}', [
+                'itemId' => $this->id,
+                'assetId' => $assetId,
+            ])->execute();
+    }
+
+    public function deleteMultimedia($assetId){
+        Craft::$app->db->createCommand()
+            ->delete('{{%museumplus_items_assets}}', ['itemId' => $this->id, 'assetId' => $assetId])->execute();
     }
 
     /**

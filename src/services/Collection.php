@@ -98,23 +98,39 @@ class Collection extends Component
         $this->init();
         try {
             $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Object/' . $objectId . '/attachment', $this->requestHeaders);
-            $res = $this->client->sendAsync($request)->wait();
-            $responseXml = simplexml_load_string($res->getBody()->getContents());
-            if ($responseXml->modules->module->moduleItem->attachment->attributes()->{"name"}) {
-                $fileName = $responseXml->modules->module->moduleItem->attachment->attributes()->{"name"}->__toString();
-            } else {
-                return false;
-            }
-            if ($responseXml->modules->module->moduleItem->attachment->value) {
-                $base64 = $responseXml->modules->module->moduleItem->attachment->value->__toString();
-            } else {
-                return false;
-            }
-
-            return $this->base64_to_file($base64, $fileName);
+            return $this->responseFile($request);
         } catch (\Exception $e) {
             return false;
         }
+    }
+
+    public function getMultimediaById($multimediaId)
+    {
+        $this->init();
+        try {
+            $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Multimedia/' . $multimediaId . '/attachment', $this->requestHeaders);
+            return $this->responseFile($request);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    private function responseFile(Request $request)
+    {
+        $res = $this->client->sendAsync($request)->wait();
+        $responseXml = simplexml_load_string($res->getBody()->getContents());
+        if ($responseXml->modules->module->moduleItem->attachment->attributes()->{"name"}) {
+            $fileName = $responseXml->modules->module->moduleItem->attachment->attributes()->{"name"}->__toString();
+        } else {
+            return false;
+        }
+        if ($responseXml->modules->module->moduleItem->attachment->value) {
+            $base64 = $responseXml->modules->module->moduleItem->attachment->value->__toString();
+        } else {
+            return false;
+        }
+
+        return $this->base64_to_file($base64, $fileName);
     }
 
     private function base64_to_file($base64_string, $output_file) {

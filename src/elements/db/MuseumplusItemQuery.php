@@ -2,6 +2,7 @@
 namespace furbo\museumplusforcraftcms\elements\db;
 
 use craft\db\Query;
+use craft\db\Table;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
 use furbo\museumplusforcraftcms\elements\MuseumplusItem;
@@ -29,12 +30,14 @@ class MuseumplusItemQuery extends ElementQuery
     {
         // join in the items table
         $this->joinElementTable('museumplus_items');
+        //$this->query->innerJoin(['multiMedia' => '{{%museumplus_items_assets}}'], '[[multiMedia.itemId]] = [[museumplus_items.id]]');
 
         // select the collection id column
         $this->query->select([
             'museumplus_items.collectionId',
             'museumplus_items.data',
-            'museumplus_items.assetId'
+            'museumplus_items.assetId',
+            //'multiMedia.assetId as multiMedia',
         ]);
 
         if ($this->collectionId) {

@@ -49,6 +49,7 @@ class CollectionController extends Controller
 {
     private $settings;
     private $collection;
+    public $assets;
 
 
     // Public Methods
@@ -59,6 +60,7 @@ class CollectionController extends Controller
         parent::__construct($id, $module, $config);
         $this->settings = MuseumplusForCraftcms::$plugin->getSettings();
         $this->collection = MuseumplusForCraftcms::$plugin->collection;
+        $this->assets = Craft::$app->getAssets();
     }
 
     /**
@@ -101,7 +103,6 @@ class CollectionController extends Controller
 
      public function actionImportAttachments()
      {
-
          $existingItems = MuseumplusItem::find()->all();
          foreach ($existingItems as $item) {
              //TODO: Check last modified is different __lastModified imported
@@ -114,13 +115,8 @@ class CollectionController extends Controller
                  echo "[OK] Id: " . $item->id . " AssetID: NULL" . PHP_EOL;
              }
          }
-        echo "Total: " . count($existingItems) . PHP_EOL;
+         echo "Total: " . count($existingItems) . PHP_EOL;
          return true;
-     }
-
-     public function actionImportMultimediaObjects()
-     {
-
      }
 
      public function actionRemoveAttachments()
@@ -142,12 +138,32 @@ class CollectionController extends Controller
          return true;
      }
 
-     private function createAttachmentFromObjectId($id)
-     {
-         $assets = Craft::$app->getAssets();
+    public function actionImportMultimediaObjects()
+    {
+        $existingItems = MuseumplusItem::find()->all();
+        foreach ($existingItems as $item) {
+            $assetIds = [];
+            foreach ($item->multiMediaObjects as $id => $value){
+                $assetId = $this->createMultimediaFromId($id);
+                if($assetId){
+                    $assetIds[] = $assetId;
+                }
+            }
+            if(count($assetIds)){
+                echo "[OK] Id: " . $item->id . " AssetsIDs: " . implode(",", $assetIds) . PHP_EOL;
+                $item->multiMedia = $assetIds;
+                Craft::$app->elements->saveElement($item);
+            }else{
+                echo "[OK] Id: " . $item->id . " AssetID: NULL" . PHP_EOL;
+            }
+        }
+    }
+
+    private function createAttachmentFromObjectId($id)
+    {
          $folderId = $this->settings['attachmentVolumeId'];
-         $folder = $assets->findFolder(['id' => $folderId]);
-         $parentFolder = $assets->findFolder(['path' => $folder->path . 'Items/']);
+         $folder = $this->assets->findFolder(['id' => $folderId]);
+         $parentFolder = $this->assets->findFolder(['path' => $folder->path . 'Items/']);
          $attachment = $this->collection->getAttachmentByObjectId($id);
 
          if ($attachment) {
@@ -155,14 +171,10 @@ class CollectionController extends Controller
              $extension = pathinfo($attachment, PATHINFO_EXTENSION);
              $filename = $basename . '_' . $id . '.' . $extension;
              try {
-                 //create asset
                  $asset = Asset::find()->filename($filename)->folderId($parentFolder->id)->one();
                  if(is_null($asset)){
                     $asset = new Asset();
                  }
-
-                 //dd($asset->dateCreated);
-
                  $asset->tempFilePath = $attachment;
                  $asset->filename = $filename;
                  $asset->newFolderId = $parentFolder->id;
@@ -173,7 +185,6 @@ class CollectionController extends Controller
                  $result = Craft::$app->getElements()->saveElement($asset);
                  if ($result){
                      return $asset->id;
-
                  }else{
                      return false;
                  }
@@ -182,7 +193,43 @@ class CollectionController extends Controller
              }
          }
          return false;
-     }
+    }
+
+    private function createMultimediaFromId($id)
+    {
+        $folderId = $this->settings['attachmentVolumeId'];
+        $folder = $this->assets->findFolder(['id' => $folderId]);
+        $parentFolder = $this->assets->findFolder(['path' => $folder->path . 'Multimedia/']);
+        $attachment = $this->collection->getAttachmentByObjectId($id);
+
+        if ($attachment) {
+            $basename = pathinfo($attachment, PATHINFO_FILENAME);
+            $extension = pathinfo($attachment, PATHINFO_EXTENSION);
+            $filename = $basename . '_' . $id . '.' . $extension;
+            try {
+                $asset = Asset::find()->filename($filename)->folderId($parentFolder->id)->one();
+                if(is_null($asset)){
+                    $asset = new Asset();
+                }
+                $asset->tempFilePath = $attachment;
+                $asset->filename = $filename;
+                $asset->newFolderId = $parentFolder->id;
+                $asset->setVolumeId($parentFolder->volumeId);
+                $asset->setScenario(Asset::SCENARIO_CREATE);
+                $asset->avoidFilenameConflicts = true;
+
+                $result = Craft::$app->getElements()->saveElement($asset);
+                if ($result){
+                    return $asset->id;
+                }else{
+                    return false;
+                }
+            } catch (\Throwable $e) {
+                return false;
+            }
+        }
+        return false;
+    }
 
     private function createOrUpdateItem($object) {
         $collectionId = $object->id;
