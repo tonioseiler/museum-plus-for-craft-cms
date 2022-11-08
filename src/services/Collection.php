@@ -49,8 +49,24 @@ class Collection extends Component
     {
         $this->init();
         $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/'.$objectId.'/', $this->requestHeaders);
+        return $this->getDetail($request);
+    }
+
+    private function getDetail(Request $request)
+    {
         $res = $this->client->sendAsync($request)->wait();
-        //dd($res->getBody());
+        $responseXml = simplexml_load_string($res->getBody()->getContents());
+        return $responseXml->modules->module->moduleItem;
+    }
+
+    public function getObjectLastModified($objectId)
+    {
+        $object = $this->getObjectDetail($objectId);
+        try{
+            return $object->systemField[2]->value->__toString();
+        }catch (\Exception $e){
+            return null;
+        }
     }
 
     public function getObjectsByObjectGroup($groupId)
@@ -112,6 +128,18 @@ class Collection extends Component
             return $this->responseFile($request);
         } catch (\Exception $e) {
             return false;
+        }
+    }
+
+    public function getMultimediaLastModified($multimediaId)
+    {
+        $this->init();
+        try{
+            $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Multimedia/' . $multimediaId, $this->requestHeaders);
+            $object = $this->getDetail($request);
+            return $object->systemField[2]->value->__toString();
+        }catch (\Exception $e){
+            return null;
         }
     }
 

@@ -11,6 +11,7 @@
 namespace furbo\museumplusforcraftcms\elements;
 
 use craft\db\Query;
+use craft\helpers\Cp;
 use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
 use furbo\museumplusforcraftcms\elements\db\MuseumplusItemQuery;
 
@@ -321,11 +322,18 @@ class MuseumplusItem  extends Element
             case 'assetId':
                 if($this->assetId) {
                     $asset = Craft::$app->getAssets()->getAssetById($this->assetId);
-                    if($asset) {
-                        return '<img src="'.$asset->getUrl(['width' => 70]).'" style="max-width: 34px; max-height: 34px;">';
+                    if($asset){
+                        return Cp::elementPreviewHtml([$asset], Cp::ELEMENT_SIZE_SMALL, false, true, true, false);
                     }
+                    return '-';
                 }
                 return '';
+            case 'multimedia':
+                $assets = $this->getMultimedia();
+                if(count($assets)) {
+                    return Cp::elementPreviewHtml($assets, Cp::ELEMENT_SIZE_SMALL, false, true, true, false);
+                }
+                return '-';
 
         }
         return parent::tableAttributeHtml($attribute);
@@ -336,6 +344,18 @@ class MuseumplusItem  extends Element
         return [
             'collectionId' => 'Museumplus Id',
             'assetId' => 'Attachment',
+            'multimedia' => 'Multimedia',
+        ];
+    }
+
+    protected static function defineSortOptions(): array
+    {
+        return [
+            [
+                'label' => Craft::t('app', 'Date Created'),
+                'orderBy' => 'elements.dateCreated',
+                'attribute' => 'dateCreated'
+            ]
         ];
     }
 
@@ -386,6 +406,21 @@ class MuseumplusItem  extends Element
             return $data[$name];
         } else {
             return parent::__get($name);
+        }
+    }
+
+    public function __set($name, $value)
+    {
+        $data = json_decode($this->data, true);
+        if(is_array($data)) {
+            if (array_key_exists($name, $data)) {
+                $data[$name] = $value;
+                $this->data = json_encode($data);
+            }else{
+                parent::__set($name, $value);
+            }
+        }else{
+            parent::__set($name, $value);
         }
     }
 }
