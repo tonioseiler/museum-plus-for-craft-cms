@@ -10,6 +10,8 @@
 
 namespace furbo\museumplusforcraftcms\elements;
 
+use craft\db\Query;
+use craft\helpers\Cp;
 use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
 use furbo\museumplusforcraftcms\elements\db\MuseumplusItemQuery;
 
@@ -38,6 +40,8 @@ class MuseumplusItem  extends Element
     public $collectionId = null;
 
     public $assetId = null;
+
+    public $multiMedia = [];
 
     // Static Methods
     // =========================================================================
@@ -212,8 +216,57 @@ class MuseumplusItem  extends Element
                 ->execute();
         }
 
+        Craft::$app->db->createCommand()
+            ->delete('{{%museumplus_items_assets}}', ['itemId' => $this->id])
+            ->execute();
+
+        foreach($this->multiMedia as $multiMedia){
+            Craft::$app->db->createCommand()
+                ->insert('{{%museumplus_items_assets}}', [
+                    'itemId' => $this->id,
+                    'assetId' => $multiMedia,
+                ])->execute();
+        }
+
         parent::afterSave($isNew);
 
+    }
+
+    public function getMultimedia()
+    {
+        $assets = [];
+        $multiMedia = (new Query())
+            ->select(['assetId'])
+            ->from('{{%museumplus_items_assets}}')
+            ->where(['itemId' => $this->id])
+            ->all();
+
+        foreach($multiMedia as $asset){
+            $assets[] = Craft::$app->assets->getAssetById($asset['assetId']);
+        }
+
+        return $assets;
+    }
+
+    public function getAttachment()
+    {
+        if($this->assetId){
+            return Craft::$app->assets->getAssetById($this->assetId);
+        }
+        return false;
+    }
+
+    public function addMultimedia($assetId){
+        Craft::$app->db->createCommand()
+            ->insert('{{%museumplus_items_assets}}', [
+                'itemId' => $this->id,
+                'assetId' => $assetId,
+            ])->execute();
+    }
+
+    public function deleteMultimedia($assetId){
+        Craft::$app->db->createCommand()
+            ->delete('{{%museumplus_items_assets}}', ['itemId' => $this->id, 'assetId' => $assetId])->execute();
     }
 
     /**
@@ -269,11 +322,18 @@ class MuseumplusItem  extends Element
             case 'assetId':
                 if($this->assetId) {
                     $asset = Craft::$app->getAssets()->getAssetById($this->assetId);
-                    if($asset) {
-                        return '<img src="'.$asset->getUrl(['width' => 70]).'" style="max-width: 34px; max-height: 34px;">';
+                    if($asset){
+                        return Cp::elementPreviewHtml([$asset], Cp::ELEMENT_SIZE_SMALL, false, true, true, false);
                     }
+                    return '-';
                 }
                 return '';
+            case 'multimedia':
+                $assets = $this->getMultimedia();
+                if(count($assets)) {
+                    return Cp::elementPreviewHtml($assets, Cp::ELEMENT_SIZE_SMALL, false, true, true, false);
+                }
+                return '-';
 
         }
         return parent::tableAttributeHtml($attribute);
@@ -284,6 +344,18 @@ class MuseumplusItem  extends Element
         return [
             'collectionId' => 'Museumplus Id',
             'assetId' => 'Attachment',
+            'multimedia' => 'Multimedia',
+        ];
+    }
+
+    protected static function defineSortOptions(): array
+    {
+        return [
+            [
+                'label' => Craft::t('app', 'Date Created'),
+                'orderBy' => 'elements.dateCreated',
+                'attribute' => 'dateCreated'
+            ]
         ];
     }
 
@@ -334,6 +406,21 @@ class MuseumplusItem  extends Element
             return $data[$name];
         } else {
             return parent::__get($name);
+        }
+    }
+
+    public function __set($name, $value)
+    {
+        $data = json_decode($this->data, true);
+        if(is_array($data)) {
+            if (array_key_exists($name, $data)) {
+                $data[$name] = $value;
+                $this->data = json_encode($data);
+            }else{
+                parent::__set($name, $value);
+            }
+        }else{
+            parent::__set($name, $value);
         }
     }
 }
