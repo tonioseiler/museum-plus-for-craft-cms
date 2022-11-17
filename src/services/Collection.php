@@ -73,11 +73,11 @@ class Collection extends Component
     {
 
       $this->init();
-      
+
       $offset = 0;
       $size = self::MAX_ITEMS;
       $objects = [];
-      
+
         while ($offset <= $size) {
             $body = '<?xml version="1.0" encoding="UTF-8"?>
                 <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
@@ -386,7 +386,7 @@ class Collection extends Component
         $ret = [];
         if (isset($arr['moduleReference'])) {
             foreach ($arr['moduleReference'] as $ref) {
-                if ($ref['@attributes']['name'] == $type) {
+                if (isset($ref['@attributes']) && isset($ref['@attributes']['name']) && $ref['@attributes']['name'] == $type) {
                     if (isset($ref['moduleReferenceItem'])){
                         if ($ref['@attributes']['size'] == '1') {
                             if (isset($ref['moduleReferenceItem']) && isset($ref['moduleReferenceItem']['@attributes']['moduleItemId'])) {
@@ -462,7 +462,7 @@ class Collection extends Component
         // - objekte in der zwischentabelle löschen mit diesem name
         // - bei bedarf referenzobjekte erstellen (inkl typ) und eintrag in zwischentabelle machen.
         // - am schluss muss noch überprüft werden, welche referenzobjekt gar keinen Eintrag mehr in der pivot tabelle haben.
-        
+
 
     }
 
