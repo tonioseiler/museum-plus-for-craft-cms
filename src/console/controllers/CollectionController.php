@@ -135,8 +135,8 @@ class CollectionController extends Controller
     public function actionImportAttachments()
      {
          $existingItems = MuseumplusItem::find()->all();
-         $yesteday = new \DateTime();
-         $yesteday->sub(new \DateInterval('PT24H'));
+         $yesterday = new \DateTime();
+         $yesterday->sub(new \DateInterval('PT24H'));
 
          foreach ($existingItems as $item) {
              $newDate = null;
@@ -148,7 +148,7 @@ class CollectionController extends Controller
                  } catch (\Exception $e) {}
              }
 
-             if($newDate > $yesteday || $this->forceAll){
+             if($newDate > $yesterday || $this->forceAll){
                  $assetId = $this->createAttachmentFromObjectId($item->collectionId);
                  if($assetId){
                      echo "[OK] Id: " . $item->id . " AssetID: " . $assetId . PHP_EOL;
@@ -186,8 +186,8 @@ class CollectionController extends Controller
     public function actionImportMultimediaObjects()
     {
         $existingItems = MuseumplusItem::find()->all();
-        $yesteday = new \DateTime();
-        $yesteday->sub(new \DateInterval('PT24H'));
+        $yesterday = new \DateTime();
+        $yesterday->sub(new \DateInterval('PT24H'));
 
         foreach ($existingItems as $item) {
             $assetIds = [];
@@ -201,7 +201,7 @@ class CollectionController extends Controller
                     } catch (\Exception $e) {}
                 }
 
-                if($newDate > $yesteday || $this->forceAll) {
+                if($newDate > $yesterday || $this->forceAll) {
                     $assetId = $this->createMultimediaFromId($id);
                     if ($assetId) {
                         $assetIds[] = $assetId;
