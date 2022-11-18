@@ -37,8 +37,53 @@ class Install extends Migration
                 'CASCADE',
                 null
             );
+        }
 
+        if (!$this->db->tableExists('{{%museumplus_objectgroups}}')) {
+            $this->createTable('{{%museumplus_objectgroups}}', [
+                'id' => $this->integer()->notNull(),
+                'data' => $this->longText()->null(),
+                'collectionId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid(),
+                'PRIMARY KEY(id)',
+            ]);
+        }
 
+        if (!$this->db->tableExists('{{%museumplus_items_objectgroups}}')) {
+            $this->createTable('{{%museumplus_items_objectgroups}}', [
+                'id' => $this->integer()->notNull(),
+                'itemId' => $this->integer()->notNull(),
+                'objectGroupId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid(),
+                'PRIMARY KEY(id)',
+            ]);
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_items_objectgroups}}', 'objectGroupId'),
+                '{{%museumplus_items_objectgroups}}',
+                'objectGroupId',
+                '{{%museumplus_objectgroups}}',
+                'id',
+                'CASCADE',
+                'CASCADE'
+            );
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_items_objectgroups}}', 'itemId'),
+                '{{%museumplus_items_objectgroups}}',
+                'itemId',
+                '{{%museumplus_items}}',
+                'id',
+                'CASCADE',
+                'CASCADE'
+            );
+        }
+
+        if (!$this->db->tableExists('{{%museumplus_literature}}')) {
             $this->createTable('{{%museumplus_literature}}', [
                 'id' => $this->integer()->notNull(),
                 'data' => $this->longText()->null(),
@@ -58,7 +103,9 @@ class Install extends Migration
                 'CASCADE',
                 null
             );
+        };
 
+        if (!$this->db->tableExists('{{%museumplus_people}}')) {
             $this->createTable('{{%museumplus_people}}', [
                 'id' => $this->integer()->notNull(),
                 'data' => $this->longText()->null(),
@@ -119,7 +166,8 @@ class Install extends Migration
      */
     public function safeDown(): bool
     {
-        $this->dropTable('{{%museumplus_items}}');
+        //$this->dropTable('{{%museumplus_items}}');
+        //TODO: but later
         return true;
     }
 }
