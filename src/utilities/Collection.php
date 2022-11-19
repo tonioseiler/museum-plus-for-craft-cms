@@ -10,7 +10,7 @@
 
 namespace furbo\museumplusforcraftcms\utilities;
 
-use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\assetbundles\collectionutility\CollectionUtilityAsset;
 
 use Craft;
@@ -24,7 +24,7 @@ use craft\base\Utility;
  * https://craftcms.com/docs/plugins/utilities
  *
  * @author    Furbo GmbH
- * @package   MuseumplusForCraftcms
+ * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  */
 class Collection extends Utility
@@ -39,7 +39,7 @@ class Collection extends Utility
      */
     public static function displayName(): string
     {
-        $settings = MuseumplusForCraftCms::$plugin->getSettings();
+        $settings = MuseumPlusForCraftCms::$plugin->getSettings();
         return $settings['cpTitle'];
         //return Craft::t('museum-plus-for-craft-cms', 'Collection');
     }

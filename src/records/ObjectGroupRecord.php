@@ -7,6 +7,8 @@ namespace furbo\museumplusforcraftcms\records;
 
 use craft\db\ActiveRecord;
 
+use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
+
 /*
  * @author    Furbo GmbH
  * @package   MuseumPlusForCraftCms

@@ -12,8 +12,9 @@ namespace furbo\museumplusforcraftcms\elements;
 
 use craft\db\Query;
 use craft\helpers\Cp;
-use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
-use furbo\museumplusforcraftcms\elements\db\MuseumplusItemQuery;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
+use furbo\museumplusforcraftcms\elements\db\MuseumPlusItemQuery;
+use furbo\museumplusforcraftcms\records\ObjectGroupRecord as ObjectGroup;
 
 use Craft;
 use craft\base\Element;
@@ -23,14 +24,14 @@ use craft\models\FieldLayout;
 use craft\models\TagGroup;
 
 /**
- *  Element MuseumplusItem
+ *  Element MuseumPlusItem
  *
  *
  * @author    Furbo GmbH
- * @package   MuseumplusForCraftcms
+ * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  */
-class MuseumplusItem  extends Element
+class MuseumPlusItem  extends Element
 {
     // Public Properties
     // =========================================================================
@@ -53,7 +54,7 @@ class MuseumplusItem  extends Element
      */
     public static function displayName(): string
     {
-        return Craft::t('museum-plus-for-craft-cms', '');
+        return Craft::t('museum-plus-for-craft-cms', 'Item');
     }
 
     /**
@@ -73,6 +74,11 @@ class MuseumplusItem  extends Element
      * @return bool Whether elements of this type have traditional titles.
      */
     public static function hasTitles(): bool
+    {
+        return true;
+    }
+
+    public static function hasUris(): bool
     {
         return true;
     }
@@ -128,7 +134,7 @@ class MuseumplusItem  extends Element
      */
     public function getFieldLayout(): FieldLayout
     {
-        return \Craft::$app->fields->getLayoutByType(MuseumplusItem::class);
+        return \Craft::$app->fields->getLayoutByType(MuseumPlusItem::class);
     }
 
     // Indexes, etc.
@@ -165,12 +171,20 @@ class MuseumplusItem  extends Element
         return 'museum-plus-for-craft-cms/collection/'.$this->id;
     }
 
+
     public static function hasStatuses(): bool
     {
         return true;
     }
 
+    protected function uiLabel(): ?string
+    {
+        if (!isset($this->title) || trim($this->title) === '') {
+            return '–';
+        }
 
+        return null;
+    }
 
     // Events
     // -------------------------------------------------------------------------
@@ -313,7 +327,7 @@ class MuseumplusItem  extends Element
 
     public static function find(): ElementQueryInterface
     {
-        return new MuseumplusItemQuery(static::class);
+        return new MuseumPlusItemQuery(static::class);
     }
 
     protected function tableAttributeHtml(string $attribute): string
@@ -325,16 +339,15 @@ class MuseumplusItem  extends Element
                     if($asset){
                         return Cp::elementPreviewHtml([$asset], Cp::ELEMENT_SIZE_SMALL, false, true, true, false);
                     }
-                    return '-';
+                    return $this->assetId;
                 }
-                return '';
+                return '-';
             case 'multimedia':
                 $assets = $this->getMultimedia();
                 if(count($assets)) {
                     return Cp::elementPreviewHtml($assets, Cp::ELEMENT_SIZE_SMALL, false, true, true, false);
                 }
                 return '-';
-
         }
         return parent::tableAttributeHtml($attribute);
     }
@@ -342,20 +355,24 @@ class MuseumplusItem  extends Element
     protected static function defineTableAttributes(): array
     {
         return [
-            'collectionId' => 'Museumplus Id',
+            'collectionId' => 'MuseumPlus Id',
             'assetId' => 'Attachment',
             'multimedia' => 'Multimedia',
+            'id' => ['label' => Craft::t('app', 'ID')],
         ];
     }
+
+    protected static function defineDefaultTableAttributes(string $source): array
+    {
+        return ['collectionId', 'assetId', 'multimedia'];
+    }
+
 
     protected static function defineSortOptions(): array
     {
         return [
-            [
-                'label' => Craft::t('app', 'Date Created'),
-                'orderBy' => 'elements.dateCreated',
-                'attribute' => 'dateCreated'
-            ]
+            'title' => \Craft::t('app', 'Title'),
+            'collectionId' => 'MuseumPlus Id'
         ];
     }
 
@@ -363,6 +380,7 @@ class MuseumplusItem  extends Element
     {
         return ['data', 'collectionId'];
     }
+
 
     public function getRelatedItems() {
         /*$items = [];
@@ -423,4 +441,5 @@ class MuseumplusItem  extends Element
             parent::__set($name, $value);
         }
     }
+
 }

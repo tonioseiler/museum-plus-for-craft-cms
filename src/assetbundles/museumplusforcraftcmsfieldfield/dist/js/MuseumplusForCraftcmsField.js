@@ -1,18 +1,18 @@
 /**
  * MuseumPlus for CraftCMS plugin for Craft CMS
  *
- * MuseumplusForCraftcmsField Field JS
+ * MuseumPlusForCraftCmsField Field JS
  *
  * @author    Furbo GmbH
  * @copyright Copyright (c) 2022 Furbo GmbH
  * @link      https://furbo.ch
- * @package   MuseumplusForCraftcms
- * @since     1.0.0MuseumplusForCraftcmsMuseumplusForCraftcmsField
+ * @package   MuseumPlusForCraftCms
+ * @since     1.0.0MuseumPlusForCraftCmsMuseumPlusForCraftCmsField
  */
 
  ;(function ( $, window, document, undefined ) {
 
-    var pluginName = "MuseumplusForCraftcmsMuseumplusForCraftcmsField",
+    var pluginName = "MuseumPlusForCraftCmsMuseumPlusForCraftCmsField",
         defaults = {
         };
 

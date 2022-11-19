@@ -10,7 +10,7 @@
 
 namespace furbo\museumplusforcraftcms\variables;
 
-use furbo\museumplusforcraftcms\MuseumplusForCraftCms;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 
 use Craft;
 
@@ -18,36 +18,36 @@ use Craft;
  * MuseumPlus for CraftCMS Variable
  *
  * Craft allows plugins to provide their own template variables, accessible from
- * the {{ craft }} global variable (e.g. {{ craft.museumplusForCraftcms }}).
+ * the {{ craft }} global variable (e.g. {{ craft.museumPlusForCraftCms }}).
  *
  * https://craftcms.com/docs/plugins/variables
  *
  * @author    Furbo GmbH
- * @package   MuseumplusForCraftcms
+ * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  */
-class MuseumplusForCraftcmsVariable
+class MuseumPlusForCraftCmsVariable
 {
     // Public Methods
     // =========================================================================
 
     /**
      *
-     *     {{ craft.museumplusForCraftcms.cpTitle }} or
-     *     {{ craft.museumplusForCraftcms.cpTitle(twigValue) }}
+     *     {{ craft.museumPlusForCraftCms.cpTitle }} or
+     *     {{ craft.museumPlusForCraftCms.cpTitle(twigValue) }}
      *
      * @param null $optional
      * @return string
      */
     public function cpTitle($optional = null)
     {
-        $settings = MuseumplusForCraftCms::$plugin->getSettings();
+        $settings = MuseumPlusForCraftCms::$plugin->getSettings();
         return $settings['cpTitle'];
     }
 
     public function getObjectGroups() {
         try {
-            $objectGroups = MuseumplusForCraftcms::$plugin->collection->getObjectGroups();
+            $objectGroups = MuseumPlusForCraftCms::$plugin->museumPlus->getObjectGroups();
             $ret = [];
             foreach ($objectGroups as $og) {
                 $title = $og->OgrNameTxt;
@@ -64,7 +64,7 @@ class MuseumplusForCraftcmsVariable
 
     public function getExhibitions() {
         try {
-            $exhibitions = MuseumplusForCraftcms::$plugin->collection->getExhibitions();
+            $exhibitions = MuseumPlusForCraftCms::$plugin->museumPlus->getExhibitions();
             $ret = [];
             foreach ($exhibitions as $ex) {
                 $title = $ex->ExhExhibitionTitleVrt;

@@ -10,13 +10,13 @@
 
 namespace furbo\museumplusforcraftcms\models;
 
-use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 
 use Craft;
 use craft\base\Model;
 
 /**
- * MuseumplusForCraftcms Settings Model
+ * MuseumPlusForCraftCms Settings Model
  *
  * This is a model used to define the plugin's settings.
  *
@@ -26,7 +26,7 @@ use craft\base\Model;
  * https://craftcms.com/docs/plugins/models
  *
  * @author    Furbo GmbH
- * @package   MuseumplusForCraftcms
+ * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  */
 class Settings extends Model

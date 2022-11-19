@@ -15,7 +15,7 @@ use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
 
 /**
- * MuseumplusForCraftcmsFieldFieldAsset AssetBundle
+ * MuseumPlusForCraftCmsFieldFieldAsset AssetBundle
  *
  * AssetBundle represents a collection of asset files, such as CSS, JS, images.
  *
@@ -29,10 +29,10 @@ use craft\web\assets\cp\CpAsset;
  * http://www.yiiframework.com/doc-2.0/guide-structure-assets.html
  *
  * @author    Furbo GmbH
- * @package   MuseumplusForCraftcms
+ * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  */
-class MuseumplusForCraftcmsFieldFieldAsset extends AssetBundle
+class MuseumPlusForCraftCmsFieldFieldAsset extends AssetBundle
 {
     // Public Methods
     // =========================================================================
@@ -53,11 +53,11 @@ class MuseumplusForCraftcmsFieldFieldAsset extends AssetBundle
         // define the relative path to CSS/JS files that should be registered with the page
         // when this asset bundle is registered
         $this->js = [
-            'js/MuseumplusForCraftcmsField.js',
+            'js/MuseumPlusForCraftCmsField.js',
         ];
 
         $this->css = [
-            'css/MuseumplusForCraftcmsField.css',
+            'css/MuseumPlusForCraftCmsField.css',
         ];
 
         parent::init();

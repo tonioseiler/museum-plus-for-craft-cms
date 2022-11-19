@@ -10,8 +10,8 @@
 
 namespace furbo\museumplusforcraftcms\services;
 
-use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
-use furbo\museumplusforcraftcms\elements\MuseumplusItem;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
+use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 
 use Craft;
 use craft\base\Component;
@@ -22,18 +22,18 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 
 /**
-* Collection Service
+* MuseumPlus Service
 *
 * From any other plugin file, call it like this:
 *
-*     MuseumplusForCraftcms::$plugin->collection->someMethod()
+*     MuseumPlusForCraftCms::$plugin->museumPlus->someMethod()
 *
 *
 * @author    Furbo GmbH
-* @package   MuseumplusForCraftcms
+* @package   MuseumPlusForCraftCms
 * @since     1.0.0
 */
-class Collection extends Component
+class MuseumPlusService extends Component
 {
 
     const QUERY_LIMIT = 100;
@@ -277,7 +277,7 @@ class Collection extends Component
         App::maxPowerCaptain();
         if (empty($this->client)) {
 
-            $settings = MuseumplusForCraftcms::$plugin->getSettings();
+            $settings = MuseumPlusForCraftCms::$plugin->getSettings();
 
             $username = $settings['username'];
             $password = $settings['password'];
@@ -317,6 +317,7 @@ class Collection extends Component
     private function createDataObjectFromXML($xmlObject) {
         $object = new \stdClass();
         $tmp = json_decode(json_encode($xmlObject), true);
+        //dd($tmp);
         foreach ($tmp['@attributes'] as $key => $value) {
             $object->{$key} = $value;
         }
@@ -385,7 +386,13 @@ class Collection extends Component
     private function getModuleReferencesByName($arr, $type) {
         $ret = [];
         if (isset($arr['moduleReference'])) {
-            foreach ($arr['moduleReference'] as $ref) {
+
+            if (isset($arr['moduleReference']['@attributes']))
+                $tmp = [$arr['moduleReference']];
+            else
+                $tmp = $arr['moduleReference'];
+
+            foreach ($tmp as $ref) {
                 if (isset($ref['@attributes']) && isset($ref['@attributes']['name']) && $ref['@attributes']['name'] == $type) {
                     if (isset($ref['moduleReferenceItem'])){
                         if ($ref['@attributes']['size'] == '1') {

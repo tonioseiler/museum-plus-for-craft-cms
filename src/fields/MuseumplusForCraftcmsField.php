@@ -10,8 +10,8 @@
 
 namespace furbo\museumplusforcraftcms\fields;
 
-use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
-use furbo\museumplusforcraftcms\assetbundles\museumplusforcraftcmsfieldfield\MuseumplusForCraftcmsFieldFieldAsset;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
+use furbo\museumplusforcraftcms\assetbundles\museumplusforcraftcmsfieldfield\MuseumPlusForCraftCmsFieldFieldAsset;
 
 use Craft;
 use craft\base\ElementInterface;
@@ -21,7 +21,7 @@ use yii\db\Schema;
 use craft\helpers\Json;
 
 /**
- * MuseumplusForCraftcmsField Field
+ * MuseumPlusForCraftCmsField Field
  *
  * Whenever someone creates a new field in Craft, they must specify what
  * type of field it is. The system comes with a handful of field types baked in,
@@ -30,10 +30,10 @@ use craft\helpers\Json;
  * https://craftcms.com/docs/plugins/field-types
  *
  * @author    Furbo GmbH
- * @package   MuseumplusForCraftcms
+ * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  */
-class MuseumplusForCraftcmsField extends Field
+class MuseumPlusForCraftCmsField extends Field
 {
     // Public Properties
     // =========================================================================
@@ -55,7 +55,7 @@ class MuseumplusForCraftcmsField extends Field
      */
     public static function displayName(): string
     {
-        return Craft::t('museum-plus-for-craft-cms', 'MuseumplusForCraftcmsField');
+        return Craft::t('museum-plus-for-craft-cms', 'MuseumPlusForCraftCmsField');
     }
 
     // Public Methods
@@ -226,7 +226,7 @@ class MuseumplusForCraftcmsField extends Field
     {
         // Render the settings template
         return Craft::$app->getView()->renderTemplate(
-            'museum-plus-for-craft-cms/_components/fields/MuseumplusForCraftcmsField_settings',
+            'museum-plus-for-craft-cms/_components/fields/MuseumPlusForCraftCmsField_settings',
             [
                 'field' => $this,
             ]
@@ -333,7 +333,7 @@ class MuseumplusForCraftcmsField extends Field
     public function getInputHtml(mixed $value, ?\craft\base\ElementInterface $element = null): string
     {
         // Register our asset bundle
-        Craft::$app->getView()->registerAssetBundle(MuseumplusForCraftcmsFieldFieldAsset::class);
+        Craft::$app->getView()->registerAssetBundle(MuseumPlusForCraftCmsFieldFieldAsset::class);
 
         // Get our id and namespace
         $id = Craft::$app->getView()->formatInputId($this->handle);
@@ -347,11 +347,11 @@ class MuseumplusForCraftcmsField extends Field
             'prefix' => Craft::$app->getView()->namespaceInputId(''),
             ];
         $jsonVars = Json::encode($jsonVars);
-        Craft::$app->getView()->registerJs("$('#{$namespacedId}-field').MuseumplusForCraftcmsMuseumplusForCraftcmsField(" . $jsonVars . ");");
+        Craft::$app->getView()->registerJs("$('#{$namespacedId}-field').MuseumPlusForCraftCmsMuseumPlusForCraftCmsField(" . $jsonVars . ");");
 
         // Render the input template
         return Craft::$app->getView()->renderTemplate(
-            'museum-plus-for-craft-cms/_components/fields/MuseumplusForCraftcmsField_input',
+            'museum-plus-for-craft-cms/_components/fields/MuseumPlusForCraftCmsField_input',
             [
                 'name' => $this->handle,
                 'value' => $value,

@@ -1,9 +1,9 @@
 {% import "_includes/forms" as forms %}
 
 {# The title of this CP section #}
-{% set title = craft.museumplusForCraftcms.cpTitle~' - Settings' %}
+{% set title = craft.museumPlusForCraftCms.cpTitle~' - Settings' %}
 
-{% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\museumplusforcraftcms\\MuseumplusForCraftcmsAsset") %}
+{% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\museumplusforcraftcms\\MuseumPlusForCraftCmsAsset") %}
 
 {# The content of the CP Section#}
 {% block content %}
@@ -61,7 +61,7 @@
                 {{ forms.select({
                     id: 'attachmentVolumeId',
                     name: 'attachmentVolumeId',
-                    options: craft.museumplusForCraftcms.getVolumes(),
+                    options: craft.museumPlusForCraftCms.getVolumes(),
                     value: settings['attachmentVolumeId']})
                 }}
 
@@ -76,7 +76,7 @@
                 {{ forms.checkboxSelect({
                     id: 'objectGroups',
                     name: 'objectGroups',
-                    options: craft.museumplusForCraftcms.getObjectGroups(),
+                    options: craft.museumPlusForCraftCms.getObjectGroups(),
                     values: settings['objectGroups']})
                 }}
 
@@ -92,7 +92,7 @@
                 {{ forms.multiSelect({
                     id: 'exhibitions',
                     name: 'exhibitions',
-                    options: craft.museumplusForCraftcms.getExhibitions(),
+                    options: craft.museumPlusForCraftCms.getExhibitions(),
                     values: settings['exhibitions']})
                 }}
 
@@ -103,7 +103,7 @@
 
             {{ forms.fieldLayoutDesignerField({
                 fieldLayout: craft.app.fields.getLayoutByType(
-                    'furbo\\museumplusforcraftcms\\elements\\MuseumplusItem'
+                    'furbo\\museumplusforcraftcms\\elements\\MuseumPlusItem'
                 ),
             }) }}
 
