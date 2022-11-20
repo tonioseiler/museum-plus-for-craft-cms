@@ -70,7 +70,7 @@
                 instructions: ''
             }) }}
             <div class="field" data-attribute="attachment">
-                <div class="heading"><label>Attachment</label></div>
+                <div class="heading"><label>Main Image</label></div>
                 <div class="input ltr">
                     {% if item.getAttachment() %}
                         {% set myAsset = item.getAttachment() %}
@@ -92,8 +92,8 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="field" data-attribute="attachment">
-                <div class="heading"><label>Multimedia</label></div>
+            <div class="field" data-attribute="multiMedia">
+                <div class="heading"><label>Media</label></div>
                 <div class="flex">
                     {% for myAsset in item.getMultimedia() %}
                         {% if myAsset %}
