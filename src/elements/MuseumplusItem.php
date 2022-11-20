@@ -14,7 +14,8 @@ use craft\db\Query;
 use craft\helpers\Cp;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\db\MuseumPlusItemQuery;
-use furbo\museumplusforcraftcms\records\ObjectGroupRecord as ObjectGroup;
+use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
+use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 
 use Craft;
 use craft\base\Element;
@@ -105,9 +106,27 @@ class MuseumPlusItem  extends Element
                'label' => Craft::t('app', 'All'),
                'criteria' => [],
                'hasThumbs' => false
-           ]
+           ],
+           [
+               'heading' => 'Object Groups',
+           ],
         ];
+
+        $objectGroups = MuseumPlusForCraftCms::$plugin->collection->getAllObjectGroups();
+
+        foreach ($objectGroups as $objectGroup) {
+            $sources[] = [
+                'key' => 'objectGroup:' . $objectGroup->id,
+                'label' => $objectGroup->title,
+                'criteria' => ['objectGroupId' => $objectGroup->id]
+            ];
+        }
+
         return $sources;
+
+
+
+
     }
 
     // Public Methods
@@ -212,35 +231,20 @@ class MuseumPlusItem  extends Element
     {
 
         if ($isNew) {
-            Craft::$app->db->createCommand()
-                ->insert('{{%museumplus_items}}', [
-                    'id' => $this->id,
-                    'collectionId' => $this->collectionId,
-                    'data' => $this->data,
-                    'assetId' => $this->assetId
-                ])
-                ->execute();
-        } else {
-            Craft::$app->db->createCommand()
-                ->update('{{%museumplus_items}}', [
-                    'data' => $this->data,
-                    'collectionId' => $this->collectionId,
-                    'assetId' => $this->assetId
-                ], ['id' => $this->id])
-                ->execute();
+            $itemRecord = new MuseumPlusItemRecord();
+            $itemRecord->id = $this->id;
+        }
+        else {
+            $itemRecord = MuseumPlusItemRecord::findOne($this->id);
         }
 
-        Craft::$app->db->createCommand()
-            ->delete('{{%museumplus_items_assets}}', ['itemId' => $this->id])
-            ->execute();
+        $itemRecord->collectionId = $this->collectionId;
+        $itemRecord->data = $this->data;
+        $itemRecord->assetId = $this->assetId;
 
-        foreach($this->multiMedia as $multiMedia){
-            Craft::$app->db->createCommand()
-                ->insert('{{%museumplus_items_assets}}', [
-                    'itemId' => $this->id,
-                    'assetId' => $multiMedia,
-                ])->execute();
-        }
+        $itemRecord->save(false);
+
+        $this->syncMultimediaRelations();
 
         parent::afterSave($isNew);
 
@@ -440,6 +444,29 @@ class MuseumPlusItem  extends Element
         }else{
             parent::__set($name, $value);
         }
+    }
+
+    protected function syncMultimediaRelations() {
+        Craft::$app->db->createCommand()
+            ->delete('{{%museumplus_items_assets}}', ['itemId' => $this->id])
+            ->execute();
+
+        foreach($this->multiMedia as $multiMedia){
+            Craft::$app->db->createCommand()
+                ->insert('{{%museumplus_items_assets}}', [
+                    'itemId' => $this->id,
+                    'assetId' => $multiMedia,
+                ])->execute();
+        }
+    }
+
+    public function getObjectGroups() {
+        $rec = $this->getRecord();
+        return $rec->getObjectGroups();
+    }
+
+    public function getRecord() {
+        return MuseumPlusItemRecord::findOne($this->id);
     }
 
 }

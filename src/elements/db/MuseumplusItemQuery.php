@@ -11,6 +11,7 @@ class MuseumPlusItemQuery extends ElementQuery
 {
     public $collectionId;
     public $assetId;
+    public $objectGroupId;
 
     public function collectionId($value)
     {
@@ -19,9 +20,9 @@ class MuseumPlusItemQuery extends ElementQuery
         return $this;
     }
 
-    public function assetId($value)
+    public function objectGroupId($value)
     {
-        $this->assetId = $value;
+        $this->objectGroupId = $value;
 
         return $this;
     }
@@ -46,6 +47,11 @@ class MuseumPlusItemQuery extends ElementQuery
 
         if ($this->assetId) {
             $this->subQuery->andWhere(Db::parseParam('museumplus_items.assetId', $this->assetId));
+        }
+
+        if ($this->objectGroupId) {
+            $this->subQuery->innerJoin('museumplus_items_objectgroups', '[[museumplus_items.id]] = [[museumplus_items_objectgroups.itemId]]');
+            $this->subQuery->andWhere(Db::parseParam('museumplus_items_objectgroups.objectGroupId', $this->objectGroupId));
         }
 
         return parent::beforePrepare();

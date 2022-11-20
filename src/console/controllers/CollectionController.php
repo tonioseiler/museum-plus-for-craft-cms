@@ -15,7 +15,7 @@ use craft\helpers\Assets;
 use craft\models\VolumeFolder;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
-use furbo\museumplusforcraftcms\records\ObjectGroupRecord as ObjectGroup;
+use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 
 use Craft;
 use yii\console\Controller;
@@ -209,7 +209,7 @@ class CollectionController extends Controller
             }
         }
 
-        $existingObjectGroups = ObjectGroup::find()->all();
+        $existingObjectGroups = ObjectGroupRecord::find()->all();
         foreach ($existingObjectGroups as $objectGroup) {
             if (!in_array($objectGroup->collectionId, $objectGroupIds)) {
                 $success = $objectGroup->delete();
@@ -352,12 +352,15 @@ class CollectionController extends Controller
         }
         $success = Craft::$app->elements->saveElement($item);
 
-        //insert obejct relations if they do not exits
-
-        /*foreach($object->objectGroups as $id => $title) {
-
+        //insert object relations if they do not exist
+        $itemRecord = $item->getRecord();
+        $itemRecord->unlinkAll('objectGroups', true);
+        $ogIds = [];
+        foreach($item->objectGroups as $ogCollectionId => $ogName) {
+            $objectGroup = ObjectGroupRecord::find()->where(['collectionId' => $ogCollectionId])->one();
+            if ($objectGroup)
+                $itemRecord->link('objectGroups', $objectGroup);
         }
-        $item->link('objectGroups', array_keys($object->objectGroups));*/
 
         echo '.';
         return true;
@@ -366,13 +369,13 @@ class CollectionController extends Controller
     private function createOrUpdateObjectGroup($data) {
         $collectionId = $data->id;
 
-        $objectGroup = ObjectGroup::find()
+        $objectGroup = ObjectGroupRecord::find()
             ->where(['collectionId' => $collectionId])
             ->one();
 
         if (empty($objectGroup)) {
             //create new
-            $objectGroup = new ObjectGroup();
+            $objectGroup = new ObjectGroupRecord();
             $objectGroup->id = rand(0, 10);
             $objectGroup->collectionId = $collectionId;
             $objectGroup->data = json_encode($data);

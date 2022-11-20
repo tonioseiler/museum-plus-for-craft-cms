@@ -7,7 +7,8 @@ namespace furbo\museumplusforcraftcms\records;
 
 use craft\db\ActiveRecord;
 
-use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
+use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
+
 
 /*
  * @author    Furbo GmbH
@@ -22,5 +23,11 @@ class ObjectGroupRecord extends ActiveRecord
     {
         return '{{%museumplus_objectgroups}}';
     }
+
+    public function getItems() {
+        return $this->hasMany(MuseumPlusItemRecord::className(), ['id' => 'itemId'])
+            ->viaTable('museumplus_items_objectgroups', ['objectGroupId' => 'id']);
+    }
+
 
 }
