@@ -244,8 +244,6 @@ class MuseumPlusItem  extends Element
 
         $itemRecord->save(false);
 
-        $this->syncMultimediaRelations();
-
         parent::afterSave($isNew);
 
     }
@@ -431,31 +429,16 @@ class MuseumPlusItem  extends Element
         }
     }
 
-    public function __set($name, $value)
-    {
-        $data = json_decode($this->data, true);
-        if(is_array($data)) {
-            if (array_key_exists($name, $data)) {
-                $data[$name] = $value;
-                $this->data = json_encode($data);
-            }else{
-                parent::__set($name, $value);
-            }
-        }else{
-            parent::__set($name, $value);
-        }
-    }
-
-    protected function syncMultimediaRelations() {
+    public function syncMultimediaRelations($assetIds) {
         Craft::$app->db->createCommand()
             ->delete('{{%museumplus_items_assets}}', ['itemId' => $this->id])
             ->execute();
 
-        foreach($this->multiMedia as $multiMedia){
+        foreach($assetIds as $assetId){
             Craft::$app->db->createCommand()
                 ->insert('{{%museumplus_items_assets}}', [
                     'itemId' => $this->id,
-                    'assetId' => $multiMedia,
+                    'assetId' => $assetId,
                 ])->execute();
         }
     }

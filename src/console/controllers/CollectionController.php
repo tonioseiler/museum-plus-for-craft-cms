@@ -194,8 +194,7 @@ class CollectionController extends Controller
             }
             if(count($assetIds)){
                 echo "[OK] Id: " . $item->id . " AssetsIDs: " . implode(",", $assetIds) . PHP_EOL;
-                $item->multiMedia = $assetIds;
-                Craft::$app->elements->saveElement($item);
+                $item->syncMultimediaRelations($assetIds);
             }
         }
     }
