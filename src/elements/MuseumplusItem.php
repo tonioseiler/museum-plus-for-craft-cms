@@ -123,10 +123,6 @@ class MuseumPlusItem  extends Element
         }
 
         return $sources;
-
-
-
-
     }
 
     // Public Methods
@@ -457,7 +453,6 @@ class MuseumPlusItem  extends Element
 
     public function getObjectGroups() {
         $rec = $this->getRecord();
-
         return $rec->getObjectGroups();
     }
 
