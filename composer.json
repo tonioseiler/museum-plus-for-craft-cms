@@ -40,7 +40,7 @@
             "museumPlus": "furbo\\museumplusforcraftcms\\services\\MuseumPlusService",
             "collection": "furbo\\museumplusforcraftcms\\services\\CollectionService"
         },
-        "class": "furbo\\museumplusforcraftcms\\MuseumplusForCraftCms"
+        "class": "furbo\\museumplusforcraftcms\\MuseumPlusForCraftCms"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
