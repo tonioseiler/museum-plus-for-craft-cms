@@ -173,9 +173,9 @@ class CollectionController extends Controller
                  if ($asset) {
                      $success = Craft::$app->elements->deleteElement($asset);
                      if ($success) {
-                         echo "[OK] Id:" . $item->id . " AssetID" . $item->assetId . PHP_EOL;
+                         echo "[OK] Id:" . $item->id . " AssetID " . $item->assetId . PHP_EOL;
                      } else {
-                         echo "[ERROR] Id:" . $item->id . " AssetID" . $item->assetId . PHP_EOL;
+                         echo "[ERROR] Id:" . $item->id . " AssetID " . $item->assetId . PHP_EOL;
                      }
                  }
              }
