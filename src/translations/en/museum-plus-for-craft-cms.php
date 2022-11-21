@@ -17,7 +17,7 @@
  * http://www.yiiframework.com/doc-2.0/guide-tutorial-i18n.html
  *
  * @author    Furbo GmbH
- * @package   MuseumplusForCraftcms
+ * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  */
 return [

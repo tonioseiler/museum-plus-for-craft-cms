@@ -13,8 +13,9 @@ namespace furbo\museumplusforcraftcms\console\controllers;
 use craft\elements\Asset;
 use craft\helpers\Assets;
 use craft\models\VolumeFolder;
-use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
-use furbo\museumplusforcraftcms\elements\MuseumplusItem;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
+use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
+use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 
 use Craft;
 use yii\console\Controller;
@@ -42,7 +43,7 @@ use yii\helpers\Console;
  * ./craft museum-plus-for-craft-cms/collection/do-something
  *
  * @author    Furbo GmbH
- * @package   MuseumplusForCraftcms
+ * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  */
 class CollectionController extends Controller
@@ -56,7 +57,7 @@ class CollectionController extends Controller
     // Private Properties
     private $start;
     private $settings;
-    private $collection;
+    private $museumPlus;
     public $assets;
 
 
@@ -66,8 +67,8 @@ class CollectionController extends Controller
     public function __construct($id, $module, $config = [])
     {
         parent::__construct($id, $module, $config);
-        $this->settings = MuseumplusForCraftcms::$plugin->getSettings();
-        $this->collection = MuseumplusForCraftcms::$plugin->collection;
+        $this->settings = MuseumPlusForCraftCms::$plugin->getSettings();
+        $this->museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
         $this->assets = Craft::$app->getAssets();
     }
 
@@ -104,25 +105,8 @@ class CollectionController extends Controller
 
      public function actionImportData()
      {
-
-         $objectIds = [];
-         foreach ($this->settings['objectGroups'] as $objectGroupId) {
-             $objects = $this->collection->getObjectsByObjectGroup($objectGroupId);
-             foreach ($objects as $o) {
-                 $objectIds[$o->id] = $o->id;
-                 $this->createOrUpdateItem($o);
-             }
-         }
-
-         $existingItems = MuseumplusItem::find()->all();
-         foreach ($existingItems as $item) {
-             if (!isset($objectIds[$item->collectionId])) {
-                 $success = Craft::$app->elements->deleteElement($item);
-                 echo 'x';
-             }
-         }
-
-         return true;
+         $this->downloadObjectGroups();
+         $this->downloadItems();
      }
 
      public function options($actionID)
@@ -134,21 +118,21 @@ class CollectionController extends Controller
 
     public function actionImportAttachments()
      {
-         $existingItems = MuseumplusItem::find()->all();
-         $yesteday = new \DateTime();
-         $yesteday->sub(new \DateInterval('PT24H'));
+         $existingItems = MuseumPlusItem::find()->all();
+         $yesterday = new \DateTime();
+         $yesterday->sub(new \DateInterval('PT24H'));
 
          foreach ($existingItems as $item) {
              $newDate = null;
 
              if(!$this->forceAll) {
-                 $date = $this->collection->getObjectLastModified($item->collectionId);
+                 $date = $this->museumPlus->getObjectLastModified($item->collectionId);
                  try {
                      $newDate = new \DateTime($date);
                  } catch (\Exception $e) {}
              }
 
-             if($newDate > $yesteday || $this->forceAll){
+             if($newDate > $yesterday || $this->forceAll){
                  $assetId = $this->createAttachmentFromObjectId($item->collectionId);
                  if($assetId){
                      echo "[OK] Id: " . $item->id . " AssetID: " . $assetId . PHP_EOL;
@@ -166,7 +150,7 @@ class CollectionController extends Controller
 
      public function actionRemoveAttachments()
      {
-        $existingItems = MuseumplusItem::find()->all();
+        $existingItems = MuseumPlusItem::find()->all();
          foreach ($existingItems as $item) {
              if($item->assetId) {
                  $asset = Asset::find()->id($item->assetId)->one();
@@ -185,9 +169,9 @@ class CollectionController extends Controller
 
     public function actionImportMultimediaObjects()
     {
-        $existingItems = MuseumplusItem::find()->all();
-        $yesteday = new \DateTime();
-        $yesteday->sub(new \DateInterval('PT24H'));
+        $existingItems = MuseumPlusItem::find()->all();
+        $yesterday = new \DateTime();
+        $yesterday->sub(new \DateInterval('PT24H'));
 
         foreach ($existingItems as $item) {
             $assetIds = [];
@@ -195,13 +179,13 @@ class CollectionController extends Controller
                 $newDate = null;
 
                 if(!$this->forceAll) {
-                    $date = $this->collection->getMultimediaLastModified($id);
+                    $date = $this->museumPlus->getMultimediaLastModified($id);
                     try {
                         $newDate = new \DateTime($date);
                     } catch (\Exception $e) {}
                 }
 
-                if($newDate > $yesteday || $this->forceAll) {
+                if($newDate > $yesterday || $this->forceAll) {
                     $assetId = $this->createMultimediaFromId($id);
                     if ($assetId) {
                         $assetIds[] = $assetId;
@@ -210,10 +194,50 @@ class CollectionController extends Controller
             }
             if(count($assetIds)){
                 echo "[OK] Id: " . $item->id . " AssetsIDs: " . implode(",", $assetIds) . PHP_EOL;
-                $item->multiMedia = $assetIds;
-                Craft::$app->elements->saveElement($item);
+                $item->syncMultimediaRelations($assetIds);
             }
         }
+    }
+
+    private function downloadObjectGroups() {
+        $objectGroupIds = $this->settings['objectGroups'];
+        $objectGroupsData = $this->museumPlus->getObjectGroups();
+        foreach ($objectGroupsData as $ogd) {
+            if (in_array($ogd->id, $objectGroupIds)) {
+                $this->createOrUpdateObjectGroup($ogd);
+            }
+        }
+
+        $existingObjectGroups = ObjectGroupRecord::find()->all();
+        foreach ($existingObjectGroups as $objectGroup) {
+            if (!in_array($objectGroup->collectionId, $objectGroupIds)) {
+                $success = $objectGroup->delete();
+                echo 'x';
+            }
+        }
+
+        return true;
+    }
+
+    private function downloadItems() {
+        $objectIds = [];
+        foreach ($this->settings['objectGroups'] as $objectGroupId) {
+            $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId);
+            foreach ($objects as $o) {
+                $objectIds[$o->id] = $o->id;
+                $this->createOrUpdateItem($o);
+            }
+        }
+
+        $existingItems = MuseumPlusItem::find()->all();
+        foreach ($existingItems as $item) {
+            if (!isset($objectIds[$item->collectionId])) {
+                $success = Craft::$app->elements->deleteElement($item);
+                echo 'x';
+            }
+        }
+
+        return true;
     }
 
     private function createAttachmentFromObjectId($id)
@@ -221,7 +245,7 @@ class CollectionController extends Controller
          $folderId = $this->settings['attachmentVolumeId'];
          $folder = $this->assets->findFolder(['id' => $folderId]);
          $parentFolder = $this->createFolder("Items", $folderId);
-         $attachment = $this->collection->getAttachmentByObjectId($id);
+         $attachment = $this->museumPlus->getAttachmentByObjectId($id);
 
          if ($attachment) {
              $basename = pathinfo($attachment, PATHINFO_FILENAME);
@@ -246,6 +270,7 @@ class CollectionController extends Controller
                      return false;
                  }
              } catch (\Throwable $e) {
+                 echo $e->getMessage();
                 return false;
              }
          }
@@ -257,7 +282,7 @@ class CollectionController extends Controller
         $folderId = $this->settings['attachmentVolumeId'];
         $folder = $this->assets->findFolder(['id' => $folderId]);
         $parentFolder = $this->createFolder("Multimedia", $folderId);
-        $attachment = $this->collection->getMultimediaById($id);
+        $attachment = $this->museumPlus->getMultimediaById($id);
 
         if ($attachment) {
             $basename = pathinfo($attachment, PATHINFO_FILENAME);
@@ -307,26 +332,54 @@ class CollectionController extends Controller
     private function createOrUpdateItem($object) {
         $collectionId = $object->id;
 
-        $item = MuseumplusItem::find()
+        $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
 
         if (empty($item)) {
             //create new
-            $item = new MuseumplusItem();
+            $item = new MuseumPlusItem();
             $item->collectionId = $collectionId;
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
-            $success = Craft::$app->elements->saveElement($item);
         } else {
             //update
             $item->data = json_encode($object);
             if (empty($item->title)) {
                 $item->title = $object->ObjObjectTitleVrt;
             }
-            $success = Craft::$app->elements->saveElement($item);
         }
+        $success = Craft::$app->elements->saveElement($item);
+
+        $item->syncObjectGroups($item->objectGroups);
+
         echo '.';
+        return true;
+    }
+
+    private function createOrUpdateObjectGroup($data) {
+        $collectionId = $data->id;
+
+        $objectGroup = ObjectGroupRecord::find()
+            ->where(['collectionId' => $collectionId])
+            ->one();
+
+        if (empty($objectGroup)) {
+            //create new
+            $objectGroup = new ObjectGroupRecord();
+            $objectGroup->id = rand(0, 10);
+            $objectGroup->collectionId = $collectionId;
+            $objectGroup->data = json_encode($data);
+            $objectGroup->title = $data->OgrNameTxt;
+            $success = $objectGroup->save();
+        } else {
+            //update
+            $objectGroup->data = json_encode($data);
+            if (empty($objectGroup->title)) {
+                $objectGroup->title = $data->OgrNameTxt;
+            }
+            $success = $objectGroup->save();
+        }
         return true;
     }
 

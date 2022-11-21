@@ -12,8 +12,10 @@ namespace furbo\museumplusforcraftcms\elements;
 
 use craft\db\Query;
 use craft\helpers\Cp;
-use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
-use furbo\museumplusforcraftcms\elements\db\MuseumplusItemQuery;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
+use furbo\museumplusforcraftcms\elements\db\MuseumPlusItemQuery;
+use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
+use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 
 use Craft;
 use craft\base\Element;
@@ -23,14 +25,14 @@ use craft\models\FieldLayout;
 use craft\models\TagGroup;
 
 /**
- *  Element MuseumplusItem
+ *  Element MuseumPlusItem
  *
  *
  * @author    Furbo GmbH
- * @package   MuseumplusForCraftcms
+ * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  */
-class MuseumplusItem  extends Element
+class MuseumPlusItem  extends Element
 {
     // Public Properties
     // =========================================================================
@@ -53,7 +55,7 @@ class MuseumplusItem  extends Element
      */
     public static function displayName(): string
     {
-        return Craft::t('museum-plus-for-craft-cms', '');
+        return Craft::t('museum-plus-for-craft-cms', 'Item');
     }
 
     /**
@@ -73,6 +75,11 @@ class MuseumplusItem  extends Element
      * @return bool Whether elements of this type have traditional titles.
      */
     public static function hasTitles(): bool
+    {
+        return true;
+    }
+
+    public static function hasUris(): bool
     {
         return true;
     }
@@ -99,9 +106,27 @@ class MuseumplusItem  extends Element
                'label' => Craft::t('app', 'All'),
                'criteria' => [],
                'hasThumbs' => false
-           ]
+           ],
+           [
+               'heading' => 'Object Groups',
+           ],
         ];
+
+        $objectGroups = MuseumPlusForCraftCms::$plugin->collection->getAllObjectGroups();
+
+        foreach ($objectGroups as $objectGroup) {
+            $sources[] = [
+                'key' => 'objectGroup:' . $objectGroup->id,
+                'label' => $objectGroup->title,
+                'criteria' => ['objectGroupId' => $objectGroup->id]
+            ];
+        }
+
         return $sources;
+
+
+
+
     }
 
     // Public Methods
@@ -128,7 +153,7 @@ class MuseumplusItem  extends Element
      */
     public function getFieldLayout(): FieldLayout
     {
-        return \Craft::$app->fields->getLayoutByType(MuseumplusItem::class);
+        return \Craft::$app->fields->getLayoutByType(MuseumPlusItem::class);
     }
 
     // Indexes, etc.
@@ -165,12 +190,20 @@ class MuseumplusItem  extends Element
         return 'museum-plus-for-craft-cms/collection/'.$this->id;
     }
 
+
     public static function hasStatuses(): bool
     {
         return true;
     }
 
+    protected function uiLabel(): ?string
+    {
+        if (!isset($this->title) || trim($this->title) === '') {
+            return '–';
+        }
 
+        return null;
+    }
 
     // Events
     // -------------------------------------------------------------------------
@@ -198,35 +231,18 @@ class MuseumplusItem  extends Element
     {
 
         if ($isNew) {
-            Craft::$app->db->createCommand()
-                ->insert('{{%museumplus_items}}', [
-                    'id' => $this->id,
-                    'collectionId' => $this->collectionId,
-                    'data' => $this->data,
-                    'assetId' => $this->assetId
-                ])
-                ->execute();
-        } else {
-            Craft::$app->db->createCommand()
-                ->update('{{%museumplus_items}}', [
-                    'data' => $this->data,
-                    'collectionId' => $this->collectionId,
-                    'assetId' => $this->assetId
-                ], ['id' => $this->id])
-                ->execute();
+            $itemRecord = new MuseumPlusItemRecord();
+            $itemRecord->id = $this->id;
+        }
+        else {
+            $itemRecord = MuseumPlusItemRecord::findOne($this->id);
         }
 
-        Craft::$app->db->createCommand()
-            ->delete('{{%museumplus_items_assets}}', ['itemId' => $this->id])
-            ->execute();
+        $itemRecord->collectionId = $this->collectionId;
+        $itemRecord->data = $this->data;
+        $itemRecord->assetId = $this->assetId;
 
-        foreach($this->multiMedia as $multiMedia){
-            Craft::$app->db->createCommand()
-                ->insert('{{%museumplus_items_assets}}', [
-                    'itemId' => $this->id,
-                    'assetId' => $multiMedia,
-                ])->execute();
-        }
+        $itemRecord->save(false);
 
         parent::afterSave($isNew);
 
@@ -313,7 +329,7 @@ class MuseumplusItem  extends Element
 
     public static function find(): ElementQueryInterface
     {
-        return new MuseumplusItemQuery(static::class);
+        return new MuseumPlusItemQuery(static::class);
     }
 
     protected function tableAttributeHtml(string $attribute): string
@@ -325,16 +341,15 @@ class MuseumplusItem  extends Element
                     if($asset){
                         return Cp::elementPreviewHtml([$asset], Cp::ELEMENT_SIZE_SMALL, false, true, true, false);
                     }
-                    return '-';
+                    return $this->assetId;
                 }
-                return '';
+                return '-';
             case 'multimedia':
                 $assets = $this->getMultimedia();
                 if(count($assets)) {
                     return Cp::elementPreviewHtml($assets, Cp::ELEMENT_SIZE_SMALL, false, true, true, false);
                 }
                 return '-';
-
         }
         return parent::tableAttributeHtml($attribute);
     }
@@ -342,20 +357,24 @@ class MuseumplusItem  extends Element
     protected static function defineTableAttributes(): array
     {
         return [
-            'collectionId' => 'Museumplus Id',
-            'assetId' => 'Attachment',
-            'multimedia' => 'Multimedia',
+            'collectionId' => 'MuseumPlus Id',
+            'assetId' => 'Main Image',
+            'multimedia' => 'Media',
+            'id' => ['label' => Craft::t('app', 'ID')],
         ];
     }
+
+    protected static function defineDefaultTableAttributes(string $source): array
+    {
+        return ['collectionId', 'assetId', 'multimedia'];
+    }
+
 
     protected static function defineSortOptions(): array
     {
         return [
-            [
-                'label' => Craft::t('app', 'Date Created'),
-                'orderBy' => 'elements.dateCreated',
-                'attribute' => 'dateCreated'
-            ]
+            'title' => \Craft::t('app', 'Title'),
+            'collectionId' => 'MuseumPlus Id'
         ];
     }
 
@@ -363,6 +382,7 @@ class MuseumplusItem  extends Element
     {
         return ['data', 'collectionId'];
     }
+
 
     public function getRelatedItems() {
         /*$items = [];
@@ -409,18 +429,40 @@ class MuseumplusItem  extends Element
         }
     }
 
-    public function __set($name, $value)
-    {
-        $data = json_decode($this->data, true);
-        if(is_array($data)) {
-            if (array_key_exists($name, $data)) {
-                $data[$name] = $value;
-                $this->data = json_encode($data);
-            }else{
-                parent::__set($name, $value);
-            }
-        }else{
-            parent::__set($name, $value);
+    public function syncMultimediaRelations($assetIds) {
+        Craft::$app->db->createCommand()
+            ->delete('{{%museumplus_items_assets}}', ['itemId' => $this->id])
+            ->execute();
+
+        foreach($assetIds as $assetId){
+            Craft::$app->db->createCommand()
+                ->insert('{{%museumplus_items_assets}}', [
+                    'itemId' => $this->id,
+                    'assetId' => $assetId,
+                ])->execute();
         }
     }
+
+    public function syncObjectGroups($objectGroups) {
+        //insert object relations if they do not exist
+        $itemRecord = $this->getRecord();
+        $itemRecord->unlinkAll('objectGroups', true);
+        $ogIds = [];
+        foreach($objectGroups as $ogCollectionId => $ogName) {
+            $objectGroup = ObjectGroupRecord::find()->where(['collectionId' => $ogCollectionId])->one();
+            if ($objectGroup)
+                $itemRecord->link('objectGroups', $objectGroup);
+        }
+    }
+
+    public function getObjectGroups() {
+        $rec = $this->getRecord();
+
+        return $rec->getObjectGroups();
+    }
+
+    public function getRecord() {
+        return MuseumPlusItemRecord::findOne($this->id);
+    }
+
 }

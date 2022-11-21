@@ -11,13 +11,13 @@
 namespace furbo\museumplusforcraftcms;
 
 use craft\helpers\App;
-use furbo\museumplusforcraftcms\services\Collection as CollectionService;
-use furbo\museumplusforcraftcms\variables\MuseumplusForCraftcmsVariable;
+use furbo\museumplusforcraftcms\services\MuseumPlusService;
+use furbo\museumplusforcraftcms\variables\MuseumPlusForCraftCmsVariable;
 use furbo\museumplusforcraftcms\models\Settings;
-use furbo\museumplusforcraftcms\fields\MuseumplusForCraftcmsField as MuseumplusForCraftcmsFieldField;
+use furbo\museumplusforcraftcms\fields\MuseumPlusForCraftCmsField as MuseumPlusForCraftCmsFieldField;
 use furbo\museumplusforcraftcms\utilities\Collection as CollectionUtility;
 use furbo\museumplusforcraftcms\widgets\Collection as CollectionWidget;
-use furbo\museumplusforcraftcms\elements\MuseumplusItem;
+use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 
 use Craft;
 use craft\base\Plugin;
@@ -46,23 +46,23 @@ use yii\base\Event;
  * https://docs.craftcms.com/v3/extend/
  *
  * @author    Furbo GmbH
- * @package   MuseumplusForCraftcms
+ * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  *
- * @property  CollectionService $collection
+ * @property  MuseumPlusService $museumPlus
  * @property  Settings $settings
  * @method    Settings getSettings()
  */
-class MuseumplusForCraftCms extends Plugin
+class MuseumPlusForCraftCms extends Plugin
 {
     // Static Properties
     // =========================================================================
 
     /**
      * Static property that is an instance of this plugin class so that it can be accessed via
-     * MuseumplusForCraftcms::$plugin
+     * MuseumPlusForCraftCms::$plugin
      *
-     * @var MuseumplusForCraftcms
+     * @var MuseumPlusForCraftCms
      */
     public static $plugin;
 
@@ -95,7 +95,7 @@ class MuseumplusForCraftCms extends Plugin
 
     /**
      * Set our $plugin static property to this class so that it can be accessed via
-     * MuseumplusForCraftcms::$plugin
+     * MuseumPlusForCraftCms::$plugin
      *
      * Called after the plugin class is instantiated; do any one-time initialization
      * here such as hooks and events.
@@ -135,7 +135,7 @@ class MuseumplusForCraftCms extends Plugin
             Elements::class,
             Elements::EVENT_REGISTER_ELEMENT_TYPES,
             function (RegisterComponentTypesEvent $event) {
-                $event->types[] = MuseumplusItem::class;
+                $event->types[] = MuseumPlusItem::class;
             }
         );
 
@@ -144,7 +144,7 @@ class MuseumplusForCraftCms extends Plugin
             Fields::class,
             Fields::EVENT_REGISTER_FIELD_TYPES,
             function (RegisterComponentTypesEvent $event) {
-                $event->types[] = MuseumplusForCraftcmsFieldField::class;
+                $event->types[] = MuseumPlusForCraftCmsFieldField::class;
             }
         );
 
@@ -173,7 +173,7 @@ class MuseumplusForCraftCms extends Plugin
             function (Event $event) {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
-                $variable->set('museumplusForCraftcms', MuseumplusForCraftcmsVariable::class);
+                $variable->set('museumPlusForCraftCms', MuseumPlusForCraftCmsVariable::class);
             }
         );
 
@@ -195,7 +195,7 @@ class MuseumplusForCraftCms extends Plugin
             function (Event $event) {
                 //save field layout
                 $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost('settings');
-                $fieldLayout->type = MuseumplusItem::class;
+                $fieldLayout->type = MuseumPlusItem::class;
                 Craft::$app->getFields()->saveLayout($fieldLayout);
             }
         );
@@ -260,7 +260,7 @@ class MuseumplusForCraftCms extends Plugin
     protected function getCpRoutes(): array
     {
         return [
-            'museum-plus-for-craft-cms/museum-plus-for-craft-cms/collection' => ['template' => 'museum-plus-for-craft-cms/collection'],
+            'museum-plus-for-craft-cms/collection' => ['template' => 'museum-plus-for-craft-cms/collection'],
             'museum-plus-for-craft-cms/collection/<itemId:\d+>' => 'museum-plus-for-craft-cms/collection/edit'
         ];
     }

@@ -10,8 +10,8 @@
 
 namespace furbo\museumplusforcraftcms\services;
 
-use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
-use furbo\museumplusforcraftcms\elements\MuseumplusItem;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
+use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 
 use Craft;
 use craft\base\Component;
@@ -22,18 +22,18 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 
 /**
-* Collection Service
+* MuseumPlus Service
 *
 * From any other plugin file, call it like this:
 *
-*     MuseumplusForCraftcms::$plugin->collection->someMethod()
+*     MuseumPlusForCraftCms::$plugin->museumPlus->someMethod()
 *
 *
 * @author    Furbo GmbH
-* @package   MuseumplusForCraftcms
+* @package   MuseumPlusForCraftCms
 * @since     1.0.0
 */
-class Collection extends Component
+class MuseumPlusService extends Component
 {
 
     const QUERY_LIMIT = 100;
@@ -73,11 +73,11 @@ class Collection extends Component
     {
 
       $this->init();
-      
+
       $offset = 0;
       $size = self::MAX_ITEMS;
       $objects = [];
-      
+
         while ($offset <= $size) {
             $body = '<?xml version="1.0" encoding="UTF-8"?>
                 <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
@@ -277,7 +277,7 @@ class Collection extends Component
         App::maxPowerCaptain();
         if (empty($this->client)) {
 
-            $settings = MuseumplusForCraftcms::$plugin->getSettings();
+            $settings = MuseumPlusForCraftCms::$plugin->getSettings();
 
             $username = $settings['username'];
             $password = $settings['password'];
@@ -317,6 +317,7 @@ class Collection extends Component
     private function createDataObjectFromXML($xmlObject) {
         $object = new \stdClass();
         $tmp = json_decode(json_encode($xmlObject), true);
+        //dd($tmp);
         foreach ($tmp['@attributes'] as $key => $value) {
             $object->{$key} = $value;
         }
@@ -385,8 +386,14 @@ class Collection extends Component
     private function getModuleReferencesByName($arr, $type) {
         $ret = [];
         if (isset($arr['moduleReference'])) {
-            foreach ($arr['moduleReference'] as $ref) {
-                if ($ref['@attributes']['name'] == $type) {
+
+            if (isset($arr['moduleReference']['@attributes']))
+                $tmp = [$arr['moduleReference']];
+            else
+                $tmp = $arr['moduleReference'];
+
+            foreach ($tmp as $ref) {
+                if (isset($ref['@attributes']) && isset($ref['@attributes']['name']) && $ref['@attributes']['name'] == $type) {
                     if (isset($ref['moduleReferenceItem'])){
                         if ($ref['@attributes']['size'] == '1') {
                             if (isset($ref['moduleReferenceItem']) && isset($ref['moduleReferenceItem']['@attributes']['moduleItemId'])) {
@@ -457,13 +464,6 @@ class Collection extends Component
 
     private function addMultimediaReferences(&$obj, $arr) {
         $obj->multiMediaObjects = $this->getModuleReferencesByName($arr, 'ObjMultimediaRef');
-
-        //neu
-        // - objekte in der zwischentabelle löschen mit diesem name
-        // - bei bedarf referenzobjekte erstellen (inkl typ) und eintrag in zwischentabelle machen.
-        // - am schluss muss noch überprüft werden, welche referenzobjekt gar keinen Eintrag mehr in der pivot tabelle haben.
-        
-
     }
 
     private function addObjectGroupReferences(&$obj, $arr) {

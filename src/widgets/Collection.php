@@ -10,7 +10,7 @@
 
 namespace furbo\museumplusforcraftcms\widgets;
 
-use furbo\museumplusforcraftcms\MuseumplusForCraftcms;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\assetbundles\collectionwidget\CollectionWidgetAsset;
 
 use Craft;
@@ -25,7 +25,7 @@ use craft\base\Widget;
  * https://craftcms.com/docs/plugins/widgets
  *
  * @author    Furbo GmbH
- * @package   MuseumplusForCraftcms
+ * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  */
 class Collection extends Widget
