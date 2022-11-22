@@ -4,6 +4,25 @@
 {% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\museumplusforcraftcms\\MuseumPlusForCraftCmsAsset") %}
 {% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\collectioncpsection\\CollectionCPSectionAsset") %}
 
+{% macro printArray(arr) %}
+    {% for k,v in arr %}
+        <li>
+            {% if v is iterable %}
+                {% if k matches '/^\\d+$/' %}
+                    {# ?? #}
+                {% else %}
+                    <li>{{k}}</li>
+                {% endif %}
+                <ul style="padding-left: 1rem;">
+                    {{ _self.printArray(v) }}
+                </ul>
+            {% else %}
+                {{k}}: {{v}}
+                <br />
+            {% endif %}
+        </li>
+    {% endfor %}
+{% endmacro %}
 
 {# The title of this CP section #}
 {% set title = "Collection Item" %}
@@ -128,21 +147,9 @@
                         <div class="input ltr">
 
                         {% if value is iterable %}
-
-                            {% for k, v in value %}
-                                {% if v is iterable %}
-                                    {% for k2, v2 in v %}
-                                        {% if key == 'multiMediaObjects' %}
-                                            {{dump(v2)}}
-                                        {% endif %}
-                                        {{k2}}: {{v2}}
-                                        <br />
-                                    {% endfor %}
-                                {% else %}
-                                    {{k}}: {{v}}
-                                    <br />
-                                {% endif %}
-                            {% endfor %}
+                            <ul>
+                                {{_self.printArray(value)}}
+                            </ul>
                         {% else %}
                             {% if value|length < 60 %}
                                 <input type="text" id="fields-{{key}}" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[{{key}}]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{value is iterable ? value|join(',') : value}}">

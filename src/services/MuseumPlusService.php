@@ -325,12 +325,11 @@ class MuseumPlusService extends Component
         $this->addFieldValuesToObject($object, $tmp, 'systemField');
         $this->addFieldValuesToObject($object, $tmp, 'dataField');
         $this->addFieldValuesToObject($object, $tmp, 'virtualField');
-        $this->addVocabularyValuesToObject($object, $tmp);
-        $this->addRepeatableGroupValuesToObject($object, $tmp);
-        $this->addMultimediaReferences($object, $tmp);
-        $this->addObjectGroupReferences($object, $tmp);
-        $this->addLiteratureReferences($object, $tmp);
-        $this->addObjectRelations($object, $tmp);
+        $this->addVocabularyRefsToObject($object, $tmp);
+        $this->addModuleRefsToObject($object, $tmp);
+
+        //$this->addRepeatableGroupValuesToObject($object, $tmp);
+
 
         //$object->rawData = $xmlObject->asXML();
 
@@ -353,12 +352,73 @@ class MuseumPlusService extends Component
         }
     }
 
-    private function addVocabularyValuesToObject(&$obj, $arr) {
-        if (isset($arr['vocabularyReference'])) {
-            foreach ($arr['vocabularyReference'] as $field) {
-                $sn = $field['@attributes']['name'];
-                $sv = $field['vocabularyReferenceItem']['formattedValue'];
-                $obj->{$sn} = $sv;
+    private function addModuleRefsToObject(&$obj, $arr) {
+        //set vocabulary refs on object as array
+        if (!property_exists($obj, 'moduleReferences'))
+            $obj->moduleReferences = [];
+
+        $moduleReferences = $this->extractArrayValues($arr, 'moduleReference');
+        if (!empty($moduleReferences)) {
+
+            foreach ($moduleReferences as $field) {
+                $mr = new \stdClass();
+                $mr->targetModule = $field['@attributes']['targetModule'];
+                $mr->name = $field['@attributes']['name'];
+
+                $mr->items = [];
+
+                $mrItems = $field['moduleReferenceItem'];
+                if (isset($mrItems['@attributes']))
+                    $mrItems = [$field['moduleReferenceItem']];
+
+                foreach($mrItems as $mrItem) {
+                    $mri = new \stdClass();
+                    $mri->id = $mrItem['@attributes']['moduleItemId'];
+
+                    if (isset($mrItem['formattedValue'])) {
+                        $mri->value = $mrItem['formattedValue'];
+                        if (isset($mrItem['formattedValue']['@attributes']['language']))
+                            $mri->language = $mrItem['formattedValue']['@attributes']['language'];
+                    }
+                    $mr->items[] = $mri;
+                }
+                $obj->moduleReferences[$mr->name] = $mr;
+            }
+        }
+    }
+
+    private function addVocabularyRefsToObject(&$obj, $arr) {
+        //set vocabulary refs on object as array
+        if (!property_exists($obj, 'vocabularyReferences'))
+            $obj->vocabularyReferences = [];
+
+        $vocabularyReferences = $this->extractArrayValues($arr, 'vocabularyReference');
+        if (!empty($vocabularyReferences)) {
+
+            foreach ($vocabularyReferences as $field) {
+                $vr = new \stdClass();
+                $vr->name = $field['@attributes']['name'];
+                $vr->instanceName = $field['@attributes']['instanceName'];
+                $vr->id = $field['@attributes']['id'];
+                $vr->items = [];
+
+                $vrItems = $field;
+                if (isset($field['vocabularyReferenceItem']))
+                    $vrItems = [$field['vocabularyReferenceItem']];
+
+                foreach($vrItems as $vrItem) {
+                    $vri = new \stdClass();
+                    $vri->id = $vrItem['@attributes']['id'];
+                    if (isset($vrItem['@attributes']['name'])){
+                        $vri->name = $vrItem['@attributes']['name'];
+                    }
+                    $vri->value = $vrItem['formattedValue'];
+                    if (isset($vrItem['formattedValue']['@attributes']['language']))
+                        $vri->language = $vrItem['formattedValue']['@attributes']['language'];
+                    $vr->items[] = $vri;
+                }
+
+                $obj->vocabularyReferences[] = $vr;
             }
         }
     }
@@ -461,16 +521,29 @@ class MuseumPlusService extends Component
         // obecjt groups
     }
 
+    private function extractArrayValues(array $array, $needle)
+    {
+        $iterator  = new \RecursiveArrayIterator($array);
+        $recursive = new \RecursiveIteratorIterator($iterator,\RecursiveIteratorIterator::SELF_FIRST);
+        $return1 = [];
+        foreach ($recursive as $key => $value) {
+            if ($key === $needle) {
+                $return1[] = $value;
+            }
+        }
 
-    private function addMultimediaReferences(&$obj, $arr) {
-        $obj->multiMediaObjects = $this->getModuleReferencesByName($arr, 'ObjMultimediaRef');
-    }
+        //strange, sometimes its ann array with 2 domensions, lets flatten
+        $return2 = [];
+        foreach($return1 as $value) {
+            if (!isset($value['@attributes'])) {
+                foreach($value as $v) {
+                    $return2[] = $v;
+                }
+            } else {
+                $return2[] = $value;
+            }
 
-    private function addObjectGroupReferences(&$obj, $arr) {
-        $obj->objectGroups = $this->getModuleReferencesByName($arr, 'ObjObjectGroupsRef');
-    }
-
-    private function addLiteratureReferences(&$obj, $arr) {
-        $obj->literature = $this->getModuleReferencesByName($arr, 'ObjLiteratureRef');
+        }
+        return $return2;
     }
 }

@@ -175,26 +175,30 @@ class CollectionController extends Controller
 
         foreach ($existingItems as $item) {
             $assetIds = [];
-            foreach ($item->multiMediaObjects as $id => $value){
-                $newDate = null;
+            $moduleRefs = $item->moduleReferences;
+            if(isset($moduleRefs['ObjMultimediaRef'])) {
+                foreach ($moduleRefs['ObjMultimediaRef']['items'] as $mm){
+                    $newDate = null;
 
-                if(!$this->forceAll) {
-                    $date = $this->museumPlus->getMultimediaLastModified($id);
-                    try {
-                        $newDate = new \DateTime($date);
-                    } catch (\Exception $e) {}
-                }
+                    if(!$this->forceAll) {
+                        $date = $this->museumPlus->getMultimediaLastModified($mm['id']);
+                        try {
+                            $newDate = new \DateTime($date);
+                        } catch (\Exception $e) {}
+                    }
 
-                if($newDate > $yesterday || $this->forceAll) {
-                    $assetId = $this->createMultimediaFromId($id);
-                    if ($assetId) {
-                        $assetIds[] = $assetId;
+                    if($newDate > $yesterday || $this->forceAll) {
+                        $assetId = $this->createMultimediaFromId($mm['id']);
+                        if ($assetId) {
+                            $assetIds[] = $assetId;
+                        }
                     }
                 }
             }
+
             if(count($assetIds)){
-                echo "[OK] Id: " . $item->id . " AssetsIDs: " . implode(",", $assetIds) . PHP_EOL;
                 $item->syncMultimediaRelations($assetIds);
+                echo "Download Multimedia Assets[OK]. Item Id: " . $item->id . " Asset IDs: " . implode(",", $assetIds) . PHP_EOL;
             }
         }
     }
@@ -352,6 +356,8 @@ class CollectionController extends Controller
         $success = Craft::$app->elements->saveElement($item);
 
         $item->syncObjectGroups($item->objectGroups);
+
+        //TODO: Download or update vocabulary refs
 
         echo '.';
         return true;
