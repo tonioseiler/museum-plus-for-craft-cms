@@ -439,18 +439,6 @@ class MuseumPlusItem  extends Element
         }
     }
 
-    public function syncObjectGroups($objectGroups) {
-        //insert object relations if they do not exist
-        $itemRecord = $this->getRecord();
-        $itemRecord->unlinkAll('objectGroups', true);
-        $ogIds = [];
-        foreach($objectGroups as $ogCollectionId => $ogName) {
-            $objectGroup = ObjectGroupRecord::find()->where(['collectionId' => $ogCollectionId])->one();
-            if ($objectGroup)
-                $itemRecord->link('objectGroups', $objectGroup);
-        }
-    }
-
     public function getObjectGroups() {
         $rec = $this->getRecord();
         return $rec->getObjectGroups();

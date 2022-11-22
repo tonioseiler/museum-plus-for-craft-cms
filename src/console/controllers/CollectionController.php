@@ -355,9 +355,18 @@ class CollectionController extends Controller
         }
         $success = Craft::$app->elements->saveElement($item);
 
-        $item->syncObjectGroups($item->objectGroups);
+        //insert object relations if they do not exist
+        $itemRecord = $item->getRecord();
+        $itemRecord->unlinkAll('objectGroups', true);
 
-        //TODO: Download or update vocabulary refs
+        $moduleReferences = $item->moduleReferences;
+        if (isset($moduleReferences['ObjObjectGroupsRef'])) {
+            foreach($moduleReferences['ObjObjectGroupsRef']['items'] as $og) {
+                $objectGroup = ObjectGroupRecord::find()->where(['collectionId' => $og['id']])->one();
+                if ($objectGroup)
+                    $itemRecord->link('objectGroups', $objectGroup);
+            }
+        }
 
         echo '.';
         return true;
