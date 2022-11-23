@@ -272,6 +272,134 @@ class MuseumPlusService extends Component
         return $exhibitions;
     }
 
+    public function getPerson($personId)
+    {
+        $that = $this;
+        $cacheKey = Craft::$app->cache->buildKey('museumplus.people.'.$personId);
+        $seconds = 5*60;
+        $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $personId) {
+            $that->init();
+            //normal get is very slow, so do a search to limit fields
+            $body = '<?xml version="1.0" encoding="UTF-8"?>
+                <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
+                  <modules>
+                    <module name="Person">
+                      <search limit="10" offset="0">
+                        <select>
+                          <field fieldPath="__id"/>
+                          <field fieldPath="__lastModifiedUser"/>
+                          <field fieldPath="__lastModified"/>
+                          <field fieldPath="__createdUser"/>
+                          <field fieldPath="__created"/>
+                          <field fieldPath="__orgUnit"/>
+                          <field fieldPath="__uuid"/>
+                          <field fieldPath="__attachment"/>
+                          <field fieldPath="PerDeathDateDat"/>
+                          <field fieldPath="PerBirthDateDat"/>
+                          <field fieldPath="PerAuthorityIdTxt"/>
+                          <field fieldPath="PerDatesExistenceTxt"/>
+                          <field fieldPath="PerCorporateBodiesIdTxt"/>
+                          <field fieldPath="PerInitialsTxt"/>
+                          <field fieldPath="PerGeneralContextClb"/>
+                          <field fieldPath="PerAdditionsToNameTxt"/>
+                          <field fieldPath="PerLanguageScriptClb"/>
+                          <field fieldPath="PerAttributeTxt"/>
+                          <field fieldPath="PerInstitutionIdTxt"/>
+                          <field fieldPath="PerAwardClb"/>
+                          <field fieldPath="PerBiographicalNoteClb"/>
+                          <field fieldPath="PerLegalStatusTxt"/>
+                          <field fieldPath="PerBirthDateTxt"/>
+                          <field fieldPath="PerRuleConventionClb"/>
+                          <field fieldPath="PerMandatesClb"/>
+                          <field fieldPath="PerCollectionClb"/>
+                          <field fieldPath="PerSourceClb"/>
+                          <field fieldPath="PerDateFromTxt"/>
+                          <field fieldPath="PerSalutationTxt"/>
+                          <field fieldPath="PerDateToTxt"/>
+                          <field fieldPath="PerDatingTxt"/>
+                          <field fieldPath="PerStandardFormNameTxt"/>
+                          <field fieldPath="PerDeathDateTxt"/>
+                          <field fieldPath="PerDepartmentTxt"/>
+                          <field fieldPath="PerStructuresGenealogyClb"/>
+                          <field fieldPath="PerExhibitionClb"/>
+                          <field fieldPath="PerForeNameTxt"/>
+                          <field fieldPath="PerPersonTxt"/>
+                          <field fieldPath="PerFoundationPlaceTxt"/>
+                          <field fieldPath="PerFunctionTxt"/>
+                          <field fieldPath="PerNameTxt"/>
+                          <field fieldPath="PerNationalityTxt"/>
+                          <field fieldPath="PerNotesClb"/>
+                          <field fieldPath="PerOccupationTxt"/>
+                          <field fieldPath="PerOrganisationMainBodyTxt"/>
+                          <field fieldPath="PerPlaceBirthTxt"/>
+                          <field fieldPath="PerPlaceDeathTxt"/>
+                          <field fieldPath="PerPlaceTxt"/>
+                          <field fieldPath="PerReferenceNumTxt"/>
+                          <field fieldPath="PerRightsNotesClb"/>
+                          <field fieldPath="PerSchoolStyleTxt"/>
+                          <field fieldPath="PerSortNameTxt"/>
+                          <field fieldPath="PerSurNameTxt"/>
+                          <field fieldPath="PerTitleTxt"/>
+                          <field fieldPath="PerNameVrt"/>
+                          <field fieldPath="PerBiographicalNoteOnlineVrt"/>
+                          <field fieldPath="PerUuidVrt"/>
+                          <field fieldPath="PerPersonVrt"/>
+                          <field fieldPath="PerURLGrp"/>
+                          <field fieldPath="PerGeographyGrp"/>
+                          <field fieldPath="PerFunctionsGrp"/>
+                          <field fieldPath="PerBiographicalNoteGrp"/>
+                          <field fieldPath="PerDateGrp"/>
+                          <field fieldPath="PerGroupsGrp"/>
+                          <field fieldPath="PerNameOtherGrp"/>
+                          <field fieldPath="PerRightsGrp"/>
+                        </select>
+                        <expert>
+                            <and>
+                              <equalsField fieldPath="__id" operand="'.$personId.'" />
+                            </and>
+                            </expert>
+                          </search>
+                        </module>
+                      </modules>
+                    </application>';
+            $request = new Request('POST', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Person/search', $that->requestHeaders, $body);
+            $res = $that->client->sendAsync($request)->wait();
+            $tmp = $that->createDataFromResponse($res);
+            if ($tmp['size'] >= 1)
+                return $tmp['data'][0];
+            return null;
+        }, $seconds);
+
+        return $tmp;
+    }
+
+    public function getOwnership($ownershipId)
+    {
+        $this->init();
+        $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Ownership/'.$ownershipId.'/', $this->requestHeaders);
+        $res = $this->client->sendAsync($request)->wait();
+        $tmp = $this->createDataFromResponse($res);
+        if ($tmp['size'] >= 1)
+            return $tmp['data'][0];
+        return null;
+    }
+
+    public function getLiterature($literatureId)
+    {
+        $cacheKey = Craft::$app->cache->buildKey('museumplus.literature.'.$literatureId);
+        $that = $this;
+        $seconds = 5*60;
+        $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $literatureId) {
+            $that->init();
+            $request = new Request('GET', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Literature/'.$literatureId.'/', $that->requestHeaders);
+            $res = $that->client->sendAsync($request)->wait();
+            $tmp = $that->createDataFromResponse($res);
+            if ($tmp['size'] >= 1)
+                return $tmp['data'][0];
+            return null;
+        }, $seconds);
+    }
+
     public function init():void {
         parent::init();
         App::maxPowerCaptain();

@@ -426,22 +426,46 @@ class MuseumPlusItem  extends Element
     }
 
     public function syncMultimediaRelations($assetIds) {
-        Craft::$app->db->createCommand()
-            ->delete('{{%museumplus_items_assets}}', ['itemId' => $this->id])
-            ->execute();
-
-        foreach($assetIds as $assetId){
-            Craft::$app->db->createCommand()
-                ->insert('{{%museumplus_items_assets}}', [
-                    'itemId' => $this->id,
-                    'assetId' => $assetId,
-                ])->execute();
-        }
+        $this->getRecord()->syncMultimediaRelations($assetIds);
     }
+
+    public function syncPeopleRelations($peopleIds, $type) {
+        $this->getRecord()->syncPeopleRelations($peopleIds, $type);
+    }
+
+    public function syncOwnershipRelations($ownershipIds) {
+        $this->getRecord()->syncOwnershipRelations($ownershipIds);
+    }
+
+    public function syncLiteratureRelations($literureIds) {
+        $this->getRecord()->syncLiteratureRelations($literureIds);
+    }
+
+
 
     public function getObjectGroups() {
         $rec = $this->getRecord();
         return $rec->getObjectGroups();
+    }
+
+    public function getOwnerships() {
+        $rec = $this->getRecord();
+        return $rec->getOwnerships();
+    }
+
+    public function getAssociationPeople() {
+        $rec = $this->getRecord();
+        return $rec->getAssociationPeople();
+    }
+
+    public function getOwnerPeople() {
+        $rec = $this->getRecord();
+        return $rec->getOwnerPeople();
+    }
+
+    public function getAdministrationPeople() {
+        $rec = $this->getRecord();
+        return $rec->getAdministrationPeople();
     }
 
     public function getRecord() {

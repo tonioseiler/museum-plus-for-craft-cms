@@ -82,44 +82,130 @@ class Install extends Migration
         if (!$this->db->tableExists('{{%museumplus_literature}}')) {
             $this->createTable('{{%museumplus_literature}}', [
                 'id' => $this->primaryKey(),
+                'title' => $this->string(),
                 'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid()
             ]);
+        }
 
-            $this->addForeignKey(
-                $this->db->getForeignKeyName(),
-                '{{%museumplus_literature}}',
-                'id',
-                '{{%elements}}',
-                'id',
-                'CASCADE',
-                null
-            );
-        };
 
-        if (!$this->db->tableExists('{{%museumplus_people}}')) {
-            $this->createTable('{{%museumplus_people}}', [
+        if (!$this->db->tableExists('{{%museumplus_items_literature}}')) {
+            $this->createTable('{{%museumplus_items_literature}}', [
                 'id' => $this->primaryKey(),
-                'data' => $this->longText()->null(),
-                'collectionId' => $this->integer()->notNull(),
+                'itemId' => $this->integer()->notNull(),
+                'literatureId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid()
             ]);
 
             $this->addForeignKey(
-                $this->db->getForeignKeyName(),
-                '{{%museumplus_people}}',
-                'id',
-                '{{%elements}}',
+                $this->db->getForeignKeyName('{{%museumplus_items_literature}}', 'literatureId'),
+                '{{%museumplus_items_literature}}',
+                'literatureId',
+                '{{%museumplus_literature}}',
+                'id'
+            );
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_items_literature}}', 'itemId'),
+                '{{%museumplus_items_literature}}',
+                'itemId',
+                '{{%museumplus_items}}',
                 'id',
                 'CASCADE',
-                null
+                'CASCADE'
             );
         }
+
+        f (!$this->db->tableExists('{{%museumplus_people}}')) {
+            $this->createTable('{{%museumplus_people}}', [
+                'id' => $this->primaryKey(),
+                'title' => $this->string(),
+                'data' => $this->longText()->null(),
+                'collectionId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid()
+            ]);
+        }
+
+
+        if (!$this->db->tableExists('{{%museumplus_items_people}}')) {
+            $this->createTable('{{%museumplus_items_people}}', [
+                'id' => $this->primaryKey(),
+                'itemId' => $this->integer()->notNull(),
+                'personId' => $this->integer()->notNull(),
+                'type' => $this->string(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid()
+            ]);
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_items_people}}', 'personId'),
+                '{{%museumplus_items_people}}',
+                'personId',
+                '{{%museumplus_people}}',
+                'id'
+            );
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_items_people}}', 'itemId'),
+                '{{%museumplus_items_people}}',
+                'itemId',
+                '{{%museumplus_items}}',
+                'id',
+                'CASCADE',
+                'CASCADE'
+            );
+        }
+
+        if (!$this->db->tableExists('{{%museumplus_ownerships}}')) {
+            $this->createTable('{{%museumplus_ownerships}}', [
+                'id' => $this->primaryKey(),
+                'title' => $this->string(),
+                'data' => $this->longText()->null(),
+                'collectionId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid()
+            ]);
+        }
+
+
+        if (!$this->db->tableExists('{{%museumplus_items_ownerships}}')) {
+            $this->createTable('{{%museumplus_items_ownerships}}', [
+                'id' => $this->primaryKey(),
+                'itemId' => $this->integer()->notNull(),
+                'ownershipId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid()
+            ]);
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_items_ownerships}}', 'ownershipId'),
+                '{{%museumplus_items_ownerships}}',
+                'ownershipId',
+                '{{%museumplus_ownerships}}',
+                'id'
+            );
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_items_ownerships}}', 'itemId'),
+                '{{%museumplus_items_ownerships}}',
+                'itemId',
+                '{{%museumplus_items}}',
+                'id',
+                'CASCADE',
+                'CASCADE'
+            );
+        }
+
 
         if (!$this->db->tableExists('{{%museumplus_items_assets}}')) {
             $this->createTable('{{%museumplus_items_assets}}', [
