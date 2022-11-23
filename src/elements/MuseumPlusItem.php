@@ -12,10 +12,12 @@ namespace furbo\museumplusforcraftcms\elements;
 
 use craft\db\Query;
 use craft\helpers\Cp;
+
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\db\MuseumPlusItemQuery;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
+use furbo\museumplusforcraftcms\traits\HasAccessibleData;
 
 use Craft;
 use craft\base\Element;
@@ -34,6 +36,9 @@ use craft\models\TagGroup;
  */
 class MuseumPlusItem  extends Element
 {
+
+    use HasAccessibleData;
+    
     // Public Properties
     // =========================================================================
 
@@ -412,18 +417,6 @@ class MuseumPlusItem  extends Element
         //TODO: implement
     }
 
-
-    public function __get($name)
-    {
-        $data = json_decode($this->data, true);
-        if ($name == 'attributes') {
-            return $data;
-        } else if (array_key_exists($name, $data)) {
-            return $data[$name];
-        } else {
-            return parent::__get($name);
-        }
-    }
 
     public function syncMultimediaRelations($assetIds) {
         $this->getRecord()->syncMultimediaRelations($assetIds);

@@ -11,6 +11,7 @@ use craft\db\ActiveRecord;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
+use furbo\museumplusforcraftcms\traits\HasAccessibleData;
 
 /*
  * @author    Furbo GmbH
@@ -20,6 +21,8 @@ use furbo\museumplusforcraftcms\records\OwnershipRecord;
 
 class MuseumPlusItemRecord extends ActiveRecord
 {
+
+    use HasAccessibleData;
 
     public static function tableName(): string
     {
