@@ -396,6 +396,30 @@ class CollectionController extends Controller
                     }
                 }
 
+                //create object to object relations
+                $existingItems = MuseumPlusItem::find()->all();
+                foreach ($existingItems as $item) {
+                    $moduleRefs = $item->moduleReferences;
+                    if(isset($moduleRefs['ObjObjectARef'])) {
+                        $ids = [];
+                        foreach ($moduleRefs['ObjObjectARef']['items'] as $i){
+                            $tmp = MuseumPlusItem::find()
+                                ->where(['collectionId' => $i['id']])
+                                ->one();
+                            if ($tmp) {
+                                $ids[] = $tmp->id;
+                            }
+                        }
+                        //sync
+                        if(count($ids)){
+                            $item->syncItemRelations($ids);
+                            echo '.';
+                        }
+                    }
+
+                }
+
+
                 return true;
             }
 

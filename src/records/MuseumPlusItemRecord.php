@@ -11,7 +11,6 @@ use craft\db\ActiveRecord;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
-use furbo\museumplusforcraftcms\traits\HasAccessibleData;
 
 /*
  * @author    Furbo GmbH
@@ -21,8 +20,6 @@ use furbo\museumplusforcraftcms\traits\HasAccessibleData;
 
 class MuseumPlusItemRecord extends ActiveRecord
 {
-
-    use HasAccessibleData;
 
     public static function tableName(): string
     {
@@ -55,6 +52,11 @@ class MuseumPlusItemRecord extends ActiveRecord
         return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
             ->where(['type' => 'ObjAdministrationRef'])
             ->viaTable('museumplus_items_people', ['itemId' => 'id']);
+    }
+
+    public function getRelatedItems() {
+        return $this->hasMany(MuseumPlusitemRecord::className(), ['id' => 'reltedItemId'])
+            ->viaTable('museumplus_items_items', ['itemId' => 'id']);
     }
 
     public function syncMultimediaRelations($assetIds) {
@@ -110,6 +112,20 @@ class MuseumPlusItemRecord extends ActiveRecord
                 ->insert('{{%museumplus_items_literature}}', [
                     'itemId' => $this->id,
                     'literatureId' => $literureId
+                ])->execute();
+        }
+    }
+
+    public function syncItemRelations($itemIds) {
+        Craft::$app->db->createCommand()
+            ->delete('{{%museumplus_items_items}}', ['itemId' => $this->id])
+            ->execute();
+
+        foreach($itemIds as $itemId){
+            Craft::$app->db->createCommand()
+                ->insert('{{%museumplus_items_items}}', [
+                    'itemId' => $this->id,
+                    'relatedItemId' => $itemId
                 ])->execute();
         }
     }

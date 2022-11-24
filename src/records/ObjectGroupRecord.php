@@ -8,7 +8,6 @@ namespace furbo\museumplusforcraftcms\records;
 use craft\db\ActiveRecord;
 
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
-use furbo\museumplusforcraftcms\traits\HasAccessibleData;
 
 
 /*
@@ -19,8 +18,6 @@ use furbo\museumplusforcraftcms\traits\HasAccessibleData;
 
 class ObjectGroupRecord extends ActiveRecord
 {
-
-    use HasAccessibleData;
 
     public static function tableName(): string
     {

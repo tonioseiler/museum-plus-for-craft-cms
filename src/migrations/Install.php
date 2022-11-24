@@ -79,6 +79,35 @@ class Install extends Migration
             );
         }
 
+        if (!$this->db->tableExists('{{%museumplus_items_items}}')) {
+            $this->createTable('{{%museumplus_items_items}}', [
+                'id' => $this->primaryKey(),
+                'itemId' => $this->integer()->notNull(),
+                'relatedItemId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid()
+            ]);
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_items_items}}', 'relatedItemId'),
+                '{{%museumplus_items_items}}',
+                'relatedItemId',
+                '{{%museumplus_items}}',
+                'id'
+            );
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_items_items}}', 'itemId'),
+                '{{%museumplus_items_items}}',
+                'itemId',
+                '{{%museumplus_items}}',
+                'id',
+                'CASCADE',
+                'CASCADE'
+            );
+        }
+
         if (!$this->db->tableExists('{{%museumplus_literature}}')) {
             $this->createTable('{{%museumplus_literature}}', [
                 'id' => $this->primaryKey(),

@@ -17,7 +17,6 @@ use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\db\MuseumPlusItemQuery;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
-use furbo\museumplusforcraftcms\traits\HasAccessibleData;
 
 use Craft;
 use craft\base\Element;
@@ -37,8 +36,6 @@ use craft\models\TagGroup;
 class MuseumPlusItem  extends Element
 {
 
-    use HasAccessibleData;
-    
     // Public Properties
     // =========================================================================
 
@@ -384,19 +381,6 @@ class MuseumPlusItem  extends Element
         return ['data', 'collectionId'];
     }
 
-
-    public function getRelatedItems() {
-        /*$items = [];
-
-        foreach($this->relatedObjects as $collectionId => $title) {
-            $rel = self::find()->collectionId($collectionId)->all();
-            dd($collectionId);
-            dd($rel);
-        }
-
-        dd();*/
-    }
-
     public function getAttachments() {
         //TODO: implement
     }
@@ -434,6 +418,12 @@ class MuseumPlusItem  extends Element
         $this->getRecord()->syncLiteratureRelations($literureIds);
     }
 
+    public function syncItemRelations($itemIds) {
+        $this->getRecord()->syncItemRelations($itemIds);
+    }
+
+
+
 
 
     public function getObjectGroups() {
@@ -461,8 +451,25 @@ class MuseumPlusItem  extends Element
         return $rec->getAdministrationPeople();
     }
 
+    public function getRelatedItems() {
+        $rec = $this->getRecord();
+        return $rec->getRelatedItems();
+    }
+
     public function getRecord() {
         return MuseumPlusItemRecord::findOne($this->id);
+    }
+
+    public function __get($name)
+    {
+        $data = json_decode($this->data, true);
+        if ($name == 'attributes') {
+            return $data;
+        } else if (array_key_exists($name, $data)) {
+            return $data[$name];
+        } else {
+            return parent::__get($name);
+        }
     }
 
 }
