@@ -18,3 +18,12 @@
     opacity: 1;
     background-color: rgb(242,242,252);
 }
+
+#tab--museumplusforcraftcms-item {
+
+}
+
+#tab--museumplusforcraftcms-item .disabled {
+    opacity: 1;
+    background-color: rgb(242,242,252);
+}

@@ -456,7 +456,7 @@ class MuseumPlusService extends Component
         $this->addVocabularyRefsToObject($object, $tmp);
         $this->addModuleRefsToObject($object, $tmp);
 
-        //$this->addRepeatableGroupValuesToObject($object, $tmp);
+        $this->addRepeatableGroupValuesToObject($object, $tmp);
 
 
         //$object->rawData = $xmlObject->asXML();
@@ -464,7 +464,8 @@ class MuseumPlusService extends Component
         return $object;
     }
 
-    private function addFieldValuesToObject(&$obj, $arr, $fieldName) {
+    private function addFieldValuesToObject(&$obj, $arr, $fieldName, $dd = false) {
+
         if (isset($arr[$fieldName])) {
             if (isset($arr[$fieldName]['@attributes'])) {
                 $sn = $arr[$fieldName]['@attributes']['name'];
@@ -552,22 +553,64 @@ class MuseumPlusService extends Component
     }
 
     private function addRepeatableGroupValuesToObject(&$obj, $arr) {
-        if (isset($arr['repeatableGroup'])) {
-            foreach ($arr['repeatableGroup'] as $group) {
-                $gn = $group['@attributes']['name'];
-                $groupValues = [];
-                foreach ($group['repeatableGroupItem'] as $groupItem) {
+
+        //set vocabulary refs on object as array
+        if (!property_exists($obj, 'repeatableGroups'))
+            $obj->repeatableGroups = [];
+
+        $repeatableGroups = $this->extractArrayValues($arr, 'repeatableGroup');
+        if (!empty($repeatableGroups)) {
+
+            foreach ($repeatableGroups as $repeatableGroup) {
+                $gr = new \stdClass();
+                $gr->name = $repeatableGroup['@attributes']['name'];
+                $gr->items = [];
+
+                if (isset($repeatableGroup['repeatableGroupItem'])) {
+                    $grItems = [$repeatableGroup['repeatableGroupItem']];
+                }
+
+                foreach($grItems as $grItem) {
+                    $gri = new \stdClass();
                     $groupItemObject = new \stdClass();
 
-                    $this->addFieldValuesToObject($groupItemObject, $groupItem, 'systemField');
-                    $this->addFieldValuesToObject($groupItemObject, $groupItem, 'dataField');
-                    $this->addFieldValuesToObject($groupItemObject, $groupItem, 'virtualField');
-                    if ($groupItemObject != new \stdClass())
-                        $groupValues[] = $groupItemObject;
+                    $this->addFieldValuesToObject($groupItemObject, $grItem, 'systemField');
+                    $this->addFieldValuesToObject($groupItemObject, $grItem, 'dataField');
+                    $this->addFieldValuesToObject($groupItemObject, $grItem, 'virtualField');
+
+                    $gr->items[] = $groupItemObject;
+
                 }
-                if (!empty($groupValues))
-                    $obj->{$gn} = $groupValues;
+                $obj->repeatableGroups[] = $gr;
+
+
             }
+/*
+
+
+        if (isset($arr['repeatableGroup'])) {
+            foreach ($arr['repeatableGroup'] as $group) {
+                if (isset($group['@attributes']) && isset($group['@attributes']['name'])) {
+                    $gn = $group['@attributes']['name'];
+                    if (isset($group['repeatableGroupItem'])) {
+                        $groupItem = $group['repeatableGroupItem'];
+                        $groupItemObject = new \stdClass();
+
+                        if ($gn == 'ObjDateGrp' && $obj->id == 45693) {
+                            $this->addFieldValuesToObject($groupItemObject, $groupItem, 'systemField');
+                            $this->addFieldValuesToObject($groupItemObject, $groupItem, 'dataField', true);
+                            $this->addFieldValuesToObject($groupItemObject, $groupItem, 'virtualField');
+                        } else {
+                            $this->addFieldValuesToObject($groupItemObject, $groupItem, 'systemField');
+                            $this->addFieldValuesToObject($groupItemObject, $groupItem, 'dataField');
+                            $this->addFieldValuesToObject($groupItemObject, $groupItem, 'virtualField');
+                        }
+
+                        $obj->{$gn} = $groupItemObject;
+
+                    }
+                }
+            }*/
         }
     }
 

@@ -47,6 +47,8 @@ class MuseumPlusItem  extends Element
 
     public $multiMedia = [];
 
+    private $record = null;
+
     // Static Methods
     // =========================================================================
 
@@ -381,26 +383,6 @@ class MuseumPlusItem  extends Element
         return ['data', 'collectionId'];
     }
 
-    public function getAttachments() {
-        //TODO: implement
-    }
-
-    public function getMultimediaContents() {
-        //TODO: implement
-    }
-
-    public function getPeople() {
-        //TODO: implement
-    }
-
-    public function getLiterature() {
-        //TODO: implement
-    }
-
-    public function getArchivalien() {
-        //TODO: implement
-    }
-
 
     public function syncMultimediaRelations($assetIds) {
         $this->getRecord()->syncMultimediaRelations($assetIds);
@@ -421,10 +403,6 @@ class MuseumPlusItem  extends Element
     public function syncItemRelations($itemIds) {
         $this->getRecord()->syncItemRelations($itemIds);
     }
-
-
-
-
 
     public function getObjectGroups() {
         $rec = $this->getRecord();
@@ -457,7 +435,40 @@ class MuseumPlusItem  extends Element
     }
 
     public function getRecord() {
-        return MuseumPlusItemRecord::findOne($this->id);
+        if (empty($this->record)) {
+            $this->record = MuseumPlusItemRecord::findOne($this->id);
+        }
+        return $this->record;
+    }
+
+    public function getDating() {
+        $rec = $this->getRecord();
+        return $rec->getRepeatableGroupValues('ObjDateGrp', 'DateTxt');
+    }
+
+    public function getGeographicReferences() {
+        $rec = $this->getRecord();
+        return $rec->getGeographicReferences();
+    }
+
+    public function getMaterial() {
+        $rec = $this->getRecord();
+        return $rec->getMaterial();
+    }
+
+    public function getDimensions() {
+        $rec = $this->getRecord();
+        return $rec->getDimensions();
+    }
+
+    public function getProvenance() {
+        $rec = $this->getRecord();
+        return $rec->getProvenance();
+    }
+
+    public function getCreditLine() {
+        $rec = $this->getRecord();
+        return $rec->getCreditLine();
     }
 
     public function __get($name)

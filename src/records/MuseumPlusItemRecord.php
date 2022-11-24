@@ -38,20 +38,24 @@ class MuseumPlusItemRecord extends ActiveRecord
 
     public function getAssociationPeople() {
         return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
-            ->where(['type' => 'ObjPerAssociationRef'])
-            ->viaTable('museumplus_items_people', ['itemId' => 'id']);
+            ->viaTable('museumplus_items_people', ['itemId' => 'id'], function ($query) {
+                $query->andWhere(['type' => 'ObjPerAssociationRef']);
+            });
+
     }
 
     public function getOwnerPeople() {
         return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
-            ->where(['type' => 'ObjPerOwnerRef'])
-            ->viaTable('museumplus_items_people', ['itemId' => 'id']);
+            ->viaTable('museumplus_items_people', ['itemId' => 'id'], function ($query) {
+                $query->andWhere(['type' => 'ObjPerOwnerRef']);
+            });
     }
 
     public function getAdministrationPeople() {
         return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
-            ->where(['type' => 'ObjAdministrationRef'])
-            ->viaTable('museumplus_items_people', ['itemId' => 'id']);
+            ->viaTable('museumplus_items_people', ['itemId' => 'id'], function ($query) {
+                $query->andWhere(['type' => 'ObjAdministrationRef']);
+            });
     }
 
     public function getRelatedItems() {
@@ -128,6 +132,39 @@ class MuseumPlusItemRecord extends ActiveRecord
                     'relatedItemId' => $itemId
                 ])->execute();
         }
+    }
+
+    public function getRepeatableGroupValues($groupName, $attribute) {
+        $data = json_decode($this->data, true);
+        $ret = [];
+        foreach($data['repeatableGroups'] as $group) {
+            if ($group['name'] == $groupName) {
+                foreach($group['items'] as $i) {
+                    $ret[] = $i[$attribute];
+                }
+            }
+        }
+        return $ret;
+    }
+
+    public function getGeographicReferences() {
+        return 'to be implemented';
+    }
+
+    public function getMaterial() {
+        return 'to be implemented';
+    }
+
+    public function getDimensions() {
+        return 'to be implemented';
+    }
+
+    public function getProvenance() {
+        return 'to be implemented';
+    }
+
+    public function getCreditLine() {
+        return 'to be implemented';
     }
 
 

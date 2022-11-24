@@ -34,10 +34,10 @@
 {% set fieldLayout = item.getFieldLayout() %}
 {% set form = fieldLayout.createForm(item) %}
 {% set firstTabs = {
-    "tab--museumplusforcraftcms-data-title": {
-        "tabId": "tab-tab--museumplusforcraftcms-data-title",
+    "tab--museumplusforcraftcms-item": {
+        "tabId": "tab-tab--museumplusforcraftcms-item",
         "label": "Title",
-        "url": "#tab--museumplusforcraftcms-data-title",
+        "url": "#tab--museumplusforcraftcms-item",
         "class": null
     },
     "tab--museumplusforcraftcms-data": {
@@ -80,57 +80,108 @@
     <input type="hidden" name="itemId" value="{{ item.id }}">
 
     <div id="fields">
-        <div id="tab--museumplusforcraftcms-data-title" class="flex-fields" data-id="tab--museumplusforcraftcms-data-title" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-data-title">
-            {{ forms.textField({
+        <div id="tab--museumplusforcraftcms-item" class="flex-fields" data-id="tab--museumplusforcraftcms-item" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-item">
+            {# forms.textField({
                 label: 'Title'|t(),
                 id: 'title',
                 name: 'title',
                 value: item.title,
                 instructions: ''
-            }) }}
-            <div class="field" data-attribute="attachment">
-                <div class="heading"><label>Main Image</label></div>
-                <div class="input ltr">
-                    {% if item.getAttachment() %}
-                        {% set myAsset = item.getAttachment() %}
-                        {% if myAsset %}
-                            {% set thumb = {
-                                width: 300,
-                                quality: 75
-                            } %}
-                            {% set myAssetUrl = myAsset.getUrl(thumb) %}
+            ) #}
+            <fieldset id="fields-item-data" class="field width-50">
+                <div class="field" data-attribute="title">
+                    <div class="heading">
+                        <label id="fields-title-label" for="fields-title">{{'Title'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.__get('ObjObjectTitleVrt')}}">
+                    </div>
+                </div>
 
-                            <a href="{{ myAsset.getCpEditUrl() }}">
-                                <img src="{{ myAssetUrl }}" width="150" />
-                            </a>
+                <div class="field" data-attribute="artist">
+                    <div class="heading">
+                        <label id="fields-artist-label" for="fields-artist">{{'Originator'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        {% for person in item.getAssociationPeople().all() %}
+                            <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{person.__get('PerPersonTxt')}}">
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="field" data-attribute="artist">
+                    <div class="heading">
+                        <label id="fields-artist-label" for="fields-artist">{{'Dating'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        {% for person in item.getAssociationPeople().all() %}
+                            <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.getDating()|join(', ')}}">
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="field" data-attribute="artist">
+                    <div class="heading">
+                        <label id="fields-artist-label" for="fields-artist">{{'Inventory Number'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        {% for person in item.getAssociationPeople().all() %}
+                            <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.__get('ObjObjectNumberTxt')}}">
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </fieldset>
+            <fieldset id="fields-item-refs" class="field width-50">
+                <div class="field" data-attribute="attachment">
+                    <div class="heading"><label>Main Image</label></div>
+                    <div class="input ltr">
+                        {% if item.getAttachment() %}
+                            {% set myAsset = item.getAttachment() %}
+                            {% if myAsset %}
+                                {% set thumb = {
+                                    width: 300,
+                                    quality: 75
+                                } %}
+                                {% set myAssetUrl = myAsset.getUrl(thumb) %}
+
+                                <a href="{{ myAsset.getCpEditUrl() }}">
+                                    <img src="{{ myAssetUrl }}" width="150" />
+                                </a>
+                            {% else %}
+                                <p>No asset selected</p>
+                            {% endif %}
                         {% else %}
                             <p>No asset selected</p>
                         {% endif %}
-                    {% else %}
-                        <p>No asset selected</p>
-                    {% endif %}
+                    </div>
                 </div>
-            </div>
-            <div class="field" data-attribute="multiMedia">
-                <div class="heading"><label>Media</label></div>
-                <div class="flex">
-                    {% for myAsset in item.getMultimedia() %}
-                        {% if myAsset %}
-                            {% set thumb = {
-                                width: 300,
-                                quality: 75
-                            } %}
-                            {% set myAssetUrl = myAsset.getUrl(thumb) %}
+                <div class="field" data-attribute="multiMedia">
+                    <div class="heading"><label>Media</label></div>
+                    <div class="flex">
+                        {% for myAsset in item.getMultimedia() %}
+                            {% if myAsset %}
+                                {% set thumb = {
+                                    width: 300,
+                                    quality: 75
+                                } %}
+                                {% set myAssetUrl = myAsset.getUrl(thumb) %}
 
-                            <a href="{{ myAsset.getCpEditUrl() }}">
-                                <img src="{{ myAssetUrl }}" width="150" />
-                            </a>
-                        {% else %}
-                            <p>No asset selected</p>
-                        {% endif %}
-                    {% endfor %}
+                                <a href="{{ myAsset.getCpEditUrl() }}">
+                                    <img src="{{ myAssetUrl }}" width="150" />
+                                </a>
+                            {% else %}
+                                <p>No asset selected</p>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
+            </fieldset>
+
         </div>
 
         <div id="tab--museumplusforcraftcms-data" class="flex-fields hidden" data-id="tab--museumplusforcraftcms-data" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-data">

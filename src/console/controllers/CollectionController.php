@@ -109,7 +109,7 @@ class CollectionController extends Controller
     public function actionImportData()
     {
         echo 'Data import started.'.PHP_EOL;
-        $this->downloadObjectGroups();
+        //$this->downloadObjectGroups();
         $this->downloadItems();
         $this->downloadLiterature();
         $this->downloadPeople();
