@@ -331,6 +331,7 @@ class CollectionController extends Controller
             foreach ($existingItems as $item) {
                 $assetIds = [];
                 $moduleRefs = $item->moduleReferences;
+
                 if(isset($moduleRefs['ObjMultimediaRef'])) {
                     foreach ($moduleRefs['ObjMultimediaRef']['items'] as $mm){
                         $newDate = null;
@@ -400,26 +401,28 @@ class CollectionController extends Controller
                 $existingItems = MuseumPlusItem::find()->all();
                 foreach ($existingItems as $item) {
                     $moduleRefs = $item->moduleReferences;
-                    if(isset($moduleRefs['ObjObjectARef'])) {
-                        $ids = [];
-                        foreach ($moduleRefs['ObjObjectARef']['items'] as $i){
-                            $tmp = MuseumPlusItem::find()
-                                ->where(['collectionId' => $i['id']])
-                                ->one();
-                            if ($tmp) {
-                                $ids[] = $tmp->id;
+
+                    $types = ['ObjObjectARef', 'ObjObjectBRef',];
+
+                    foreach($types as $type) {
+                        if(isset($moduleRefs[$type])) {
+                            $ids = [];
+                            foreach ($moduleRefs[$type]['items'] as $i){
+                                $tmp = MuseumPlusItem::find()
+                                    ->where(['collectionId' => $i['id']])
+                                    ->one();
+                                if ($tmp) {
+                                    $ids[] = $tmp->id;
+                                }
+                            }
+                            //sync
+                            if(count($ids)){
+                                $item->syncItemRelations($ids);
+                                echo '.';
                             }
                         }
-                        //sync
-                        if(count($ids)){
-                            $item->syncItemRelations($ids);
-                            echo '.';
-                        }
                     }
-
                 }
-
-
                 return true;
             }
 
