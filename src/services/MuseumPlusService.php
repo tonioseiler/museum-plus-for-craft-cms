@@ -122,9 +122,13 @@ class MuseumPlusService extends Component
 
       $this->init();
 
-      $offset = 0;
-      $size = self::MAX_ITEMS;
-      $objects = [];
+      $that = $this;
+      $cacheKey = Craft::$app->cache->buildKey('museumplus.objects-by-object-group.'.$groupId);
+      $seconds = 24*60*60;
+      $objects = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupId) {
+          $offset = 0;
+          $size = self::MAX_ITEMS;
+          $objects = [];
 
         while ($offset <= $size) {
             $body = '<?xml version="1.0" encoding="UTF-8"?>
@@ -141,9 +145,9 @@ class MuseumPlusService extends Component
                   </module>
                 </modules>
                 </application>';
-            $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/search/', $this->requestHeaders, $body);
-            $res = $this->client->sendAsync($request)->wait();
-            $tmp = $this->createDataFromResponse($res);
+            $request = new Request('POST', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Object/search/', $that->requestHeaders, $body);
+            $res = $that->client->sendAsync($request)->wait();
+            $tmp = $that->createDataFromResponse($res);
             foreach($tmp['data'] as $d) {
                 $objects[] = $d;
             }
@@ -155,6 +159,10 @@ class MuseumPlusService extends Component
         echo count($objects);
 
         return $objects;
+      });
+
+      return $objects;
+
     }
 
     public function getAttachmentByObjectId($objectId)
@@ -423,13 +431,20 @@ class MuseumPlusService extends Component
 
     public function getOwnership($ownershipId)
     {
-        $this->init();
-        $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Ownership/'.$ownershipId.'/', $this->requestHeaders);
-        $res = $this->client->sendAsync($request)->wait();
-        $tmp = $this->createDataFromResponse($res);
-        if ($tmp['size'] >= 1)
-            return $tmp['data'][0];
-        return null;
+
+        $that = $this;
+        $cacheKey = Craft::$app->cache->buildKey('museumplus.ownerships.'.$ownershipId);
+        $seconds = 5*60;
+        $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $ownershipId) {
+            $that->init();
+            $request = new Request('GET', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Ownership/'.$ownershipId.'/', $that->requestHeaders);
+            $res = $that->client->sendAsync($request)->wait();
+            $tmp = $that->createDataFromResponse($res);
+            if ($tmp['size'] >= 1)
+                return $tmp['data'][0];
+            return null;
+        });
+        return $tmp;
     }
 
     public function getLiterature($literatureId)
