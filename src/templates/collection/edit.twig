@@ -148,9 +148,15 @@
                         <label id="fields-geographical-references-label" for="fields-geographical-references">{{'Geographical References'|t('museum-plus-for-craft-cms')}}</label>
                         <div class="flex-grow"></div>
                     </div>
+
+                    {% set geoValues = [] %}
+                    {% for geo in item.getGeographicReferences().all() %}
+                        {% set geoValues = geoValues|merge([geo.title]) %}
+                    {% endfor %}
                     <div class="input ltr">
-                        <input type="text" id="fields-geographical-references" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[geographical-references]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.getGeographicReferences()}}">
+                        <textarea id="fields-geographical-references" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{geoValues|join('\n – ')}}</textarea>
                     </div>
+
                 </div>
 
                 <div class="field" data-attribute="material">
@@ -199,12 +205,18 @@
 
                 <div class="field" data-attribute="tags">
                     <div class="heading">
-                        <label id="fields-tags-label" for="fields-credit-line">{{'Tags'|t('museum-plus-for-craft-cms')}}</label>
+                        <label id="fields-tags-label" for="fields-tags">{{'Tags'|t('museum-plus-for-craft-cms')}}</label>
                         <div class="flex-grow"></div>
                     </div>
+
+                    {% set tagValues = [] %}
+                    {% for tag in item.getTags().all() %}
+                        {% set tagValues = tagValues|merge([tag.title]) %}
+                    {% endfor %}
                     <div class="input ltr">
-                        <textarea id="fields-tags" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[tags]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">To be implemented</textarea>
+                        <textarea id="fields-tags" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[tags]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{tagValues|join('\n – ')}}</textarea>
                     </div>
+
                 </div>
 
                 <div class="field" data-attribute="literature">

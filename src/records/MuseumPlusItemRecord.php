@@ -52,8 +52,7 @@ class MuseumPlusItemRecord extends DataRecord
     }
 
     public function getVocabularyEntriesByType($type) {
-        return $this->hasMany(VocabularyEntryRecord::className(), ['id' => 'vocabularyId', 'type' => $type])
-            ->viaTable('museumplus_items_vocabulary', ['itemId' => 'id']);
+        return $this->getVocabularyEntries()->where(['type' => $type]);
     }
 
     public function getAssociationPeople() {
@@ -112,22 +111,21 @@ class MuseumPlusItemRecord extends DataRecord
         }
     }
 
-    public function syncVocabularyRelations($ids, $type) {
+    public function syncVocabularyRelations($syncData) {
 
-        foreach($ids as $id) {
-            $query = VocabularyEntryRecord::find();
-            $query = $query->innerJoin('museumplus_items_vocabulary', '[[museumplus_vocabulary.id]] = [[museumplus_items_vocabulary.vocabularyId]]');
-            $query = $query->andWhere(Db::parseParam('museumplus_items_vocabulary.vocabularyId', $id));
-            $query = $query->andWhere(Db::parseParam('museumplus_vocabulary.type', $type));
-            $query = $query->andWhere(Db::parseParam('museumplus_items_vocabulary.itemId', $this->id));
+        Craft::$app->db->createCommand()
+            ->delete('{{%museumplus_items_vocabulary}}', ['itemId' => $this->id])
+            ->execute();
 
-            $tmp = $query->all();
+        foreach($syncData as $type => $ids) {
+            foreach($ids as $id) {
 
-            Craft::$app->db->createCommand()
-                ->insert('{{%museumplus_items_vocabulary}}', [
-                    'itemId' => $this->id,
-                    'vocabularyId' => $id
-                ])->execute();
+                Craft::$app->db->createCommand()
+                    ->insert('{{%museumplus_items_vocabulary}}', [
+                        'itemId' => $this->id,
+                        'vocabularyId' => $id
+                    ])->execute();
+            }
         }
     }
 
@@ -184,11 +182,6 @@ class MuseumPlusItemRecord extends DataRecord
             }
         }
         return $ret;
-    }
-
-    public function getGeographicReferences() {
-        $this->getVocabularyEntriesByType('GenPlaceVgr');
-        return 'to be implemented';
     }
 
 

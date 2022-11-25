@@ -405,8 +405,8 @@ class MuseumPlusItem  extends Element
         $this->getRecord()->syncItemRelations($itemIds);
     }
 
-    public function syncVocabularyRelations($ids, $type) {
-        $this->getRecord()->syncVocabularyRelations($ids, $type);
+    public function syncVocabularyRelations($syncData) {
+        $this->getRecord()->syncVocabularyRelations($syncData);
     }
 
     public function getObjectGroups() {
@@ -451,7 +451,7 @@ class MuseumPlusItem  extends Element
 
     public function getVocabularyEntriesByType($type) {
         $rec = $this->getRecord();
-        return $rec->getVocabularyEntriesByType($type);
+        $vcs = $rec->getVocabularyEntriesByType($type);
     }
 
     public function getRecord() {
@@ -468,7 +468,12 @@ class MuseumPlusItem  extends Element
 
     public function getGeographicReferences() {
         $rec = $this->getRecord();
-        return $rec->getGeographicReferences();
+        return $this->getVocabularyEntries()->where(['type' => 'GenPlaceVgr']);
+    }
+
+    public function getTags() {
+        $rec = $this->getRecord();
+        return $this->getVocabularyEntries()->where(['type' => 'ObjKeyWordVgr']);
     }
 
     public function getMaterial() {

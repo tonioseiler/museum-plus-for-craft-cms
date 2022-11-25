@@ -54,40 +54,48 @@ class MuseumPlusService extends Component
 
     public function getVocabularyNode($groupName, $nodeId)
     {
-        $this->init();
-        $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application//vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
-        $res = $this->client->sendAsync($request)->wait();
-        $responseXml = simplexml_load_string($res->getBody()->getContents());
 
-        $terms = json_decode(json_encode($responseXml->terms), true);
-        $parents = json_decode(json_encode($responseXml->parents), true);
+        $that = $this;
+        $cacheKey = Craft::$app->cache->buildKey('museumplus.vocabulary.'.$groupName.'.'.$nodeId);
+        $seconds = 24*60*60;
+        $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupName, $nodeId) {
+            $this->init();
+            $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application//vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
+            $res = $that->client->sendAsync($request)->wait();
+            $responseXml = simplexml_load_string($res->getBody()->getContents());
 
-        $parentId = 0;
-        if(!empty($parents)) {
-            $parentId = $parents[0]['parent']['@attributes']['nodeId'];
-        }
+            $terms = json_decode(json_encode($responseXml->terms), true);
+            $parents = json_decode(json_encode($responseXml->parents), true);
 
-        $ret = [];
+            $parentId = 0;
+            if(!empty($parents)) {
+                $parentId = $parents[0]['parent']['@attributes']['nodeId'];
+            }
 
-        if (isset($terms['term']) && !isset($terms['term']['@attributes'])) {
-            $terms = $terms['term'];
-        }
+            $ret = [];
 
-        foreach($terms as $term) {
-            $object = new \stdClass();
-            $object->parentId = $parentId;
-            $tmp = json_decode(json_encode($term), true);
-            if (isset($tmp['@attributes'])) {
-                foreach ($tmp['@attributes'] as $key => $value) {
+            if (isset($terms['term']) && !isset($terms['term']['@attributes'])) {
+                $terms = $terms['term'];
+            }
+
+            foreach($terms as $term) {
+                $object = new \stdClass();
+                $object->parentId = $parentId;
+                $tmp = json_decode(json_encode($term), true);
+                if (isset($tmp['@attributes'])) {
+                    foreach ($tmp['@attributes'] as $key => $value) {
+                        $object->{$key} = $value;
+                    }
+                }
+                foreach ($tmp as $key => $value) {
                     $object->{$key} = $value;
                 }
+                $ret[] = $object;
             }
-            foreach ($tmp as $key => $value) {
-                $object->{$key} = $value;
-            }
-            $ret[] = $object;
-        }
-        return $ret;
+            return $ret;
+
+        });
+        return $tmp;
     }
 
 

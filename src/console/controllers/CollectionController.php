@@ -406,6 +406,7 @@ class CollectionController extends Controller
                     if($newDate > $yesterday || $this->forceAll){
                         $vocabularyRefs = $item->getDataAttribute('vocabularyReferences');
 
+                        $syncData = [];
                         foreach($vocabularyRefs as $vocabularyRef) {
                             $ids = [];
                             $type = $vocabularyRef['instanceName'];
@@ -418,13 +419,19 @@ class CollectionController extends Controller
                                     }
                                 }
                             }
-                            //sync
-                            if(count($ids)){
-                                $item->syncVocabularyRelations($ids, $type);
-                                echo '.';
+                            if (isset($syncData[$type])) {
+                                foreach($ids as $id) {
+                                    $syncData[$type][] = $id;
+                                }
+                            } else {
+                                $syncData[$type] = $ids;
                             }
                         }
 
+                        if(count($syncData)){
+                            $item->syncVocabularyRelations($syncData);
+                            echo '.';
+                        }
 
                     }
                 }
