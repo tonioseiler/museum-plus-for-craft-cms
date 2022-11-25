@@ -30,17 +30,5 @@ class PersonRecord extends DataRecord
             ->viaTable('museumplus_items_objectgroups', ['objectGroupId' => 'id']);
     }
 
-    public function __get($name)
-    {
-        $data = json_decode(parent::__get('data'), true);
-        if ($name == 'attributes') {
-            return $data;
-        } else if (array_key_exists($name, $data)) {
-            return $data[$name];
-        } else {
-            return parent::__get($name);
-        }
-    }
-
 
 }

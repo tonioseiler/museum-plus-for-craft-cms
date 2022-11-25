@@ -17,8 +17,6 @@ use craft\db\ActiveRecord;
 abstract class DataRecord extends ActiveRecord
 {
 
-
-
     public function getDataAttributes() {
         $data = json_decode($this->data, true);
         return $data;
@@ -26,6 +24,8 @@ abstract class DataRecord extends ActiveRecord
 
     public function getDataAttribute($name) {
         $attributes = $this->getDataAttributes();
+        if (!isset($attributes[$name]))
+            return null;
         return $attributes[$name];
     }
 

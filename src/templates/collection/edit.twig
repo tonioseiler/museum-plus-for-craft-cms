@@ -118,7 +118,7 @@
                     </div>
                     <div class="input ltr">
                         {% for person in item.getAssociationPeople().all() %}
-                            <input type="text" id="fields-originator-{{person.id}}" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[originator]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{person.__get('PerPersonTxt')}}">
+                            <input type="text" id="fields-originator-{{person.id}}" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[originator]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{person.getDataAttribute('PerPersonTxt')}}">
                         {% endfor %}
                     </div>
                 </div>

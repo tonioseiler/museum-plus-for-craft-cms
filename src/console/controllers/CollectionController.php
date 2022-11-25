@@ -158,11 +158,11 @@ class CollectionController extends Controller
                                 $ids[] = $person->id;
                             }
                         }
-                    }
-                    //sync
-                    if(count($ids)){
-                        $item->syncPeopleRelations($ids, $type);
-                        echo '.';
+                        //sync
+                        if(count($ids)){
+                            $item->syncPeopleRelations($ids, $type);
+                            echo '.';
+                        }
                     }
                 }
 

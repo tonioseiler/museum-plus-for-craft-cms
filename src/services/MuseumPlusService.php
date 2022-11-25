@@ -566,6 +566,7 @@ class MuseumPlusService extends Component
                 $gr->name = $repeatableGroup['@attributes']['name'];
                 $gr->items = [];
 
+                $grItems = [];
                 if (isset($repeatableGroup['repeatableGroupItem'])) {
                     $grItems = [$repeatableGroup['repeatableGroupItem']];
                 }
@@ -585,32 +586,6 @@ class MuseumPlusService extends Component
 
 
             }
-/*
-
-
-        if (isset($arr['repeatableGroup'])) {
-            foreach ($arr['repeatableGroup'] as $group) {
-                if (isset($group['@attributes']) && isset($group['@attributes']['name'])) {
-                    $gn = $group['@attributes']['name'];
-                    if (isset($group['repeatableGroupItem'])) {
-                        $groupItem = $group['repeatableGroupItem'];
-                        $groupItemObject = new \stdClass();
-
-                        if ($gn == 'ObjDateGrp' && $obj->id == 45693) {
-                            $this->addFieldValuesToObject($groupItemObject, $groupItem, 'systemField');
-                            $this->addFieldValuesToObject($groupItemObject, $groupItem, 'dataField', true);
-                            $this->addFieldValuesToObject($groupItemObject, $groupItem, 'virtualField');
-                        } else {
-                            $this->addFieldValuesToObject($groupItemObject, $groupItem, 'systemField');
-                            $this->addFieldValuesToObject($groupItemObject, $groupItem, 'dataField');
-                            $this->addFieldValuesToObject($groupItemObject, $groupItem, 'virtualField');
-                        }
-
-                        $obj->{$gn} = $groupItemObject;
-
-                    }
-                }
-            }*/
         }
     }
 
