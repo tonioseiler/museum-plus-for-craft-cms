@@ -8,6 +8,7 @@ namespace furbo\museumplusforcraftcms\records;
 use craft\db\ActiveRecord;
 
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
+use furbo\museumplusforcraftcms\records\DataRecord;
 
 
 /*
@@ -16,7 +17,7 @@ use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
  * @since     1.0.0
  */
 
-class ObjectGroupRecord extends ActiveRecord
+class ObjectGroupRecord extends DataRecord
 {
 
     public static function tableName(): string

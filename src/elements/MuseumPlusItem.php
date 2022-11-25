@@ -409,6 +409,11 @@ class MuseumPlusItem  extends Element
         return $rec->getObjectGroups();
     }
 
+    public function getLiterature() {
+        $rec = $this->getRecord();
+        return $rec->getLiterature();
+    }
+
     public function getOwnerships() {
         $rec = $this->getRecord();
         return $rec->getOwnerships();
@@ -453,34 +458,28 @@ class MuseumPlusItem  extends Element
 
     public function getMaterial() {
         $rec = $this->getRecord();
-        return $rec->getMaterial();
+        return $rec->getRepeatableGroupValues('ObjMaterialTechniqueGrp', 'DetailsTxt');
     }
 
     public function getDimensions() {
         $rec = $this->getRecord();
-        return $rec->getDimensions();
-    }
-
-    public function getProvenance() {
-        $rec = $this->getRecord();
-        return $rec->getProvenance();
+        return $rec->getRepeatableGroupValues('ObjDimAllGrp', 'PreviewVrt');
     }
 
     public function getCreditLine() {
         $rec = $this->getRecord();
-        return $rec->getCreditLine();
+        return $rec->getRepeatableGroupValues('ObjCreditlineGrp', 'CreditlineTxt');
+
     }
 
-    public function __get($name)
-    {
-        $data = json_decode($this->data, true);
-        if ($name == 'attributes') {
-            return $data;
-        } else if (array_key_exists($name, $data)) {
-            return $data[$name];
-        } else {
-            return parent::__get($name);
-        }
+    public function getDataAttributes() {
+        $rec = $this->getRecord();
+        return $rec->getDataAttributes();
+    }
+
+    public function getDataAttribute($name) {
+        $rec = $this->getRecord();
+        return $rec->getDataAttribute($name);
     }
 
 }

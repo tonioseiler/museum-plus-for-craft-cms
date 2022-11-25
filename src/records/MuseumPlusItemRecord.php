@@ -8,9 +8,11 @@ namespace furbo\museumplusforcraftcms\records;
 use Craft;
 use craft\db\ActiveRecord;
 
+use furbo\museumplusforcraftcms\records\DataRecord;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
+use furbo\museumplusforcraftcms\records\LiteratureRecord;
 
 /*
  * @author    Furbo GmbH
@@ -18,7 +20,7 @@ use furbo\museumplusforcraftcms\records\OwnershipRecord;
  * @since     1.0.0
  */
 
-class MuseumPlusItemRecord extends ActiveRecord
+class MuseumPlusItemRecord extends DataRecord
 {
 
     public static function tableName(): string
@@ -34,6 +36,11 @@ class MuseumPlusItemRecord extends ActiveRecord
     public function getOwnerships() {
         return $this->hasMany(OwnershipRecord::className(), ['id' => 'ownershipId'])
             ->viaTable('museumplus_items_ownerships', ['itemId' => 'id']);
+    }
+
+    public function getLiterature() {
+        return $this->hasMany(LiteratureRecord::className(), ['id' => 'literatureId'])
+            ->viaTable('museumplus_items_literature', ['itemId' => 'id']);
     }
 
     public function getAssociationPeople() {
@@ -59,7 +66,7 @@ class MuseumPlusItemRecord extends ActiveRecord
     }
 
     public function getRelatedItems() {
-        return $this->hasMany(MuseumPlusitemRecord::className(), ['id' => 'reltedItemId'])
+        return $this->hasMany(MuseumPlusitemRecord::className(), ['id' => 'relatedItemId'])
             ->viaTable('museumplus_items_items', ['itemId' => 'id']);
     }
 
@@ -150,23 +157,6 @@ class MuseumPlusItemRecord extends ActiveRecord
     public function getGeographicReferences() {
         return 'to be implemented';
     }
-
-    public function getMaterial() {
-        return 'to be implemented';
-    }
-
-    public function getDimensions() {
-        return 'to be implemented';
-    }
-
-    public function getProvenance() {
-        return 'to be implemented';
-    }
-
-    public function getCreditLine() {
-        return 'to be implemented';
-    }
-
 
 
 }

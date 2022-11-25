@@ -39,14 +39,26 @@
         "label": "Title",
         "url": "#tab--museumplusforcraftcms-item",
         "class": null
-    },
-    "tab--museumplusforcraftcms-data": {
-        "tabId": "tab-tab--museumplusforcraftcms-data",
-        "label": "MuseumPlus Data",
-        "url": "#tab--museumplusforcraftcms-data",
-        "class": null
     }
 } %}
+
+{% if currentUser.admin %}
+    {% set firstTabs = {
+        "tab--museumplusforcraftcms-item": {
+            "tabId": "tab-tab--museumplusforcraftcms-item",
+            "label": "Title",
+            "url": "#tab--museumplusforcraftcms-item",
+            "class": null
+        },
+        "tab--museumplusforcraftcms-data": {
+            "tabId": "tab-tab--museumplusforcraftcms-data",
+            "label": "MuseumPlus Data",
+            "url": "#tab--museumplusforcraftcms-data",
+            "class": null
+        }
+    } %}
+{% endif %}
+
 {% set tabs = firstTabs|merge(form.getTabMenu()) %}
 {% set fieldsHtml = form.render(false) %}
 
@@ -95,43 +107,131 @@
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
-                        <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.__get('ObjObjectTitleVrt')}}">
+                        <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.getDataAttribute('ObjObjectTitleVrt')}}">
                     </div>
                 </div>
 
-                <div class="field" data-attribute="artist">
+                <div class="field" data-attribute="originator">
                     <div class="heading">
-                        <label id="fields-artist-label" for="fields-artist">{{'Originator'|t('museum-plus-for-craft-cms')}}</label>
+                        <label id="fields-originator-label" for="fields-originator">{{'Originator'|t('museum-plus-for-craft-cms')}}</label>
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
                         {% for person in item.getAssociationPeople().all() %}
-                            <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{person.__get('PerPersonTxt')}}">
+                            <input type="text" id="fields-originator-{{person.id}}" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[originator]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{person.__get('PerPersonTxt')}}">
                         {% endfor %}
                     </div>
                 </div>
 
-                <div class="field" data-attribute="artist">
+                <div class="field" data-attribute="dating">
                     <div class="heading">
-                        <label id="fields-artist-label" for="fields-artist">{{'Dating'|t('museum-plus-for-craft-cms')}}</label>
+                        <label id="fields-dating-label" for="fields-dating">{{'Dating'|t('museum-plus-for-craft-cms')}}</label>
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
-                        {% for person in item.getAssociationPeople().all() %}
-                            <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.getDating()|join(', ')}}">
-                        {% endfor %}
+                        <input type="text" id="fields-dating" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[dating]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.getDating()|join(', ')}}">
                     </div>
                 </div>
 
-                <div class="field" data-attribute="artist">
+                <div class="field" data-attribute="inventory-number">
                     <div class="heading">
-                        <label id="fields-artist-label" for="fields-artist">{{'Inventory Number'|t('museum-plus-for-craft-cms')}}</label>
+                        <label id="fields-inventory-number-label" for="fields-inventory-number">{{'Inventory Number'|t('museum-plus-for-craft-cms')}}</label>
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
-                        {% for person in item.getAssociationPeople().all() %}
-                            <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.__get('ObjObjectNumberTxt')}}">
-                        {% endfor %}
+                        <input type="text" id="fields-inventory-number" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[inventory-number]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.getDataAttribute('ObjObjectNumberTxt')}}">
+                    </div>
+                </div>
+
+                <div class="field" data-attribute="geographical-references">
+                    <div class="heading">
+                        <label id="fields-geographical-references-label" for="fields-geographical-references">{{'Geographical References'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        <input type="text" id="fields-geographical-references" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[geographical-references]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.getGeographicReferences()}}">
+                    </div>
+                </div>
+
+                <div class="field" data-attribute="material">
+                    <div class="heading">
+                        <label id="fields-material-label" for="fields-material">{{'Material'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        <input type="text" id="fields-material" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[material]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.getMaterial()|join}}">
+                    </div>
+                </div>
+
+                <div class="field" data-attribute="dimension">
+                    <div class="heading">
+                        <label id="fields-dimension-label" for="fields-dimension">{{'Dimensions'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        <input type="text" id="fields-dimension" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[dimension]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{item.getDimensions()|join}}">
+                    </div>
+                </div>
+
+                <div class="field" data-attribute="provenance">
+                    <div class="heading">
+                        <label id="fields-provenance-label" for="fields-provenance">{{'Provenance'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    {% set ownershipValues = [] %}
+                    {% for ownership in item.getOwnerships().all() %}
+                        {% set ownershipValues = ownershipValues|merge([ownership.getDataAttribute('OwsOwnershipVrt')]) %}
+                    {% endfor %}
+                    <div class="input ltr">
+                        <textarea id="fields-provenance" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[provenance]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{ownershipValues|join('\n – ')}}</textarea>
+                    </div>
+                </div>
+
+                <div class="field" data-attribute="credit-line">
+                    <div class="heading">
+                        <label id="fields-credit-line-label" for="fields-credit-line">{{'Credit Line'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        <textarea id="fields-credit-line" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[credit-line]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{item.getCreditLine()|join('\n – ')}}</textarea>
+                    </div>
+                </div>
+
+                <div class="field" data-attribute="tags">
+                    <div class="heading">
+                        <label id="fields-tags-label" for="fields-credit-line">{{'Tags'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        <textarea id="fields-tags" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[tags]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">To be implemented</textarea>
+                    </div>
+                </div>
+
+                <div class="field" data-attribute="literature">
+                    <div class="heading">
+                        <label>References/Literature</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    {% set literatureValues = [] %}
+                    {% for literature in item.getLiterature().all() %}
+                        {% set literatureValues = literatureValues|merge([literature.getDataAttribute('LitLiteratureVrt')]) %}
+                    {% endfor %}
+                    <div class="input ltr">
+                        <textarea id="fields-literature" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[literature]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{literatureValues|join('\n – ')}}</textarea>
+                    </div>
+                </div>
+
+                <div class="field" data-attribute="relatedItems">
+                    <div class="heading">
+                        <label>Related Items</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    {% set rItemValues = [] %}
+                    {% for relatedItem in item.getRelatedItems().all() %}
+                        {% set rItemValues = rItemValues|merge([relatedItem.getDataAttribute('ObjObjectTitleVrt')]) %}
+                    {% endfor %}
+                    <div class="input ltr">
+                        <textarea id="fields-related-items" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[related-items]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{rItemValues|join('\n – ')}}</textarea>
                     </div>
                 </div>
 
@@ -161,7 +261,7 @@
                     </div>
                 </div>
                 <div class="field" data-attribute="multiMedia">
-                    <div class="heading"><label>Media</label></div>
+                    <div class="heading"><label>Digital Assets</label></div>
                     <div class="flex">
                         {% for myAsset in item.getMultimedia() %}
                             {% if myAsset %}
@@ -184,9 +284,11 @@
 
         </div>
 
-        <div id="tab--museumplusforcraftcms-data" class="flex-fields hidden" data-id="tab--museumplusforcraftcms-data" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-data">
+        {% if currentUser.admin %}
+            <div id="tab--museumplusforcraftcms-data" class="flex-fields hidden" data-id="tab--museumplusforcraftcms-data" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-data">
 
-                {% for key,value in item.attributes %}
+                {% for key,value in item.getDataAttributes() %}
+
                     <div id="fields-{{key}}-field" class="field width-100">
                         <div class="heading">
                             <label id="fields-{{key}}-label" for="fields-{{key}}">{{key|t('museum-plus-for-craft-cms')}}</label>
@@ -202,16 +304,18 @@
                                 {{_self.printArray(value)}}
                             </ul>
                         {% else %}
-                            {% if value|length < 60 %}
-                                <input type="text" id="fields-{{key}}" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[{{key}}]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{value is iterable ? value|join(',') : value}}">
+                            {% set v = value is iterable ? value|join(',') : value.timestamp is defined ? value|date : value %}
+                            {% if v|length < 60 %}
+                                <input type="text" id="fields-{{key}}" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[{{key}}]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{v}}">
                             {% else %}
-                                <textarea id="fields-{{key}}" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[{{key}}]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{value|nl2br}}</textarea>
+                                <textarea id="fields-{{key}}" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[{{key}}]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{v|nl2br}}</textarea>
                             {% endif %}
                         {% endif %}
                         </div>
                     </div>
                 {% endfor %}
-        </div>
+            </div>
+        {% endif %}
 
         {{ fieldsHtml|raw }}
 
