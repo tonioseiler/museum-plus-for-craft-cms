@@ -541,7 +541,7 @@ class CollectionController extends Controller
                 $itemRecord = $item->getRecord();
                 $itemRecord->unlinkAll('objectGroups', true);
 
-                if (isset($item->moduleReferences)) {
+                //if (isset($item->moduleReferences)) {
                     $moduleReferences = $item->moduleReferences;
                     if (isset($moduleReferences['ObjObjectGroupsRef'])) {
                         foreach($moduleReferences['ObjObjectGroupsRef']['items'] as $og) {
@@ -550,7 +550,7 @@ class CollectionController extends Controller
                             $itemRecord->link('objectGroups', $objectGroup);
                         }
                     }
-                }
+                //}
 
 
                 echo '.';
