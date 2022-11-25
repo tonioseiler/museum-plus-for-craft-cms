@@ -38,6 +38,7 @@ class MuseumPlusService extends Component
 
     const QUERY_LIMIT = 100;
     const MAX_ITEMS = 10000000;
+    const CACHE_DURATION = 24*60*60;
 
     private $client = null;
 
@@ -57,7 +58,7 @@ class MuseumPlusService extends Component
 
         $that = $this;
         $cacheKey = Craft::$app->cache->buildKey('museumplus.vocabulary.'.$groupName.'.'.$nodeId);
-        $seconds = 24*60*60;
+        $seconds = self::CACHE_DURATION;
         $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupName, $nodeId) {
             $this->init();
             $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application//vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
@@ -94,7 +95,7 @@ class MuseumPlusService extends Component
             }
             return $ret;
 
-        });
+        }, $seconds);
         return $tmp;
     }
 
@@ -124,7 +125,7 @@ class MuseumPlusService extends Component
 
       $that = $this;
       $cacheKey = Craft::$app->cache->buildKey('museumplus.objects-by-object-group.'.$groupId);
-      $seconds = 24*60*60;
+      $seconds = self::CACHE_DURATION;
       $objects = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupId) {
           $offset = 0;
           $size = self::MAX_ITEMS;
@@ -159,7 +160,7 @@ class MuseumPlusService extends Component
         echo count($objects);
 
         return $objects;
-      });
+    }, $seconds);
 
       return $objects;
 
@@ -332,7 +333,7 @@ class MuseumPlusService extends Component
     {
         $that = $this;
         $cacheKey = Craft::$app->cache->buildKey('museumplus.people.'.$personId);
-        $seconds = 5*60;
+        $seconds = self::CACHE_DURATION;
         $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $personId) {
             $that->init();
             //normal get is very slow, so do a search to limit fields
@@ -434,7 +435,7 @@ class MuseumPlusService extends Component
 
         $that = $this;
         $cacheKey = Craft::$app->cache->buildKey('museumplus.ownerships.'.$ownershipId);
-        $seconds = 5*60;
+        $seconds = self::CACHE_DURATION;
         $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $ownershipId) {
             $that->init();
             $request = new Request('GET', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Ownership/'.$ownershipId.'/', $that->requestHeaders);
@@ -443,7 +444,7 @@ class MuseumPlusService extends Component
             if ($tmp['size'] >= 1)
                 return $tmp['data'][0];
             return null;
-        });
+        }, $seconds);
         return $tmp;
     }
 
@@ -451,7 +452,7 @@ class MuseumPlusService extends Component
     {
         $cacheKey = Craft::$app->cache->buildKey('museumplus.literature.'.$literatureId);
         $that = $this;
-        $seconds = 5*60;
+        $seconds = self::CACHE_DURATION;
         $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $literatureId) {
             $that->init();
             $request = new Request('GET', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Literature/'.$literatureId.'/', $that->requestHeaders);
