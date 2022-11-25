@@ -144,7 +144,7 @@ class CollectionController extends Controller
             }
 
             if($newDate > $yesterday || $this->forceAll){
-                $moduleRefs = $item->moduleReferences;
+                $moduleRefs = $item->getDataAttribute('moduleReferences');
 
                 $types = ['ObjAdministrationRef', 'ObjPerOwnerRef', 'ObjPerAssociationRef'];
 
@@ -196,7 +196,7 @@ class CollectionController extends Controller
             }
 
             if($newDate > $yesterday || $this->forceAll){
-                $moduleRefs = $item->moduleReferences;
+                $moduleRefs = $item->getDataAttribute('moduleReferences');
 
                 if(isset($moduleRefs['ObjOwnershipRef'])) {
                     $ids = [];
@@ -244,7 +244,7 @@ class CollectionController extends Controller
             }
 
             if($newDate > $yesterday || $this->forceAll){
-                $moduleRefs = $item->moduleReferences;
+                $moduleRefs = $item->getDataAttribute('moduleReferences');
 
                 $ids = [];
                 if(isset($moduleRefs['ObjLiteratureRef'])) {
@@ -330,7 +330,7 @@ class CollectionController extends Controller
 
             foreach ($existingItems as $item) {
                 $assetIds = [];
-                $moduleRefs = $item->moduleReferences;
+                $moduleRefs = $item->getDataAttribute('moduleReferences');
 
                 if(isset($moduleRefs['ObjMultimediaRef'])) {
                     foreach ($moduleRefs['ObjMultimediaRef']['items'] as $mm){
@@ -400,7 +400,7 @@ class CollectionController extends Controller
                 //create object to object relations
                 $existingItems = MuseumPlusItem::find()->all();
                 foreach ($existingItems as $item) {
-                    $moduleRefs = $item->moduleReferences;
+                    $moduleRefs = $item->getDataAttribute('moduleReferences');
 
                     $types = ['ObjObjectARef', 'ObjObjectBRef',];
 
@@ -541,16 +541,14 @@ class CollectionController extends Controller
                 $itemRecord = $item->getRecord();
                 $itemRecord->unlinkAll('objectGroups', true);
 
-                //if (isset($item->moduleReferences)) {
-                    $moduleReferences = $item->moduleReferences;
-                    if (isset($moduleReferences['ObjObjectGroupsRef'])) {
-                        foreach($moduleReferences['ObjObjectGroupsRef']['items'] as $og) {
-                            $objectGroup = ObjectGroupRecord::find()->where(['collectionId' => $og['id']])->one();
-                            if ($objectGroup)
-                            $itemRecord->link('objectGroups', $objectGroup);
-                        }
+                $moduleReferences = $item->getDataAttribute('moduleReferences');
+                if (isset($moduleReferences['ObjObjectGroupsRef'])) {
+                    foreach($moduleReferences['ObjObjectGroupsRef']['items'] as $og) {
+                        $objectGroup = ObjectGroupRecord::find()->where(['collectionId' => $og['id']])->one();
+                        if ($objectGroup)
+                        $itemRecord->link('objectGroups', $objectGroup);
                     }
-                //}
+                }
 
 
                 echo '.';
