@@ -34,7 +34,7 @@ class CollectionController extends Controller
     *         The actions must be in 'kebab-case'
     * @access protected
     */
-    protected array|int|bool $allowAnonymous = [];
+    protected array|int|bool $allowAnonymous = ['get-items-by-tag', 'get-items-by-id', 'get-items-by-ids', 'search-items'];
 
     // Public Methods
     // =========================================================================
@@ -136,6 +136,22 @@ class CollectionController extends Controller
 
         return $this->redirectToPostedUrl($item);
 
+    }
+
+    public function actionGetItemsByTag() {
+        return MuseumPlusForCraftCms::$plugin->collection->getItemsByTag();
+    }
+
+    public function actionGetItemsById($id) {
+        return MuseumPlusForCraftCms::$plugin->collection->getItemsById($id);
+    }
+
+    public function actionGetItemsByIds($ids) {
+        return MuseumPlusForCraftCms::$plugin->collection->getItemsById($ids);
+    }
+
+    public function actionSearchItems($tags, $query, $params = []) {
+        return MuseumPlusForCraftCms::$plugin->collection->searchItems($tags, $query);
     }
 
 }

@@ -38,4 +38,20 @@ class CollectionService extends Component
                 ->all();
         return $objectGroupRecords;
     }
+
+    public function getItemsByTag() {
+        return 'Todo: implement';
+    }
+
+    public function getItemsById($id) {
+        return 'Todo: implement';
+    }
+
+    public function getItemsByIds($ids) {
+        return 'Todo: implement';
+    }
+
+    public function searchItems($tags, $query, $params = []) {
+        return 'Todo: implement';
+    }
 }
