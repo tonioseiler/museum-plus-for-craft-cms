@@ -177,7 +177,8 @@ class MuseumPlusItemRecord extends DataRecord
         foreach($data['repeatableGroups'] as $group) {
             if ($group['name'] == $groupName) {
                 foreach($group['items'] as $i) {
-                    $ret[] = $i[$attribute];
+                    if (isset($i[$attribute]))
+                        $ret[] = $i[$attribute];
                 }
             }
         }
