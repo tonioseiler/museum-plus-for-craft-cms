@@ -541,14 +541,17 @@ class CollectionController extends Controller
                 $itemRecord = $item->getRecord();
                 $itemRecord->unlinkAll('objectGroups', true);
 
-                $moduleReferences = $item->moduleReferences;
-                if (isset($moduleReferences['ObjObjectGroupsRef'])) {
-                    foreach($moduleReferences['ObjObjectGroupsRef']['items'] as $og) {
-                        $objectGroup = ObjectGroupRecord::find()->where(['collectionId' => $og['id']])->one();
-                        if ($objectGroup)
-                        $itemRecord->link('objectGroups', $objectGroup);
+                if (isset($item->moduleReferences)) {
+                    $moduleReferences = $item->moduleReferences;
+                    if (isset($moduleReferences['ObjObjectGroupsRef'])) {
+                        foreach($moduleReferences['ObjObjectGroupsRef']['items'] as $og) {
+                            $objectGroup = ObjectGroupRecord::find()->where(['collectionId' => $og['id']])->one();
+                            if ($objectGroup)
+                            $itemRecord->link('objectGroups', $objectGroup);
+                        }
                     }
                 }
+
 
                 echo '.';
                 return true;
