@@ -24,6 +24,7 @@ use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\models\FieldLayout;
 use craft\models\TagGroup;
+use craft\helpers\Db;
 
 /**
  *  Element MuseumPlusItem
@@ -404,6 +405,10 @@ class MuseumPlusItem  extends Element
         $this->getRecord()->syncItemRelations($itemIds);
     }
 
+    public function syncVocabularyRelations($ids, $type) {
+        $this->getRecord()->syncVocabularyRelations($ids, $type);
+    }
+
     public function getObjectGroups() {
         $rec = $this->getRecord();
         return $rec->getObjectGroups();
@@ -437,6 +442,16 @@ class MuseumPlusItem  extends Element
     public function getRelatedItems() {
         $rec = $this->getRecord();
         return $rec->getRelatedItems();
+    }
+
+    public function getVocabularyEntries() {
+        $rec = $this->getRecord();
+        return $rec->getVocabularyEntries();
+    }
+
+    public function getVocabularyEntriesByType($type) {
+        $rec = $this->getRecord();
+        return $rec->getVocabularyEntriesByType($type);
     }
 
     public function getRecord() {

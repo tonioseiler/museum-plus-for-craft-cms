@@ -52,6 +52,46 @@ class MuseumPlusService extends Component
         return $this->getDetail($request);
     }
 
+    public function getVocabularyNode($groupName, $nodeId)
+    {
+        $this->init();
+        $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application//vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
+        $res = $this->client->sendAsync($request)->wait();
+        $responseXml = simplexml_load_string($res->getBody()->getContents());
+
+        $terms = json_decode(json_encode($responseXml->terms), true);
+        $parents = json_decode(json_encode($responseXml->parents), true);
+
+        $parentId = 0;
+        if(!empty($parents)) {
+            $parentId = $parents[0]['parent']['@attributes']['nodeId'];
+        }
+
+        $ret = [];
+
+        if (isset($terms['term']) && !isset($terms['term']['@attributes'])) {
+            $terms = $terms['term'];
+        }
+
+        foreach($terms as $term) {
+            $object = new \stdClass();
+            $object->parentId = $parentId;
+            $tmp = json_decode(json_encode($term), true);
+            if (isset($tmp['@attributes'])) {
+                foreach ($tmp['@attributes'] as $key => $value) {
+                    $object->{$key} = $value;
+                }
+            }
+            foreach ($tmp as $key => $value) {
+                $object->{$key} = $value;
+            }
+            $ret[] = $object;
+        }
+        return $ret;
+    }
+
+
+
     private function getDetail(Request $request)
     {
         $res = $this->client->sendAsync($request)->wait();

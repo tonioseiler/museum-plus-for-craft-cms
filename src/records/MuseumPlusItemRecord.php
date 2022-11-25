@@ -7,12 +7,15 @@ namespace furbo\museumplusforcraftcms\records;
 
 use Craft;
 use craft\db\ActiveRecord;
+use craft\helpers\Db;
 
 use furbo\museumplusforcraftcms\records\DataRecord;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
 use furbo\museumplusforcraftcms\records\LiteratureRecord;
+use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
+
 
 /*
  * @author    Furbo GmbH
@@ -41,6 +44,16 @@ class MuseumPlusItemRecord extends DataRecord
     public function getLiterature() {
         return $this->hasMany(LiteratureRecord::className(), ['id' => 'literatureId'])
             ->viaTable('museumplus_items_literature', ['itemId' => 'id']);
+    }
+
+    public function getVocabularyEntries() {
+        return $this->hasMany(VocabularyEntryRecord::className(), ['id' => 'vocabularyId'])
+            ->viaTable('museumplus_items_vocabulary', ['itemId' => 'id']);
+    }
+
+    public function getVocabularyEntriesByType($type) {
+        return $this->hasMany(VocabularyEntryRecord::className(), ['id' => 'vocabularyId', 'type' => $type])
+            ->viaTable('museumplus_items_vocabulary', ['itemId' => 'id']);
     }
 
     public function getAssociationPeople() {
@@ -95,6 +108,25 @@ class MuseumPlusItemRecord extends DataRecord
                     'itemId' => $this->id,
                     'personId' => $personId,
                     'type' => $type,
+                ])->execute();
+        }
+    }
+
+    public function syncVocabularyRelations($ids, $type) {
+
+        foreach($ids as $id) {
+            $query = VocabularyEntryRecord::find();
+            $query = $query->innerJoin('museumplus_items_vocabulary', '[[museumplus_vocabulary.id]] = [[museumplus_items_vocabulary.vocabularyId]]');
+            $query = $query->andWhere(Db::parseParam('museumplus_items_vocabulary.vocabularyId', $id));
+            $query = $query->andWhere(Db::parseParam('museumplus_vocabulary.type', $type));
+            $query = $query->andWhere(Db::parseParam('museumplus_items_vocabulary.itemId', $this->id));
+
+            $tmp = $query->all();
+
+            Craft::$app->db->createCommand()
+                ->insert('{{%museumplus_items_vocabulary}}', [
+                    'itemId' => $this->id,
+                    'vocabularyId' => $id
                 ])->execute();
         }
     }
@@ -155,6 +187,7 @@ class MuseumPlusItemRecord extends DataRecord
     }
 
     public function getGeographicReferences() {
+        $this->getVocabularyEntriesByType('GenPlaceVgr');
         return 'to be implemented';
     }
 
