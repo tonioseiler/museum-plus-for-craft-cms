@@ -50,7 +50,8 @@ class MuseumPlusService extends Component
     {
         $this->init();
         $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/'.$objectId.'/', $this->requestHeaders);
-        return $this->getDetail($request);
+        $xml = $this->getDetail($request);
+        return $this->createDataObjectFromXML($xml);
     }
 
     public function getVocabularyNode($groupName, $nodeId)
@@ -99,8 +100,6 @@ class MuseumPlusService extends Component
         return $tmp;
     }
 
-
-
     private function getDetail(Request $request)
     {
         $res = $this->client->sendAsync($request)->wait();
@@ -108,62 +107,59 @@ class MuseumPlusService extends Component
         return $responseXml->modules->module->moduleItem;
     }
 
-    public function getObjectLastModified($objectId)
-    {
-        $object = $this->getObjectDetail($objectId);
-        try{
-            return $object->systemField[2]->value->__toString();
-        }catch (\Exception $e){
-            return null;
-        }
-    }
 
-    public function getObjectsByObjectGroup($groupId)
+    public function getObjectsByObjectGroup($groupId, $fields = null)
     {
 
-      $this->init();
+        $this->init();
 
-      $that = $this;
-      $cacheKey = Craft::$app->cache->buildKey('museumplus.objects-by-object-group.'.$groupId);
-      $seconds = self::CACHE_DURATION;
-      $objects = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupId) {
-          $offset = 0;
-          $size = self::MAX_ITEMS;
-          $objects = [];
+        $that = $this;
+        $cacheKey = Craft::$app->cache->buildKey('museumplus.objects-by-object-group.'.$groupId.'.'.implode('-',$fields));
+        $seconds = self::CACHE_DURATION;
+        $objects = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupId, $fields) {
+            $offset = 0;
+            $size = self::MAX_ITEMS;
+            $objects = [];
 
-        while ($offset <= $size) {
-            $body = '<?xml version="1.0" encoding="UTF-8"?>
-                <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
-                  <modules>
-                  <module name="Object">
-                    <search limit="'.self::QUERY_LIMIT.'" offset="'.$offset.'">
-                      <expert>
-                        <and>
-                          <equalsField fieldPath="ObjObjectGroupsRef" operand="'.$groupId.'" />
-                        </and>
-                      </expert>
-                    </search>
-                  </module>
-                </modules>
-                </application>';
-            $request = new Request('POST', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Object/search/', $that->requestHeaders, $body);
-            $res = $that->client->sendAsync($request)->wait();
-            $tmp = $that->createDataFromResponse($res);
-            foreach($tmp['data'] as $d) {
-                $objects[] = $d;
+            $select = '';
+            if (!empty($fields)) {
+                $select = '<select>';
+                foreach($fields as $field) {
+                    $select .= '<field fieldPath="'.$field.'"/>';
+                }
+                $select .= '</select>';
             }
-            $size = $tmp['size'];
-            $offset += self::QUERY_LIMIT;
-            echo "groupId: " . $groupId . " / " . count($objects).' / '.$size." downloaded\n";
-        }
 
-        echo count($objects);
+            while ($offset <= $size) {
+                $body = '<?xml version="1.0" encoding="UTF-8"?>
+                    <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
+                        <modules>
+                            <module name="Object">
+                                <search limit="'.self::QUERY_LIMIT.'" offset="'.$offset.'">
+                                    '.$select.'
+                                    <expert>
+                                        <and>
+                                            <equalsField fieldPath="ObjObjectGroupsRef" operand="'.$groupId.'" />
+                                        </and>
+                                    </expert>
+                                </search>
+                            </module>
+                        </modules>
+                    </application>';
+                $request = new Request('POST', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Object/search/', $that->requestHeaders, $body);
+                $res = $that->client->sendAsync($request)->wait();
+                $tmp = $that->createDataFromResponse($res);
+                foreach($tmp['data'] as $d) {
+                    $objects[] = $d;
+                }
+                $size = $tmp['size'];
+                $offset += self::QUERY_LIMIT;
+                echo "groupId: " . $groupId . " / " . count($objects).' / '.$size." downloaded\n";
+            }
+            return $objects;
+        }, $seconds);
 
         return $objects;
-    }, $seconds);
-
-      return $objects;
-
     }
 
     public function getAttachmentByObjectId($objectId)
@@ -230,14 +226,6 @@ class MuseumPlusService extends Component
 
         return $output_file;
     }
-
-    public function getObjectsByExhibition($exhibitionId)
-    {
-
-        dd('sorry, not implpemented');
-
-    }
-
 
     public function getObjectGroups()
     {
@@ -462,6 +450,7 @@ class MuseumPlusService extends Component
                 return $tmp['data'][0];
             return null;
         }, $seconds);
+        return $tmp;
     }
 
     public function init():void {
@@ -653,7 +642,7 @@ class MuseumPlusService extends Component
         }
     }
 
-    private function getModuleReferencesByName($arr, $type) {
+    /*private function getModuleReferencesByName($arr, $type) {
         $ret = [];
         if (isset($arr['moduleReference'])) {
 
@@ -688,7 +677,7 @@ class MuseumPlusService extends Component
             }
         }
         return $ret;
-    }
+    }*/
 
     private function addObjectRelations(&$obj, $arr) {
 
