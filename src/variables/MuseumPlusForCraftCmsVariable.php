@@ -89,9 +89,9 @@ class MuseumPlusForCraftCmsVariable
         return $ret;
     }
 
-    public function getItemsByTag() {
+    public function getItemsByTag($tagId) {
         //TODO: implement
-        return MuseumPlusForCraftCms::$plugin->collection->getItemsByTag();
+        return MuseumPlusForCraftCms::$plugin->collection->getItemsByTag($tagId);
     }
 
     public function getItemsById($id) {
@@ -104,8 +104,8 @@ class MuseumPlusForCraftCmsVariable
         return MuseumPlusForCraftCms::$plugin->collection->getItemsById($ids);
     }
 
-    public function searchItems($tags, $query, $params = []) {
+    public function searchItems($params) {
         //TODO: implement
-        return MuseumPlusForCraftCms::$plugin->collection->searchItems($tags, $query);
+        return MuseumPlusForCraftCms::$plugin->collection->searchItems($params);
     }
 }
