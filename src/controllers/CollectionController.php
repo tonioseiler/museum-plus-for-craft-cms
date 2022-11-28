@@ -138,8 +138,8 @@ class CollectionController extends Controller
 
     }
 
-    public function actionGetItemsByTag() {
-        return MuseumPlusForCraftCms::$plugin->collection->getItemsByTag();
+    public function actionGetItemsByTag($tagId) {
+        return MuseumPlusForCraftCms::$plugin->collection->getItemsByTag($tagId);
     }
 
     public function actionGetItemsById($id) {
@@ -150,8 +150,8 @@ class CollectionController extends Controller
         return MuseumPlusForCraftCms::$plugin->collection->getItemsById($ids);
     }
 
-    public function actionSearchItems($tags, $query, $params = []) {
-        return MuseumPlusForCraftCms::$plugin->collection->searchItems($tags, $query);
+    public function actionSearchItems($params = []) {
+        return MuseumPlusForCraftCms::$plugin->collection->searchItems($params);
     }
 
 }

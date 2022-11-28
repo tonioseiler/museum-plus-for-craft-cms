@@ -313,25 +313,9 @@ class CollectionController extends Controller
 
             $assetIds = [];
             foreach ($moduleRefs['ObjMultimediaRef']['items'] as $mm){
-
-                if ($this->forceAll) {
-                    $asset = $this->createMultimediaFromId($mm['id']);
-                    if ($asset) {
-                        $assetIds[] = $asset->id;
-                    }
-                } else {
-                    $mmLastMod = null;
-                    $date = $this->museumPlus->getMultimediaLastModified($mm['id']);
-                    try {
-                        $mmLastMod = new \DateTime($date);
-                    } catch (\Exception $e) {
-                    }
-                    if($mmLastMod > $asset->dateModified) {
-                        $asset = $this->createMultimediaFromId($mm['id']);
-                        if ($assetId) {
-                            $assetIds[] = $asset->id;
-                        }
-                    }
+                $asset = $this->createMultimediaFromId($mm['id']);
+                if ($asset) {
+                    $assetIds[] = $asset->id;
                 }
             }
 

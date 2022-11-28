@@ -39,7 +39,7 @@ class CollectionService extends Component
         return $objectGroupRecords;
     }
 
-    public function getItemsByTag() {
+    public function getItemsByTag($tagId) {
         return 'Todo: implement';
     }
 
@@ -51,7 +51,7 @@ class CollectionService extends Component
         return 'Todo: implement';
     }
 
-    public function searchItems($tags, $query, $params = []) {
+    public function searchItems($params) {
         return 'Todo: implement';
     }
 }
