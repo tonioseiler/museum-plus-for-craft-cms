@@ -137,10 +137,10 @@ class CollectionController extends Controller
                         ->one();
 
                 if (!$item) {
-                    echo 'creating item (id: '.$o->id.')'.PHP_EOL;
+                    echo 'Creating item (id: '.$o->id.')'.PHP_EOL;
                     $this->updateItemFromMuseumPlus($o->id);
                 } else if ($this->forceAll || $item->dateUpdated < $objectLastModified) {
-                    echo 'updating item (id: '.$o->id.')'.PHP_EOL;
+                    echo 'Updating item (id: '.$o->id.')'.PHP_EOL;
                     $this->updateItemFromMuseumPlus($o->id);
                 } else {
                     echo '.';
