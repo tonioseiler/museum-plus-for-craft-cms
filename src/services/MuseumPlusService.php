@@ -717,7 +717,6 @@ class MuseumPlusService extends Component
             $obj->relatedObjects = $relatedObjects;
         }
 
-        // obecjt groups
     }
 
     private function extractArrayValues(array $array, $needle)
