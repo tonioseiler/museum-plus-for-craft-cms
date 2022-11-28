@@ -19,7 +19,7 @@ class m221122_144204_add_people_table extends Migration
         if (!$this->db->tableExists('{{%museumplus_people}}')) {
             $this->createTable('{{%museumplus_people}}', [
                 'id' => $this->primaryKey(),
-                'title' => $this->string(),
+                'title' => $this->text(),
                 'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),

@@ -18,7 +18,7 @@ class m221122_230619_add_ownerships_table extends Migration
         if (!$this->db->tableExists('{{%museumplus_ownerships}}')) {
             $this->createTable('{{%museumplus_ownerships}}', [
                 'id' => $this->primaryKey(),
-                'title' => $this->string(),
+                'title' => $this->text(),
                 'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),

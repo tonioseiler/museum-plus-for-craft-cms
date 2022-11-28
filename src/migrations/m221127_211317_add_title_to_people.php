@@ -16,10 +16,8 @@ class m221127_211317_add_title_to_people extends Migration
     public function safeUp(): bool
     {
         if (!$this->db->columnExists('{{%museumplus_people}}', 'title')) {
-            $this->addColumn('{{%museumplus_people}}', 'title', $this->string());
+            $this->addColumn('{{%museumplus_people}}', 'title', $this->text());
         }
-        return true;
-
         return true;
     }
 

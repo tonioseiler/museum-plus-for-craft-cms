@@ -41,7 +41,7 @@ class Install extends Migration
         if (!$this->db->tableExists('{{%museumplus_objectgroups}}')) {
             $this->createTable('{{%museumplus_objectgroups}}', [
                 'id' => $this->primaryKey(),
-                'title' => $this->string(),
+                'title' => $this->text(),
                 'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
@@ -111,7 +111,7 @@ class Install extends Migration
         if (!$this->db->tableExists('{{%museumplus_literature}}')) {
             $this->createTable('{{%museumplus_literature}}', [
                 'id' => $this->primaryKey(),
-                'title' => $this->string(),
+                'title' => $this->text(),
                 'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
@@ -153,7 +153,7 @@ class Install extends Migration
         f (!$this->db->tableExists('{{%museumplus_people}}')) {
             $this->createTable('{{%museumplus_people}}', [
                 'id' => $this->primaryKey(),
-                'title' => $this->string(),
+                'title' => $this->text(),
                 'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
@@ -196,7 +196,7 @@ class Install extends Migration
         if (!$this->db->tableExists('{{%museumplus_ownerships}}')) {
             $this->createTable('{{%museumplus_ownerships}}', [
                 'id' => $this->primaryKey(),
-                'title' => $this->string(),
+                'title' => $this->text(),
                 'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
@@ -282,22 +282,22 @@ class Install extends Migration
         }
 
         if (!$this->db->columnExists('{{%museumplus_objectgroups}}', 'title')) {
-            $this->addColumn('{{%museumplus_objectgroups}}', 'title', $this->string());
+            $this->addColumn('{{%museumplus_objectgroups}}', 'title', $this->text());
         }
 
         if (!$this->db->columnExists('{{%museumplus_people}}', 'title')) {
-            $this->addColumn('{{%museumplus_people}}', 'title', $this->string());
+            $this->addColumn('{{%museumplus_people}}', 'title', $this->text());
         }
 
         if (!$this->db->columnExists('{{%museumplus_literature}}', 'title')) {
-            $this->addColumn('{{%museumplus_literature}}', 'title', $this->string());
+            $this->addColumn('{{%museumplus_literature}}', 'title', $this->text());
         }
 
         if (!$this->db->tableExists('{{%museumplus_vocabulary}}')) {
             $this->createTable('{{%museumplus_vocabulary}}', [
                 'id' => $this->primaryKey(),
                 'parentId' => $this->integer()->notNull()->defaultValue(0),
-                'title' => $this->string(),
+                'title' => $this->text(),
                 'language' => $this->string()->null(),
                 'type' => $this->string(),
                 'data' => $this->longText()->null(),

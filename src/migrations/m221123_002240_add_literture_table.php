@@ -18,7 +18,7 @@ class m221123_002240_add_literture_table extends Migration
         if (!$this->db->tableExists('{{%museumplus_literature}}')) {
             $this->createTable('{{%museumplus_literature}}', [
                 'id' => $this->primaryKey(),
-                'title' => $this->string(),
+                'title' => $this->text(),
                 'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),

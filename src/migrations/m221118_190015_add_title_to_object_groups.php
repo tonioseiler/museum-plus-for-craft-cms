@@ -16,7 +16,7 @@ class m221118_190015_add_title_to_object_groups extends Migration
     public function safeUp(): bool
     {
         if (!$this->db->columnExists('{{%museumplus_objectgroups}}', 'title')) {
-            $this->addColumn('{{%museumplus_objectgroups}}', 'title', $this->string());
+            $this->addColumn('{{%museumplus_objectgroups}}', 'title', $this->text());
         }
         return true;
     }

@@ -19,7 +19,7 @@ class m221125_103709_add_vocabulary_table extends Migration
             $this->createTable('{{%museumplus_vocabulary}}', [
                 'id' => $this->primaryKey(),
                 'parentId' => $this->integer()->notNull()->defaultValue(0),
-                'title' => $this->string(),
+                'title' => $this->text(),
                 'language' => $this->string()->null(),
                 'type' => $this->string(),
                 'data' => $this->longText()->null(),

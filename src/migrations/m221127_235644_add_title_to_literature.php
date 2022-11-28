@@ -16,9 +16,8 @@ class m221127_235644_add_title_to_literature extends Migration
     public function safeUp(): bool
     {
         if (!$this->db->columnExists('{{%museumplus_literature}}', 'title')) {
-            $this->addColumn('{{%museumplus_literature}}', 'title', $this->string());
+            $this->addColumn('{{%museumplus_literature}}', 'title', $this->text());
         }
-        return true;
         return true;
     }
 
