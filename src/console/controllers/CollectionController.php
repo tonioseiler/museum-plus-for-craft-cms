@@ -54,12 +54,25 @@ use yii\helpers\Console;
 */
 class CollectionController extends Controller
 {
-    // Public Methods
     /**
-    * @var bool|null if true - script finish will download all images.
+    * @var bool|null if true - script will download all data.
     */
     public $forceAll;
+
+    /**
+    * @var int|null if set, script will downoad only this item.
+    */
     public $collectionItemId;
+
+    /**
+    * @var bool|null if true - script will not download attachments.
+    */
+    public $ignoreAttachments;
+
+    /**
+    * @var bool|null if true - script will not download multimedia.
+    */
+    public $ignoreMultimedia;
 
     // Private Properties
     private $start;
@@ -283,17 +296,20 @@ class CollectionController extends Controller
         echo PHP_EOL;
 
         //add attachment
-        $assetId = $this->createAttachmentFromObjectId($item->collectionId);
-        if($assetId){
-            echo "Attachment for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
-            $item->assetId = $assetId;
-            Craft::$app->elements->saveElement($item);
-        }else{
-            echo "Attachment for item " . $item->id . " AssetID: NULL" . PHP_EOL;
+        if (!$this->ignoreAttachments) {
+            $assetId = $this->createAttachmentFromObjectId($item->collectionId);
+            if($assetId){
+                echo "Attachment for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
+                $item->assetId = $assetId;
+                Craft::$app->elements->saveElement($item);
+            }else{
+                echo "Attachment for item " . $item->id . " AssetID: NULL" . PHP_EOL;
+            }
         }
 
+
         //add multimedia
-        if(isset($moduleRefs['ObjMultimediaRef'])) {
+        if(!$this->ignoreMultimedia && isset($moduleRefs['ObjMultimediaRef'])) {
 
             $assetIds = [];
             foreach ($moduleRefs['ObjMultimediaRef']['items'] as $mm){
@@ -332,6 +348,8 @@ class CollectionController extends Controller
         $options = parent::options($actionID);
         $options[] = 'forceAll';
         $options[] = 'collectionItemId';
+        $options[] = 'ignoreAttachments';
+        $options[] = 'ignoreMultimedia';
         return $options;
     }
 
