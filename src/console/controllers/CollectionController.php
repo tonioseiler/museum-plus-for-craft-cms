@@ -499,7 +499,7 @@ class CollectionController extends Controller
                 $itemRecord->link('objectGroups', $objectGroup);
             }
         }
-        echo '.';
+        echo 'i';
         return $item;
     }
 
