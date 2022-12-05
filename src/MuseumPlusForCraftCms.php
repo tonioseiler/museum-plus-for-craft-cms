@@ -261,7 +261,8 @@ class MuseumPlusForCraftCms extends Plugin
     {
         return [
             'museum-plus-for-craft-cms/collection' => ['template' => 'museum-plus-for-craft-cms/collection'],
-            'museum-plus-for-craft-cms/collection/<itemId:\d+>' => 'museum-plus-for-craft-cms/collection/edit'
+            'museum-plus-for-craft-cms/collection/<itemId:\d+>' => 'museum-plus-for-craft-cms/collection/edit',
+            'museum-plus-for-craft-cms/vocabularies' => ['template' => 'museum-plus-for-craft-cms/vocabularies'],
         ];
     }
 
@@ -277,6 +278,8 @@ class MuseumPlusForCraftCms extends Plugin
         $cpNavItem['subnav'] = [];
 
         $cpNavItem['subnav']['items'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Items'), 'url' => 'museum-plus-for-craft-cms/collection'];
+
+        $cpNavItem['subnav']['vocabularies'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Vocabularies'), 'url' => 'museum-plus-for-craft-cms/vocabularies'];
 
         return $cpNavItem;
     }

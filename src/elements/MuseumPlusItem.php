@@ -96,6 +96,11 @@ class MuseumPlusItem  extends Element
         return true;
     }
 
+    public static function refHandle(): ?string
+    {
+        return 'item';
+    }
+
     /**
      * Defines the sources that elements of this type may belong to.
      *
@@ -189,7 +194,17 @@ class MuseumPlusItem  extends Element
 
     public function getCpEditUrl(): ?string
     {
-        return UrlHelper::cpUrl('museum-plus-for-craft-cms/items/' . $this->id);
+        return UrlHelper::cpUrl('museum-plus-for-craft-cms/collection/' . $this->id);
+    }
+
+    protected function cpEditUrl(): ?string
+    {
+        return $this->getCpEditUrl();
+    }
+
+    public function getPostEditUrl(): ?string
+    {
+        return UrlHelper::cpUrl('museum-plus-for-craft-cms/collection');
     }
 
 
@@ -383,6 +398,11 @@ class MuseumPlusItem  extends Element
     protected static function defineSearchableAttributes(): array
     {
         return ['data', 'collectionId'];
+    }
+
+    public function __toString(): string
+    {
+        return $this->title;
     }
 
 
