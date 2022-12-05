@@ -13,6 +13,7 @@ namespace furbo\museumplusforcraftcms\elements;
 use craft\db\Query;
 use craft\helpers\Cp;
 
+use craft\helpers\UrlHelper;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\db\MuseumPlusItemQuery;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
@@ -188,7 +189,7 @@ class MuseumPlusItem  extends Element
 
     public function getCpEditUrl(): ?string
     {
-        return 'museum-plus-for-craft-cms/collection/'.$this->id;
+        return UrlHelper::cpUrl('museum-plus-for-craft-cms/items/' . $this->id);
     }
 
 

@@ -150,7 +150,7 @@ class Install extends Migration
             );
         }
 
-        f (!$this->db->tableExists('{{%museumplus_people}}')) {
+        if (!$this->db->tableExists('{{%museumplus_people}}')) {
             $this->createTable('{{%museumplus_people}}', [
                 'id' => $this->primaryKey(),
                 'title' => $this->text(),
