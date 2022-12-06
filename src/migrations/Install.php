@@ -297,7 +297,6 @@ class Install extends Migration
             $this->createTable('{{%museumplus_vocabulary}}', [
                 'id' => $this->primaryKey(),
                 'parentId' => $this->integer()->notNull()->defaultValue(0),
-                'title' => $this->text(),
                 'language' => $this->string()->null(),
                 'type' => $this->string(),
                 'data' => $this->longText()->null(),
@@ -306,6 +305,16 @@ class Install extends Migration
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid()
             ]);
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName(),
+                '{{%museumplus_vocabulary}}',
+                'id',
+                '{{%elements}}',
+                'id',
+                'CASCADE',
+                null
+            );
         }
 
 

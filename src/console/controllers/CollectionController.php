@@ -15,6 +15,7 @@ use craft\helpers\Assets;
 use craft\models\VolumeFolder;
 use craft\helpers\App;
 
+use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
@@ -580,14 +581,13 @@ class CollectionController extends Controller
     {
 
         $collectionId = $data->id;
-        $vocabularyEntry = VocabularyEntryRecord::find()
+        $vocabularyEntry = MuseumPlusVocabulary::find()
             ->where(['collectionId' => $collectionId])
             ->one();
 
         if (empty($vocabularyEntry)) {
             //create new
-            $vocabularyEntry = new VocabularyEntryRecord();
-            $vocabularyEntry->id = 0;
+            $vocabularyEntry = new MuseumPlusVocabulary();
             $vocabularyEntry->collectionId = $data->id;
             $vocabularyEntry->title = $data->content;
         } else {
@@ -600,7 +600,7 @@ class CollectionController extends Controller
         $vocabularyEntry->parentId = $data->parentId;
         $vocabularyEntry->language = $data->isoLanguageCode;
         $vocabularyEntry->data = json_encode($data);
-        $success = $vocabularyEntry->save();
+        $success = Craft::$app->elements->saveElement($vocabularyEntry);
         return $vocabularyEntry;
     }
 
