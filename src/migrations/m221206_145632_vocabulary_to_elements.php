@@ -17,7 +17,7 @@ class m221206_145632_vocabulary_to_elements extends Migration
     {
         if ($this->db->tableExists('{{%museumplus_vocabulary}}')) {
             if ($this->db->columnExists('{{%museumplus_vocabulary}}', 'title')) {
-                $this->db->dropColumn('{{%museumplus_vocabulary}}', 'title');
+                $this->dropColumn('{{%museumplus_vocabulary}}', 'title');
             }
             $this->addForeignKey(
                 $this->db->getForeignKeyName(),
