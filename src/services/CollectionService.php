@@ -10,6 +10,7 @@
 
 namespace furbo\museumplusforcraftcms\services;
 
+use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 
@@ -43,8 +44,11 @@ class CollectionService extends Component
         return 'Todo: implement';
     }
 
-    public function getItemsById($id) {
-        return 'Todo: implement';
+    public function getItemById($id) {
+        $item = MuseumPlusItem::find()
+            ->id($id)
+            ->one();
+        return $item;
     }
 
     public function getItemsByIds($ids) {

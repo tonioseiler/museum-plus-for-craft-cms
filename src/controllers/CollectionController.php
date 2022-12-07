@@ -77,6 +77,17 @@ class CollectionController extends Controller
         return $this->renderTemplate('museum-plus-for-craft-cms/collection/edit', $variables);
     }
 
+    public function actionSync()
+    {
+        $this->requirePostRequest();
+        $request = Craft::$app->getRequest();
+        $itemId = $request->getBodyParam('itemId');
+        $item = MuseumPlusForCraftCms::$plugin->collection->getItemById($itemId);
+        MuseumPlusForCraftCms::$plugin->getInstance()->controllerNamespace = 'furbo\museumplusforcraftcms\console\controllers';
+        $command = MuseumPlusForCraftCms::$plugin->getInstance()->runAction('collection/update-item', ['collectionItemId' => $item->collectionId]);
+        return $this->redirectToPostedUrl($item);
+    }
+
     public function actionUpdate()
     {
         $this->requirePostRequest();
