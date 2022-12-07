@@ -173,4 +173,9 @@ class MuseumPlusVocabulary extends Element
         return $rec->getDataAttribute($name);
     }
 
+    public function getParentElement()
+    {
+        return MuseumPlusVocabulary::find()->id($this->parentId)->one();
+    }
+
 }

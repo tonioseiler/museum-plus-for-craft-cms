@@ -85,15 +85,19 @@
                         <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{vocabulary.title}}">
                     </div>
                 </div>
-                <div class="field" data-attribute="parentId">
+                {% if vocabulary.getParentElement %}
+                <div class="field" data-attribute="parent">
                     <div class="heading">
-                        <label id="fields-title-label" for="fields-title">{{'Parent Id'|t('app')}}</label>
+                        <label id="fields-title-label" for="fields-title">{{'Parent'|t('app')}}</label>
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
-                        <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[parentId]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{vocabulary.parentId}}">
+                        <div>
+                            <a href="{{ vocabulary.getParentElement().getCpEditUrl() }}">{{vocabulary.getParentElement().title}}</a>
+                        </div>
                     </div>
                 </div>
+                {% endif %}
                 <div class="field" data-attribute="collectionId">
                     <div class="heading">
                         <label id="fields-title-label" for="fields-title">{{'Collection Id'|t('app')}}</label>
