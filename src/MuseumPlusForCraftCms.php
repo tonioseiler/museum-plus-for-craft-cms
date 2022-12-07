@@ -11,6 +11,7 @@
 namespace furbo\museumplusforcraftcms;
 
 use craft\helpers\App;
+use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\services\MuseumPlusService;
 use furbo\museumplusforcraftcms\variables\MuseumPlusForCraftCmsVariable;
 use furbo\museumplusforcraftcms\models\Settings;
@@ -136,6 +137,7 @@ class MuseumPlusForCraftCms extends Plugin
             Elements::EVENT_REGISTER_ELEMENT_TYPES,
             function (RegisterComponentTypesEvent $event) {
                 $event->types[] = MuseumPlusItem::class;
+                $event->types[] = MuseumPlusVocabulary::class;
             }
         );
 
@@ -260,6 +262,7 @@ class MuseumPlusForCraftCms extends Plugin
     protected function getCpRoutes(): array
     {
         return [
+            'museum-plus-for-craft-cms' => [ 'template' => 'museum-plus-for-craft-cms' ],
             'museum-plus-for-craft-cms/collection' => ['template' => 'museum-plus-for-craft-cms/collection'],
             'museum-plus-for-craft-cms/collection/<itemId:\d+>' => 'museum-plus-for-craft-cms/collection/edit',
             'museum-plus-for-craft-cms/vocabularies' => ['template' => 'museum-plus-for-craft-cms/vocabularies'],
@@ -273,13 +276,14 @@ class MuseumPlusForCraftCms extends Plugin
         $settings = self::$plugin->getSettings();
 
         $cpNavItem['label'] = $settings['cpTitle'];
-        $cpNavItem['url'] = 'museum-plus-for-craft-cms/collection';
+        //$cpNavItem['url'] = 'museum-plus-for-craft-cms/collection';
 
         $cpNavItem['subnav'] = [];
 
         $cpNavItem['subnav']['items'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Items'), 'url' => 'museum-plus-for-craft-cms/collection'];
 
         $cpNavItem['subnav']['vocabularies'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Vocabularies'), 'url' => 'museum-plus-for-craft-cms/vocabularies'];
+
 
         return $cpNavItem;
     }

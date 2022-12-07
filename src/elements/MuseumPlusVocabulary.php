@@ -3,6 +3,7 @@
 namespace furbo\museumplusforcraftcms\elements;
 
 use craft\db\Query;
+use craft\elements\User;
 use craft\helpers\Cp;
 
 use Craft;
@@ -76,6 +77,11 @@ class MuseumPlusVocabulary extends Element
     }
 
     public static function hasStatuses(): bool
+    {
+        return true;
+    }
+
+    public function canView(User $user): bool
     {
         return true;
     }

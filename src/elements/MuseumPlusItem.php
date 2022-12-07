@@ -11,6 +11,7 @@
 namespace furbo\museumplusforcraftcms\elements;
 
 use craft\db\Query;
+use craft\elements\User;
 use craft\helpers\Cp;
 
 use craft\helpers\UrlHelper;
@@ -329,6 +330,11 @@ class MuseumPlusItem  extends Element
      * @return bool Whether the element should be moved within the structure
      */
     public function beforeMoveInStructure(int $structureId): bool
+    {
+        return true;
+    }
+
+    public function canView(User $user): bool
     {
         return true;
     }
