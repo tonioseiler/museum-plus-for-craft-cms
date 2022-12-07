@@ -7,6 +7,8 @@ namespace furbo\museumplusforcraftcms\records;
 
 use craft\db\ActiveRecord;
 
+use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 use furbo\museumplusforcraftcms\records\DataRecord;
 
@@ -28,6 +30,13 @@ class VocabularyEntryRecord extends DataRecord
     public function getItems() {
         return $this->hasMany(MuseumPlusItemRecord::className(), ['id' => 'itemId'])
             ->viaTable('museumplus_items_vocabulary', ['vocabularyId' => 'id']);
+    }
+
+    public function getTitle()
+    {
+        //$element = MuseumPlusForCraftCms::$plugin->vocabulary->getElementById($this->id);
+        $element = MuseumPlusVocabulary::find()->id($this->id)->one();
+        return $element->title;
     }
 
 
