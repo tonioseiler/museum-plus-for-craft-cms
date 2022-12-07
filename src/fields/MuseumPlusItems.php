@@ -56,7 +56,7 @@ class MuseumPlusItems extends BaseRelationField
      */
     public static function displayName(): string
     {
-        return Craft::t('app', 'MuseumPlusItems');
+        return Craft::t('app', 'MuseumPlus - Items');
     }
 
     /**

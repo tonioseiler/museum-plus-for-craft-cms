@@ -12,6 +12,7 @@ namespace furbo\museumplusforcraftcms\console\controllers;
 
 use craft\elements\Asset;
 use craft\helpers\Assets;
+use craft\helpers\ElementHelper;
 use craft\models\VolumeFolder;
 use craft\helpers\App;
 
@@ -388,8 +389,9 @@ class CollectionController extends Controller
             $basename = pathinfo($attachment, PATHINFO_FILENAME);
             $extension = pathinfo($attachment, PATHINFO_EXTENSION);
             $filename = $basename . '_' . $id . '.' . $extension;
+            $title = Assets::filename2Title($basename . '_' . $id);
             try {
-                $asset = Asset::find()->filename($filename)->folderId($parentFolder->id)->one();
+                $asset = Asset::find()->title($title)->folderId($parentFolder->id)->one();
                 if(is_null($asset)){
                     $asset = new Asset();
                 }
@@ -399,6 +401,7 @@ class CollectionController extends Controller
                 $asset->setVolumeId($parentFolder->volumeId);
                 $asset->setScenario(Asset::SCENARIO_CREATE);
                 $asset->avoidFilenameConflicts = true;
+
 
                 $result = Craft::$app->getElements()->saveElement($asset);
                 if ($result){
@@ -425,8 +428,9 @@ class CollectionController extends Controller
             $basename = pathinfo($attachment, PATHINFO_FILENAME);
             $extension = pathinfo($attachment, PATHINFO_EXTENSION);
             $filename = $basename . '_' . $id . '.' . $extension;
+            $title = Assets::filename2Title($basename . '_' . $id);
             try {
-                $asset = Asset::find()->filename($filename)->folderId($parentFolder->id)->one();
+                $asset = Asset::find()->title($title)->folderId($parentFolder->id)->one();
                 if(is_null($asset)){
                     $asset = new Asset();
                 }

@@ -16,6 +16,7 @@ use furbo\museumplusforcraftcms\services\MuseumPlusService;
 use furbo\museumplusforcraftcms\variables\MuseumPlusForCraftCmsVariable;
 use furbo\museumplusforcraftcms\models\Settings;
 use furbo\museumplusforcraftcms\fields\MuseumPlusItems as ItemsField;
+use     furbo\museumplusforcraftcms\fields\MuseumPlusVocabularies as VocabulariesField;
 use furbo\museumplusforcraftcms\utilities\Collection as CollectionUtility;
 use furbo\museumplusforcraftcms\widgets\Collection as CollectionWidget;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
@@ -147,6 +148,7 @@ class MuseumPlusForCraftCms extends Plugin
             Fields::EVENT_REGISTER_FIELD_TYPES,
             function (RegisterComponentTypesEvent $event) {
                 $event->types[] = ItemsField::class;
+                $event->types[] = VocabulariesField::class;
             }
         );
 

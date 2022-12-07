@@ -25,7 +25,7 @@
 {% endmacro %}
 
 {# The title of this CP section #}
-{% set title = "Collection Item" %}
+{% set title = item.title %}
 {% set selectedSubnavItem = 'items' %}
 
 {# The URL to this plugin's base CP section #}
@@ -36,7 +36,7 @@
 {% set firstTabs = {
     "tab--museumplusforcraftcms-item": {
         "tabId": "tab-tab--museumplusforcraftcms-item",
-        "label": "Title",
+        "label": "Content",
         "url": "#tab--museumplusforcraftcms-item",
         "class": null
     }
@@ -46,7 +46,7 @@
     {% set firstTabs = {
         "tab--museumplusforcraftcms-item": {
             "tabId": "tab-tab--museumplusforcraftcms-item",
-            "label": "Title",
+            "label": "Content",
             "url": "#tab--museumplusforcraftcms-item",
             "class": null
         },
