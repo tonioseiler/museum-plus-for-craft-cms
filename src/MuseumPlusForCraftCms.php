@@ -266,6 +266,7 @@ class MuseumPlusForCraftCms extends Plugin
             'museum-plus-for-craft-cms/collection' => ['template' => 'museum-plus-for-craft-cms/collection'],
             'museum-plus-for-craft-cms/collection/<itemId:\d+>' => 'museum-plus-for-craft-cms/collection/edit',
             'museum-plus-for-craft-cms/vocabularies' => ['template' => 'museum-plus-for-craft-cms/vocabularies'],
+            'museum-plus-for-craft-cms/vocabularies/<itemId:\d+>' => ['template' => 'museum-plus-for-craft-cms/vocabularies/edit'],
         ];
     }
 

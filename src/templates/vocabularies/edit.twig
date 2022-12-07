@@ -1,0 +1,26 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\museumplusforcraftcms\\MuseumPlusForCraftCmsAsset") %}
+{% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\collectioncpsection\\CollectionCPSectionAsset") %}
+
+
+{# The title of this CP section #}
+{% set title = "Vocabulary Item" %}
+{% set selectedSubnavItem = 'vocabularies' %}
+
+{% block header %}
+
+    <div class="flex flex-nowrap">
+        {{ block('pageTitle') }}
+    </div>
+    <div class="flex">
+        {{ block('actionButton') }}
+    </div>
+
+{% endblock %}
+
+{% block content %}
+xx
+
+{% endblock %}

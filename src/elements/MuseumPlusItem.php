@@ -488,6 +488,7 @@ class MuseumPlusItem  extends Element
         return $this->record;
     }
 
+
     public function getDating() {
         $rec = $this->getRecord();
         return $rec->getRepeatableGroupValues('ObjDateGrp', 'DateTxt');
