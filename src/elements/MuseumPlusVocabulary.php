@@ -149,4 +149,14 @@ class MuseumPlusVocabulary extends Element
         parent::afterSave($isNew);
     }
 
+    public function getDataAttributes() {
+        $rec = $this->getRecord();
+        return $rec->getDataAttributes();
+    }
+
+    public function getDataAttribute($name) {
+        $rec = $this->getRecord();
+        return $rec->getDataAttribute($name);
+    }
+
 }
