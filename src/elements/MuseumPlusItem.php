@@ -472,13 +472,16 @@ class MuseumPlusItem  extends Element
     }
 
     public function getVocabularyEntries() {
-        $rec = $this->getRecord();
-        return $rec->getVocabularyEntries();
+        $ret = MuseumPlusVocabulary::find()
+                //add a join here
+                //where itemId=this->id
+                ->all();
+            return $ret;
+
     }
 
     public function getVocabularyEntriesByType($type) {
-        $rec = $this->getRecord();
-        $vcs = $rec->getVocabularyEntriesByType($type);
+        //TODO: return elements
     }
 
     public function getRecord() {
