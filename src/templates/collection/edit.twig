@@ -65,7 +65,9 @@
 {% block actionButton %}
 
     <div class="btngroup">
-        <input type="submit" class="btn submit" value="{{ 'Sync'|t('app') }}">
+        <button type="button" class="btn formsubmit" data-action="museum-plus-for-craft-cms/collection/sync">Sync</button>
+
+        <input type="submit" class="btn submit" value="{{ 'save'|t('app') }}">
     </div>
 
 {% endblock %}
@@ -87,7 +89,7 @@
 {% block content %}
 
     {# hidden inputs #}
-    {{ actionInput('museum-plus-for-craft-cms/collection/sync') }}
+    {{ actionInput('museum-plus-for-craft-cms/collection/update') }}
     {{ redirectInput( item.getCpEditUrl() ) }}
     <input type="hidden" name="itemId" value="{{ item.id }}">
 
