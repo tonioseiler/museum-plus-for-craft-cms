@@ -10,6 +10,7 @@ use Craft;
 use \craft\base\Element;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\UrlHelper;
+use craft\models\FieldLayout;
 use furbo\museumplusforcraftcms\elements\db\MuseumPlusVocabularyQuery;
 use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 
@@ -25,6 +26,8 @@ class MuseumPlusVocabulary extends Element
     public $parentId = null;
 
     public $language = null;
+
+    private $record = null;
 
     public static function displayName(): string
     {
@@ -149,6 +152,17 @@ class MuseumPlusVocabulary extends Element
         parent::afterSave($isNew);
     }
 
+    public function getFieldLayout(): FieldLayout
+    {
+        return Craft::$app->getFields()->getLayoutByType(MuseumPlusVocabulary::class);
+    }
+
+    public function getRecord() {
+        if (empty($this->record)) {
+            $this->record = VocabularyEntryRecord::findOne($this->id);
+        }
+        return $this->record;
+    }
     public function getDataAttributes() {
         $rec = $this->getRecord();
         return $rec->getDataAttributes();

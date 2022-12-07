@@ -23,7 +23,8 @@
 
 }
 
-#tab--museumplusforcraftcms-item .disabled {
+#tab--museumplusforcraftcms-item .disabled,
+#tab--museumplusforcraftcms-vocabulary .disabled{
     opacity: 1;
     background-color: rgb(242,242,252);
 }
