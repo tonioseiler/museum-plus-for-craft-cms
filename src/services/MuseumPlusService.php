@@ -183,6 +183,16 @@ class MuseumPlusService extends Component
             return false;
         }
     }
+    public function getLiteratureById($literatureId)
+    {
+        $this->init();
+        try {
+            $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Literature/' . $literatureId . '/attachment', $this->requestHeaders);
+            return $this->responseFile($request);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 
     public function getMultimediaLastModified($multimediaId)
     {

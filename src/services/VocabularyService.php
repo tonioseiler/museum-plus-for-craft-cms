@@ -10,6 +10,7 @@
 
 namespace furbo\museumplusforcraftcms\services;
 
+use craft\db\Query;
 use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
@@ -35,5 +36,19 @@ class VocabularyService extends Component
 {
     public function getElementById($id) {
         return MuseumPlusVocabulary::find()->id($this->id)->one();
+    }
+
+    public function getTypes() {
+        $types = [];
+        $vocabularies = (new Query())
+            ->select('type')
+            ->from(['{{%museumplus_vocabulary}}'])
+            ->groupBy(['type'])
+            ->orderBy(['type' => SORT_ASC])
+            ->all();
+        foreach ($vocabularies as $vocabulary) {
+            $types[$vocabulary["type"]] = $vocabulary["type"];
+        }
+        return $types;
     }
 }

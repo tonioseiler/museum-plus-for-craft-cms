@@ -297,6 +297,7 @@ class Install extends Migration
             $this->createTable('{{%museumplus_vocabulary}}', [
                 'id' => $this->primaryKey(),
                 'parentId' => $this->integer()->notNull()->defaultValue(0),
+                'assetId' => $this->integer(),
                 'language' => $this->string()->null(),
                 'type' => $this->string(),
                 'data' => $this->longText()->null(),
@@ -314,6 +315,16 @@ class Install extends Migration
                 'id',
                 'CASCADE',
                 null
+            );
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_literature}}', 'assetId'),
+                '{{%museumplus_literature}}',
+                'assetId',
+                '{{%assets}}',
+                'id',
+                'CASCADE',
+                'CASCADE'
             );
         }
 

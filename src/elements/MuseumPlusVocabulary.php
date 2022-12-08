@@ -12,6 +12,7 @@ use craft\elements\db\ElementQueryInterface;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
 use furbo\museumplusforcraftcms\elements\db\MuseumPlusVocabularyQuery;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 
 class MuseumPlusVocabulary extends Element
@@ -97,8 +98,21 @@ class MuseumPlusVocabulary extends Element
                 'label' => Craft::t('app', 'All'),
                 'criteria' => [],
                 'hasThumbs' => false
+            ],
+            [
+                'heading' => 'Types'
             ]
         ];
+
+        $types = MuseumPlusForCraftCms::$plugin->vocabulary->getTypes();
+        foreach ($types as $type) {
+            $sources[] = [
+                'key' => "type:" . $type,
+                'label' => $type,
+                'criteria' => ['type' => $type]
+            ];
+        }
+
         return $sources;
     }
 

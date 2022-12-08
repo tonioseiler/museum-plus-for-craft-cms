@@ -76,6 +76,11 @@ class CollectionController extends Controller
     */
     public $ignoreMultimedia;
 
+    /**
+     * @var bool|null if true - script will not download literature.
+     */
+    public $ignoreLiterature;
+
     // Private Properties
     private $start;
     private $settings;
@@ -313,9 +318,9 @@ class CollectionController extends Controller
 
             $assetIds = [];
             foreach ($moduleRefs['ObjMultimediaRef']['items'] as $mm){
-                $asset = $this->createMultimediaFromId($mm['id']);
-                if ($asset) {
-                    $assetIds[] = $asset->id;
+                $assetId = $this->createMultimediaFromId($mm['id']);
+                if ($assetId) {
+                    $assetIds[] = $assetId;
                 }
             }
 
@@ -324,6 +329,24 @@ class CollectionController extends Controller
                 echo "Multimedia assets for Item Id: " . $item->id . " Asset IDs: " . implode(",", $assetIds) . PHP_EOL;
             }
         }
+
+        //add literature
+        if(!$this->ignoreLiterature && isset($moduleRefs['ObjLiteratureRef'])) {
+
+            $assetIds = [];
+            foreach ($moduleRefs['ObjLiteratureRef']['items'] as $l){
+                $assetId = $this->createLiteratureFromId($l['id']);
+                $literature = $this->museumPlus->getLiterature($l['id']);
+                if($assetId && $literature){
+                    echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
+                    $literature->assetId = $assetId;
+                    $literature->save();
+                }else{
+                    echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: NULL" . PHP_EOL;
+                }
+            }
+        }
+
 
     }
 
@@ -334,6 +357,7 @@ class CollectionController extends Controller
         $options[] = 'collectionItemId';
         $options[] = 'ignoreAttachments';
         $options[] = 'ignoreMultimedia';
+        $options[] = 'ignoreLiterature';
         return $options;
     }
 
@@ -386,33 +410,11 @@ class CollectionController extends Controller
         $attachment = $this->museumPlus->getAttachmentByObjectId($id);
 
         if ($attachment) {
-            $basename = pathinfo($attachment, PATHINFO_FILENAME);
-            $extension = pathinfo($attachment, PATHINFO_EXTENSION);
-            $filename = $basename . '_' . $id . '.' . $extension;
-            $title = Assets::filename2Title($basename . '_' . $id);
-            try {
-                $asset = Asset::find()->title($title)->folderId($parentFolder->id)->one();
-                if(is_null($asset)){
-                    $asset = new Asset();
-                }
-                $asset->tempFilePath = $attachment;
-                $asset->filename = $filename;
-                $asset->newFolderId = $parentFolder->id;
-                $asset->setVolumeId($parentFolder->volumeId);
-                $asset->setScenario(Asset::SCENARIO_CREATE);
-                $asset->avoidFilenameConflicts = true;
-
-
-                $result = Craft::$app->getElements()->saveElement($asset);
-                if ($result){
-                    return $asset->id;
-                }else{
-                    return false;
-                }
-            } catch (\Throwable $e) {
-                echo $e->getMessage();
-                return false;
+            $asset = $this->createAsset($id, $attachment, $parentFolder);
+            if($asset){
+                return $asset->id;
             }
+
         }
         return false;
     }
@@ -425,31 +427,56 @@ class CollectionController extends Controller
         $attachment = $this->museumPlus->getMultimediaById($id);
 
         if ($attachment) {
-            $basename = pathinfo($attachment, PATHINFO_FILENAME);
-            $extension = pathinfo($attachment, PATHINFO_EXTENSION);
-            $filename = $basename . '_' . $id . '.' . $extension;
-            $title = Assets::filename2Title($basename . '_' . $id);
-            try {
-                $asset = Asset::find()->title($title)->folderId($parentFolder->id)->one();
-                if(is_null($asset)){
-                    $asset = new Asset();
-                }
-                $asset->tempFilePath = $attachment;
-                $asset->filename = $filename;
-                $asset->newFolderId = $parentFolder->id;
-                $asset->setVolumeId($parentFolder->volumeId);
-                $asset->setScenario(Asset::SCENARIO_CREATE);
-                $asset->avoidFilenameConflicts = true;
+            $asset = $this->createAsset($id, $attachment, $parentFolder);
+            if($asset){
+                return $asset->id;
+            }
+        }
+        return false;
+    }
 
-                $result = Craft::$app->getElements()->saveElement($asset);
-                if ($result){
-                    return $asset;
-                }else{
-                    return false;
-                }
-            } catch (\Throwable $e) {
+    private function createLiteratureFromId($id)
+    {
+        $folderId = $this->settings['attachmentVolumeId'];
+        $folder = $this->assets->findFolder(['id' => $folderId]);
+        $parentFolder = $this->createFolder("Literature", $folderId);
+        $attachment = $this->museumPlus->getLiteratureById($id);
+
+        if ($attachment) {
+            $asset = $this->createAsset($id, $attachment, $parentFolder);
+            if($asset){
+                return $asset->id;
+            }
+        }
+        return false;
+    }
+
+    private function createAsset($id, $attachment, $parentFolder)
+    {
+        $basename = pathinfo($attachment, PATHINFO_FILENAME);
+        $extension = pathinfo($attachment, PATHINFO_EXTENSION);
+        $filename = $basename . '_' . $id . '.' . $extension;
+        $title = Assets::filename2Title($basename . '_' . $id);
+        try {
+            $asset = Asset::find()->title($title)->folderId($parentFolder->id)->one();
+            if(is_null($asset)){
+                $asset = new Asset();
+            }
+            $asset->tempFilePath = $attachment;
+            $asset->filename = $filename;
+            $asset->newFolderId = $parentFolder->id;
+            $asset->setVolumeId($parentFolder->volumeId);
+            $asset->setScenario(Asset::SCENARIO_CREATE);
+            $asset->avoidFilenameConflicts = true;
+
+            $result = Craft::$app->getElements()->saveElement($asset);
+            if ($result){
+                return $asset;
+            }else{
                 return false;
             }
+        } catch (\Throwable $e) {
+            return false;
         }
         return false;
     }

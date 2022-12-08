@@ -38,7 +38,8 @@
         "changelogUrl": "???",
         "components": {
             "museumPlus": "furbo\\museumplusforcraftcms\\services\\MuseumPlusService",
-            "collection": "furbo\\museumplusforcraftcms\\services\\CollectionService"
+            "collection": "furbo\\museumplusforcraftcms\\services\\CollectionService",
+            "vocabulary": "furbo\\museumplusforcraftcms\\services\\VocabularyService"
         },
         "class": "furbo\\museumplusforcraftcms\\MuseumPlusForCraftCms"
     },

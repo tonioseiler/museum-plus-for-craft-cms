@@ -226,12 +226,27 @@
                         <label>References/Literature</label>
                         <div class="flex-grow"></div>
                     </div>
-                    {% set literatureValues = [] %}
-                    {% for literature in item.getLiterature().all() %}
-                        {% set literatureValues = literatureValues|merge([literature.getDataAttribute('LitLiteratureVrt')]) %}
-                    {% endfor %}
                     <div class="input ltr">
-                        <textarea id="fields-literature" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[literature]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{literatureValues|join('\n – ')}}</textarea>
+                        {% set literatureValues = [] %}
+                        {% for literature in item.getLiterature().all() %}
+                            <div style="margin-bottom: 5px;">
+                                <div style="margin-bottom: 5px;">{{ literature.getDataAttribute('LitLiteratureVrt') }}</div>
+                                {% if literature.assetId %}
+                                    {% set myAsset = craft.assets().id(literature.assetId).one() %}
+                                    {% if myAsset %}
+                                        {% set thumb = {
+                                            width: 300,
+                                            quality: 75
+                                        } %}
+                                        {% set myAssetUrl = myAsset.getUrl(thumb) %}
+
+                                        <a href="{{ myAsset.getCpEditUrl() }}">
+                                            <img src="{{ myAssetUrl }}" width="150" />
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
 
@@ -338,5 +353,42 @@
 
 
 {% block details %}
-    add details here
+    <fieldset>
+        <div class="meta">
+            <div class="field">
+                <div class="heading">
+                    <label for="">{{ 'Collection Id'|t('app') }}</label>
+                </div>
+                <div class="input ltr">
+                    {{ item.collectionId }}
+                </div>
+            </div>
+            <div class="field">
+                <div class="heading">
+                    <label for="">{{ 'Object Groups'|t('app') }}</label>
+                </div>
+                <div class="input ltr">
+                    {% for group in item.getObjectGroups.all() %}
+                        {{ group.title }}{% if loop.last == false %}, {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="field">
+                <div class="heading">
+                    <label>{{ 'Last Update'|t('app') }}</label>
+                </div>
+                <div class="input ltr">
+                    {{ item.dateUpdated|datetime('medium') }}
+                </div>
+            </div>
+            <div class="field">
+                <div class="heading">
+                    <label for="">{{ 'Created at'|t('app') }}</label>
+                </div>
+                <div class="input ltr">
+                    {{ item.dateCreated|datetime('medium') }}
+                </div>
+            </div>
+        </div>
+    </fieldset>
 {% endblock %}
