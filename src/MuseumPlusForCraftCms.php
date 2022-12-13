@@ -197,10 +197,12 @@ class MuseumPlusForCraftCms extends Plugin
             Plugin::class,
             Plugin::EVENT_AFTER_SAVE_SETTINGS,
             function (Event $event) {
-                //save field layout
-                $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost('settings');
-                $fieldLayout->type = MuseumPlusItem::class;
-                Craft::$app->getFields()->saveLayout($fieldLayout);
+                if ($event->sender::class == "furbo\museumplusforcraftcms\MuseumPlusForCraftCms"); {
+                    //save field layout
+                    $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost('settings');
+                    $fieldLayout->type = MuseumPlusItem::class;
+                    Craft::$app->getFields()->saveLayout($fieldLayout);
+                }
             }
         );
 
