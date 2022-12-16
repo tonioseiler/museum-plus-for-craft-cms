@@ -419,7 +419,6 @@ class MuseumPlusItem  extends Element
 
     protected function route(): array|string|null {
         $settings = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
-        dd("ss");
         return [
             'templates/render', [
                 'template' => $settings[$this->site->handle]['template'],
