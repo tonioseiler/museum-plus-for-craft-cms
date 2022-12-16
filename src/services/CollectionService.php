@@ -55,7 +55,25 @@ class CollectionService extends Component
         return 'Todo: implement';
     }
 
-    public function searchItems($params) {
-        return 'Todo: implement';
+    public function searchItems($params, $limit = 10, $offset = 0) {
+        $items = MuseumPlusItem::find();
+        if(isset($params['search'])) {
+            $items = $items->search($params['search']);
+            $items->orderBy(['score' => SORT_DESC]);
+        }
+        if(isset($params['geographic'])) {
+            $items = $items->geographic($params['geographic']);
+        }
+        if(isset($params['classification'])) {
+            $items = $items->classification($params['classification']);
+        }
+        if(isset($params['tag'])) {
+            $items = $items->tag($params['tag']);
+        }
+        if(isset($params['objectGroup'])) {
+            $items = $items->objectGroup($params['objectGroup']);
+        }
+        $items = $items->limit($limit)->offset($offset);
+        return $items;
     }
 }

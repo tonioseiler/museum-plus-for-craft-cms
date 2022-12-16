@@ -16,6 +16,7 @@ use craft\helpers\ElementHelper;
 use craft\models\VolumeFolder;
 use craft\helpers\App;
 
+use craft\queue\jobs\ResaveElements;
 use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
@@ -379,6 +380,18 @@ class CollectionController extends Controller
             }
         }
         return true;
+    }
+
+    public function actionResaveItems()
+    {
+        Craft::$app->getQueue()->push(new ResaveElements([
+            'elementType' => MuseumPlusItem::class,
+            'criteria' => [
+                'siteId' => '*',
+                'unique' => true,
+                'status' => null,
+            ],
+        ]));
     }
 
     private function downloadObjectGroups() {

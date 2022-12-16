@@ -19,6 +19,60 @@
 
             <hr />
 
+            {% set siteRows = [] %}
+
+
+            {% for site in craft.app.sites.getAllSites() %}
+                {% set siteSettings = settings['sites'][site.handle] ?? null %}
+                {% set siteRows = siteRows|merge({
+                    (site.handle): {
+                        heading: site.name|t('site')|e,
+                        uriFormat: {
+                            value: siteSettings ? siteSettings.uriFormat,
+                        },
+                        template: {
+                            value: siteSettings ? siteSettings.template,
+                        },
+                    }|filter
+                }) %}
+            {% endfor %}
+
+            {{ forms.editableTableField({
+                label: "Site Settings"|t('app'),
+                instructions: "Choose which sites this section should be available in, and configure the site-specific settings."|t('app'),
+                id: 'sites',
+                name: 'sites',
+                cols: {
+                    heading: {
+                        type: 'heading',
+                        heading: "Site"|t('app'),
+                        thin: true
+                    },
+                    uriFormat: {
+                        type: 'singleline',
+                        heading: "Entry URI Format"|t('app'),
+                        info: "What entry URIs should look like for the site. Leave blank if entries don’t have URLs."|t('app'),
+                        placeholder: 'Leave blank if entries don’t have URLs'|t('app'),
+                        code: true,
+                        width: 500,
+                        class: ['type-channel', 'type-structure']|filter
+                    },
+                    template: {
+                        type: 'template',
+                        heading: "Template"|t('app'),
+                        info: "Which template should be loaded when an entry’s URL is requested."|t('app'),
+                        code: true
+                    }
+                }|filter,
+                rows: siteRows,
+                fullWidth: true,
+                allowAdd: false,
+                allowDelete: false,
+                allowReorder: false
+            }) }}
+
+            <hr />
+
             {{ forms.textField({
                 label: 'Classifier',
                 instructions: '',

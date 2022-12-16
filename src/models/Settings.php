@@ -55,6 +55,8 @@ class Settings extends Model
 
     public $attachmentVolumeId = 0;
 
+    public $sites = [];
+
     // Public Methods
     // =========================================================================
 

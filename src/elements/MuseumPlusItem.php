@@ -411,6 +411,23 @@ class MuseumPlusItem  extends Element
         return $this->title;
     }
 
+    public function getUriFormat(): ?string {
+        $settings = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
+
+        return $settings[$this->site->handle]['uriFormat'];
+    }
+
+    protected function route(): array|string|null {
+        $settings = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
+        return [
+            'templates/render', [
+                'template' => $settings[$this->site->handle]['template'],
+                'variables' => [
+                    'entry' => $this,
+                ],
+            ],
+        ];
+    }
 
     public function syncMultimediaRelations($assetIds) {
         $this->getRecord()->syncMultimediaRelations($assetIds);
@@ -504,6 +521,11 @@ class MuseumPlusItem  extends Element
         return $this->getVocabularyEntries()->where(['type' => 'ObjKeyWordVgr']);
     }
 
+    public function getClassification() {
+        $rec = $this->getRecord();
+        return $this->getVocabularyEntries()->where(['type' => 'ObjClassificationVgr']);
+    }
+
     public function getMaterial() {
         $rec = $this->getRecord();
         return $rec->getRepeatableGroupValues('ObjMaterialTechniqueGrp', 'DetailsTxt');
@@ -517,7 +539,6 @@ class MuseumPlusItem  extends Element
     public function getCreditLine() {
         $rec = $this->getRecord();
         return $rec->getRepeatableGroupValues('ObjCreditlineGrp', 'CreditlineTxt');
-
     }
 
     public function getDataAttributes() {

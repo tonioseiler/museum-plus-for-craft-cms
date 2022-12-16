@@ -117,11 +117,13 @@ class MuseumPlusForCraftCms extends Plugin
         }
 
         // Register our site routes
-        /*Event::on(
+        Event::on(
             UrlManager::class,
             UrlManager::EVENT_REGISTER_SITE_URL_RULES,
-            function (RegisterUrlRulesEvent $event) {}
-        );*/
+            function (RegisterUrlRulesEvent $event) {
+                $event->rules = array_merge($event->rules, $this->getRoutes());
+            }
+        );
 
         // Register our CP routes
         Event::on(
@@ -131,6 +133,7 @@ class MuseumPlusForCraftCms extends Plugin
                 $event->rules = array_merge($event->rules, $this->getCpRoutes());
             }
         );
+
 
         // Register our elements
         Event::on(
@@ -202,6 +205,9 @@ class MuseumPlusForCraftCms extends Plugin
                     $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost('settings');
                     $fieldLayout->type = MuseumPlusItem::class;
                     Craft::$app->getFields()->saveLayout($fieldLayout);
+
+
+
                 }
             }
         );
@@ -272,6 +278,11 @@ class MuseumPlusForCraftCms extends Plugin
             'museum-plus-for-craft-cms/vocabularies' => ['template' => 'museum-plus-for-craft-cms/vocabularies'],
             'museum-plus-for-craft-cms/vocabularies/<vocabularyId:\d+>' => 'museum-plus-for-craft-cms/vocabularies/edit',
         ];
+    }
+
+    protected function getRoutes(): array
+    {
+        return [];
     }
 
     public function getCpNavItem(): ?array

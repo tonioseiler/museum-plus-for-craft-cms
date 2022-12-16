@@ -34,7 +34,7 @@ class CollectionController extends Controller
     *         The actions must be in 'kebab-case'
     * @access protected
     */
-    protected array|int|bool $allowAnonymous = ['get-items-by-tag', 'get-items-by-id', 'get-items-by-ids', 'search-items'];
+    protected array|int|bool $allowAnonymous = ['get-items-by-tag', 'get-items-by-id', 'get-items-by-ids', 'search-items', 'show'];
 
     // Public Methods
     // =========================================================================
@@ -148,6 +148,11 @@ class CollectionController extends Controller
 
         return $this->redirectToPostedUrl($item);
 
+    }
+
+    public function actionShow($slug, $id)
+    {
+        dd("show");
     }
 
     public function actionGetItemsByTag($tagId) {
