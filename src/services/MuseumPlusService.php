@@ -11,7 +11,7 @@
 namespace furbo\museumplusforcraftcms\services;
 
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
-use furbo\museumplusforcraftcms\elements\MuseumplusItem;
+use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 
 use Craft;
 use craft\base\Component;

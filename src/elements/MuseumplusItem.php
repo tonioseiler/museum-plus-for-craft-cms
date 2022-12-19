@@ -29,14 +29,14 @@ use craft\models\TagGroup;
 use craft\helpers\Db;
 
 /**
- *  Element MuseumplusItem
+ *  Element MuseumPlusItem
  *
  *
  * @author    Furbo GmbH
  * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  */
-class MuseumplusItem  extends Element
+class MuseumPlusItem  extends Element
 {
 
     // Public Properties
@@ -161,7 +161,7 @@ class MuseumplusItem  extends Element
      */
     public function getFieldLayout(): FieldLayout
     {
-        return \Craft::$app->fields->getLayoutByType(MuseumplusItem::class);
+        return \Craft::$app->fields->getLayoutByType(MuseumPlusItem::class);
     }
 
     // Indexes, etc.

@@ -23,7 +23,7 @@ use craft\helpers\Gql as GqlHelper;
 use craft\models\GqlSchema;
 use craft\services\Gql as GqlService;
 use furbo\museumplusforcraftcms\elements\db\MuseumPlusItemQuery;
-use furbo\museumplusforcraftcms\elements\MuseumplusItem;
+use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\assetbundles\museumplusforcraftcmsfieldfield\MuseumPlusForCraftCmsFieldFieldAsset;
 
@@ -64,7 +64,7 @@ class MuseumPlusItems extends BaseRelationField
      */
     public static function elementType(): string
     {
-        return MuseumplusItem::class;
+        return MuseumPlusItem::class;
     }
 
     /**

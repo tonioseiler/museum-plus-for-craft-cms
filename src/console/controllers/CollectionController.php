@@ -19,7 +19,7 @@ use craft\helpers\App;
 use craft\queue\jobs\ResaveElements;
 use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
-use furbo\museumplusforcraftcms\elements\MuseumplusItem;
+use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
@@ -124,7 +124,7 @@ class CollectionController extends Controller
             return false;
         }
 
-        $item = MuseumplusItem::find()
+        $item = MuseumPlusItem::find()
                 ->where(['collectionId' => $this->collectionItemId])
                 ->one();
 
@@ -151,7 +151,7 @@ class CollectionController extends Controller
 
                 //check if item exists and if last mod is before last mod in mplus
                 $objectLastModified = new \DateTime($o->__lastModified);
-                $item = MuseumplusItem::find()
+                $item = MuseumPlusItem::find()
                         ->where(['collectionId' => $o->id])
                         ->one();
 
@@ -167,7 +167,7 @@ class CollectionController extends Controller
             }
         }
 
-        $existingItems = MuseumplusItem::find()->all();
+        $existingItems = MuseumPlusItem::find()->all();
         foreach ($existingItems as $item) {
             if (!isset($objectIds[$item->collectionId])) {
                 $success = Craft::$app->elements->deleteElement($item);
@@ -177,7 +177,7 @@ class CollectionController extends Controller
 
         //create object to object relations
         echo 'Echo updating item to item relationships'.PHP_EOL;
-        $existingItems = MuseumplusItem::find()->all();
+        $existingItems = MuseumPlusItem::find()->all();
         foreach ($existingItems as $item) {
             $moduleRefs = $item->getDataAttribute('moduleReferences');
 
@@ -187,7 +187,7 @@ class CollectionController extends Controller
                 if(isset($moduleRefs[$type])) {
                     $ids = [];
                     foreach ($moduleRefs[$type]['items'] as $i){
-                        $tmp = MuseumplusItem::find()
+                        $tmp = MuseumPlusItem::find()
                             ->where(['collectionId' => $i['id']])
                             ->one();
                         if ($tmp) {
@@ -365,7 +365,7 @@ class CollectionController extends Controller
 
     public function actionRemoveAttachments()
     {
-        $existingItems = MuseumplusItem::find()->all();
+        $existingItems = MuseumPlusItem::find()->all();
         foreach ($existingItems as $item) {
             if($item->assetId) {
                 $asset = Asset::find()->id($item->assetId)->one();
@@ -385,7 +385,7 @@ class CollectionController extends Controller
     public function actionResaveItems()
     {
         Craft::$app->getQueue()->push(new ResaveElements([
-            'elementType' => MuseumplusItem::class,
+            'elementType' => MuseumPlusItem::class,
             'criteria' => [
                 'siteId' => '*',
                 'unique' => true,
@@ -513,13 +513,13 @@ class CollectionController extends Controller
     private function createOrUpdateItem($object) {
         $collectionId = $object->id;
 
-        $item = MuseumplusItem::find()
+        $item = MuseumPlusItem::find()
         ->where(['collectionId' => $collectionId])
         ->one();
 
         if (empty($item)) {
             //create new
-            $item = new MuseumplusItem();
+            $item = new MuseumPlusItem();
             $item->collectionId = $collectionId;
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
