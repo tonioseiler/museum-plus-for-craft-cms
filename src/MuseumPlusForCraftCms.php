@@ -19,7 +19,7 @@ use furbo\museumplusforcraftcms\fields\MuseumPlusItems as ItemsField;
 use     furbo\museumplusforcraftcms\fields\MuseumPlusVocabularies as VocabulariesField;
 use furbo\museumplusforcraftcms\utilities\Collection as CollectionUtility;
 use furbo\museumplusforcraftcms\widgets\Collection as CollectionWidget;
-use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
+use furbo\museumplusforcraftcms\elements\MuseumplusItem;
 
 use Craft;
 use craft\base\Plugin;
@@ -140,7 +140,7 @@ class MuseumPlusForCraftCms extends Plugin
             Elements::class,
             Elements::EVENT_REGISTER_ELEMENT_TYPES,
             function (RegisterComponentTypesEvent $event) {
-                $event->types[] = MuseumPlusItem::class;
+                $event->types[] = MuseumplusItem::class;
                 $event->types[] = MuseumPlusVocabulary::class;
             }
         );
@@ -203,7 +203,7 @@ class MuseumPlusForCraftCms extends Plugin
                 if ($event->sender::class == "furbo\museumplusforcraftcms\MuseumPlusForCraftCms") {
                     //save field layout
                     $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost('settings');
-                    $fieldLayout->type = MuseumPlusItem::class;
+                    $fieldLayout->type = MuseumplusItem::class;
                     Craft::$app->getFields()->saveLayout($fieldLayout);
 
 

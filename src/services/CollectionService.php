@@ -10,7 +10,7 @@
 
 namespace furbo\museumplusforcraftcms\services;
 
-use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
+use furbo\museumplusforcraftcms\elements\MuseumplusItem;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 
@@ -45,7 +45,7 @@ class CollectionService extends Component
     }
 
     public function getItemById($id) {
-        $item = MuseumPlusItem::find()
+        $item = MuseumplusItem::find()
             ->id($id)
             ->one();
         return $item;
@@ -56,7 +56,7 @@ class CollectionService extends Component
     }
 
     public function searchItems($params, $limit = 10, $offset = 0) {
-        $items = MuseumPlusItem::find();
+        $items = MuseumplusItem::find();
         if(isset($params['search'])) {
             $items = $items->search($params['search']);
             $items->orderBy(['score' => SORT_DESC]);

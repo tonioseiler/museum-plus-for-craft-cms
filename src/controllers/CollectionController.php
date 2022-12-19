@@ -11,7 +11,7 @@
 namespace furbo\museumplusforcraftcms\controllers;
 
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
-use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
+use furbo\museumplusforcraftcms\elements\MuseumplusItem;
 
 use Craft;
 use craft\web\Controller;
@@ -47,7 +47,7 @@ class CollectionController extends Controller
 
         // Get the item
         // ---------------------------------------------------------------------
-        $item = MuseumPlusItem::find()
+        $item = MuseumplusItem::find()
             ->id($itemId)
             ->one();
 
@@ -94,7 +94,7 @@ class CollectionController extends Controller
         $this->requirePostRequest();
         $request = Craft::$app->getRequest();
         $itemId = $request->getBodyParam('itemId');
-        $item = MuseumPlusItem::find()
+        $item = MuseumplusItem::find()
             ->id($itemId)
             ->one();
 

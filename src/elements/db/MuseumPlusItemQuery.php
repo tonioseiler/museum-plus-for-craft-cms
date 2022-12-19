@@ -5,7 +5,7 @@ use craft\db\Query;
 use craft\db\Table;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
-use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
+use furbo\museumplusforcraftcms\elements\MuseumplusItem;
 
 class MuseumPlusItemQuery extends ElementQuery
 {
