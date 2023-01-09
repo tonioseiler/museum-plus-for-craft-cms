@@ -12,11 +12,13 @@ namespace furbo\museumplusforcraftcms\services;
 
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
+use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 
 use Craft;
 use craft\base\Component;
 use craft\helpers\App;
+use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 
 
 /**
@@ -56,24 +58,50 @@ class CollectionService extends Component
     }
 
     public function searchItems($params, $limit = 10, $offset = 0) {
+        $criteria = [];
         $items = MuseumPlusItem::find();
+        $items->orderBy(['score' => SORT_DESC]);
         if(isset($params['search'])) {
             $items = $items->search($params['search']);
-            $items->orderBy(['score' => SORT_DESC]);
+            $criteria['search'] = $params['search'];
         }
         if(isset($params['geographic'])) {
             $items = $items->geographic($params['geographic']);
+            $criteria['geographic'] = $params['geographic'];
         }
         if(isset($params['classification'])) {
             $items = $items->classification($params['classification']);
+            $criteria['classification'] = $params['classification'];
         }
         if(isset($params['tag'])) {
             $items = $items->tag($params['tag']);
+            $criteria['tag'] = $params['tag'];
         }
         if(isset($params['objectGroup'])) {
             $items = $items->objectGroup($params['objectGroup']);
+            $criteria['objectGroup'] = $params['objectGroup'];
         }
+
+        Craft::$app->session->set('museumPlusCriteria', $items);
+
         $items = $items->limit($limit)->offset($offset);
         return $items;
+    }
+
+    public function getAllClassifications() {
+        $records = VocabularyEntryRecord::find()->where(['type' => 'ObjClassificationVgr'])->all();
+        return $records;
+    }
+
+    public function getBookmarks($limit = 10, $offset = 0) {
+        if(Craft::$app->session->has('bookmarks')) {
+            $bookmarks = MuseumPlusItem::find();
+            $bookmarks = $bookmarks->id(Craft::$app->session->get('bookmarks'));
+            Craft::$app->session->set('museumPlusCriteria', $bookmarks);
+            $bookmarks = $bookmarks->limit($limit)->offset($offset);
+            return $bookmarks;
+        } else {
+            return [];
+        }
     }
 }

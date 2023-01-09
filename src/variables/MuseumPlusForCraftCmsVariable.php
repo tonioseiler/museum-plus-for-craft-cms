@@ -90,21 +90,26 @@ class MuseumPlusForCraftCmsVariable
     }
 
     public function getItemsByTag($tagId) {
-        //TODO: implement
         return MuseumPlusForCraftCms::$plugin->collection->getItemsByTag($tagId);
     }
 
     public function getItemById($id) {
-        //TODO: implement
         return MuseumPlusForCraftCms::$plugin->collection->getItemById($id);
     }
 
     public function getItemsByIds($ids) {
-        //TODO: implement
         return MuseumPlusForCraftCms::$plugin->collection->getItemsById($ids);
     }
 
     public function searchItems($params, $limit = 10, $offset = 0) {
         return MuseumPlusForCraftCms::$plugin->collection->searchItems($params, $limit, $offset);
+    }
+
+    public function getAllClassifications() {
+        return MuseumPlusForCraftCms::$plugin->collection->getAllClassifications();
+    }
+
+    public function getBookmarks($limit = 10, $offset = 0) {
+        return MuseumPlusForCraftCms::$plugin->collection->getBookmarks($limit, $offset);
     }
 }

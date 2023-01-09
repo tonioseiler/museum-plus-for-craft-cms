@@ -10,6 +10,7 @@
 
 namespace furbo\museumplusforcraftcms\elements;
 
+use craft\base\ElementInterface;
 use craft\db\Query;
 use craft\elements\User;
 use craft\helpers\Cp;
@@ -551,4 +552,24 @@ class MuseumPlusItem  extends Element
         return $rec->getDataAttribute($name);
     }
 
+    public function getPrev($criteria = false): ?ElementInterface
+    {
+        return parent::getPrev($this->getCriteria());
+    }
+
+    public function getNext($criteria = false): ?ElementInterface
+    {
+        return parent::getNext($this->getCriteria());
+    }
+
+    private function getCriteria()
+    {
+        $criteria = false;
+        if(Craft::$app->session->get('museumPlusCriteria')) {
+            $criteria = Craft::$app->session->get('museumPlusCriteria');
+            $criteria->limit = -1;
+            $criteria->offset = 0;
+        }
+        return $criteria;
+    }
 }

@@ -51,4 +51,13 @@ class VocabularyService extends Component
         }
         return $types;
     }
+
+    public function search($searchString) {
+        return MuseumPlusVocabulary::find()
+            ->type(['ObjClassificationVgr', 'GenPlaceVgr', 'ObjKeyWordVgr'])
+            ->search($searchString)
+            ->orderBy('score')
+            ->limit(10)
+            ->all();
+    }
 }
