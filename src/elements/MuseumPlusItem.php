@@ -542,6 +542,12 @@ class MuseumPlusItem  extends Element
         return $rec->getRepeatableGroupValues('ObjCreditlineGrp', 'CreditlineTxt');
     }
 
+    public function getDetailText() {
+        $rec = $this->getRecord();
+        $tmp = $rec->getRepeatableGroupValues('ObjLabelRaisonneTextGrp', 'TextClb');
+        return implode(PHP_EOL, $tmp);
+    }
+
     public function getDataAttributes() {
         $rec = $this->getRecord();
         return $rec->getDataAttributes();
