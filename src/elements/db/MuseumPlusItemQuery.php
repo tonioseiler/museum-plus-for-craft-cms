@@ -100,7 +100,7 @@ class MuseumPlusItemQuery extends ElementQuery
                 ->andWhere("c.title LIKE '".addslashes($this->classification)."'")
                 ->groupBy('id');
         //227880
-            dd($classificationQuery->one()->id);
+        //    dd($classificationQuery->one()->id);
             if(count($classificationQuery->all()) > 0){
                 $this->subQuery->innerJoin("{{%museumplus_items_vocabulary}} itemsVocabulary", "itemsVocabulary.itemId = museumplus_items.id AND itemsVocabulary.vocabularyId = ".$classificationQuery->one()->id);
             }
