@@ -35,7 +35,7 @@ use craft\helpers\App;
 class VocabularyService extends Component
 {
     public function getElementById($id) {
-        return MuseumPlusVocabulary::find()->id($this->id)->one();
+        return MuseumPlusVocabulary::find()->id($id)->one();
     }
 
     public function getTypes() {

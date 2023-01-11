@@ -101,6 +101,10 @@ class MuseumPlusForCraftCmsVariable
         return MuseumPlusForCraftCms::$plugin->collection->getItemsById($ids);
     }
 
+    public function getVocabularyById($id) {
+        return MuseumPlusForCraftCms::$plugin->vocabulary->getElementById($id);
+    }
+
     public function searchItems($params, $limit = 10, $offset = 0) {
         return MuseumPlusForCraftCms::$plugin->collection->searchItems($params, $limit, $offset);
     }
