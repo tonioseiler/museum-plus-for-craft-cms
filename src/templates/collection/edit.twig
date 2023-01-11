@@ -116,16 +116,6 @@
                     </div>
                 </div>
 
-                <div class="field" data-attribute="detail-text">
-                    <div class="heading">
-                        <label id="fields-detail-text-label" for="fields-detail-text">{{'Text'|t('museum-plus-for-craft-cms')}}</label>
-                        <div class="flex-grow"></div>
-                    </div>
-                    <div class="input ltr">
-                        <textarea id="fields-detail-text" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[detail-text]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{item.getDetailText()}}</textarea>
-                    </div>
-                </div>
-
                 <div class="field" data-attribute="originator">
                     <div class="heading">
                         <label id="fields-originator-label" for="fields-originator">{{'Originator'|t('museum-plus-for-craft-cms')}}</label>
@@ -158,22 +148,6 @@
                     </div>
                 </div>
 
-                <div class="field" data-attribute="geographical-references">
-                    <div class="heading">
-                        <label id="fields-geographical-references-label" for="fields-geographical-references">{{'Geographical References'|t('museum-plus-for-craft-cms')}}</label>
-                        <div class="flex-grow"></div>
-                    </div>
-
-                    {% set geoValues = [] %}
-                    {% for geo in item.getGeographicReferences().all() %}
-                        {% set geoValues = geoValues|merge([geo.title]) %}
-                    {% endfor %}
-                    <div class="input ltr">
-                        <textarea id="fields-geographical-references" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{geoValues|join('\n – ')}}</textarea>
-                    </div>
-
-                </div>
-
                 <div class="field" data-attribute="material">
                     <div class="heading">
                         <label id="fields-material-label" for="fields-material">{{'Material'|t('museum-plus-for-craft-cms')}}</label>
@@ -194,28 +168,20 @@
                     </div>
                 </div>
 
-                <div class="field" data-attribute="provenance">
+                <div class="field" data-attribute="geographical-references">
                     <div class="heading">
-                        <label id="fields-provenance-label" for="fields-provenance">{{'Provenance'|t('museum-plus-for-craft-cms')}}</label>
+                        <label id="fields-geographical-references-label" for="fields-geographical-references">{{'Geographical References'|t('museum-plus-for-craft-cms')}}</label>
                         <div class="flex-grow"></div>
                     </div>
-                    {% set ownershipValues = [] %}
-                    {% for ownership in item.getOwnerships().all() %}
-                        {% set ownershipValues = ownershipValues|merge([ownership.getDataAttribute('OwsOwnershipVrt')]) %}
+
+                    {% set geoValues = [] %}
+                    {% for geo in item.getGeographicReferences().all() %}
+                        {% set geoValues = geoValues|merge([geo.title]) %}
                     {% endfor %}
                     <div class="input ltr">
-                        <textarea id="fields-provenance" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[provenance]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{ownershipValues|join('\n – ')}}</textarea>
+                        <textarea id="fields-geographical-references" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{geoValues|join('\n – ')}}</textarea>
                     </div>
-                </div>
 
-                <div class="field" data-attribute="credit-line">
-                    <div class="heading">
-                        <label id="fields-credit-line-label" for="fields-credit-line">{{'Credit Line'|t('museum-plus-for-craft-cms')}}</label>
-                        <div class="flex-grow"></div>
-                    </div>
-                    <div class="input ltr">
-                        <textarea id="fields-credit-line" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[credit-line]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{item.getCreditLine()|join('\n – ')}}</textarea>
-                    </div>
                 </div>
 
                 <div class="field" data-attribute="tags">
@@ -234,50 +200,10 @@
 
                 </div>
 
-                <div class="field" data-attribute="literature">
-                    <div class="heading">
-                        <label>References/Literature</label>
-                        <div class="flex-grow"></div>
-                    </div>
-                    <div class="input ltr">
-                        {% set literatureValues = [] %}
-                        {% for literature in item.getLiterature().all() %}
-                            <div style="margin-bottom: 5px;">
-                                <div style="margin-bottom: 5px;"> - {{ literature.getDataAttribute('LitLiteratureVrt') }}</div>
-                                {% if literature.assetId %}
-                                    {% set myAsset = craft.assets().id(literature.assetId).one() %}
-                                    {% if myAsset %}
-                                        {% set thumb = {
-                                            width: 300,
-                                            quality: 75
-                                        } %}
-                                        {% set myAssetUrl = myAsset.getUrl(thumb) %}
-
-                                        <a href="{{ myAsset.getCpEditUrl() }}">
-                                            <img src="{{ myAssetUrl }}" width="150" />
-                                        </a>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div class="field" data-attribute="relatedItems">
-                    <div class="heading">
-                        <label>Related Items</label>
-                        <div class="flex-grow"></div>
-                    </div>
-                    {% set rItemValues = [] %}
-                    {% for relatedItem in item.getRelatedItems().all() %}
-                        {% set rItemValues = rItemValues|merge([relatedItem.getDataAttribute('ObjObjectTitleVrt')]) %}
-                    {% endfor %}
-                    <div class="input ltr">
-                        <textarea id="fields-related-items" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[related-items]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{rItemValues|join('\n – ')}}</textarea>
-                    </div>
-                </div>
+                
 
             </fieldset>
+
             <fieldset id="fields-item-refs" class="field width-50">
                 <div class="field" data-attribute="attachment">
                     <div class="heading"><label>Main Image</label></div>
@@ -322,6 +248,87 @@
                         {% endfor %}
                     </div>
                 </div>
+
+            </fieldset>
+
+            <fieldset id="fields-item-more" class="field width-100">
+                <div class="field" data-attribute="detail-text">
+                    <div class="heading">
+                        <label id="fields-detail-text-label" for="fields-detail-text">{{'Text'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        <textarea id="fields-detail-text" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[detail-text]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{item.getDetailText()}}</textarea>
+                    </div>
+                </div>
+
+                 <div class="field" data-attribute="provenance">
+                    <div class="heading">
+                        <label id="fields-provenance-label" for="fields-provenance">{{'Provenance'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    {% set ownershipValues = [] %}
+                    {% for ownership in item.getOwnerships().all() %}
+                        {% set ownershipValues = ownershipValues|merge([ownership.getDataAttribute('OwsOwnershipVrt')]) %}
+                    {% endfor %}
+                    <div class="input ltr">
+                        <textarea id="fields-provenance" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[provenance]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{ownershipValues|join('\n – ')}}</textarea>
+                    </div>
+                </div>
+
+                <div class="field" data-attribute="credit-line">
+                    <div class="heading">
+                        <label id="fields-credit-line-label" for="fields-credit-line">{{'Credit Line'|t('museum-plus-for-craft-cms')}}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        <textarea id="fields-credit-line" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[credit-line]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{item.getCreditLine()|join('\n – ')}}</textarea>
+                    </div>
+                </div>
+
+                <div class="field" data-attribute="relatedItems">
+                    <div class="heading">
+                        <label>Related Items</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    {% set rItemValues = [] %}
+                    {% for relatedItem in item.getRelatedItems().all() %}
+                        {% set rItemValues = rItemValues|merge([relatedItem.getDataAttribute('ObjObjectTitleVrt')]) %}
+                    {% endfor %}
+                    <div class="input ltr">
+                        <textarea id="fields-related-items" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[related-items]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{rItemValues|join('\n – ')}}</textarea>
+                    </div>
+                </div>
+                
+                <div class="field" data-attribute="literature">
+                    <div class="heading">
+                        <label>References/Literature</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        {% set literatureValues = [] %}
+                        {% for literature in item.getLiterature().all() %}
+                            <div style="margin-bottom: 5px;">
+                                <div style="margin-bottom: 5px;"> - {{ literature.getDataAttribute('LitLiteratureVrt') }}</div>
+                                {% if literature.assetId %}
+                                    {% set myAsset = craft.assets().id(literature.assetId).one() %}
+                                    {% if myAsset %}
+                                        {% set thumb = {
+                                            width: 300,
+                                            quality: 75
+                                        } %}
+                                        {% set myAssetUrl = myAsset.getUrl(thumb) %}
+
+                                        <a href="{{ myAsset.getCpEditUrl() }}">
+                                            <img src="{{ myAssetUrl }}" width="150" />
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
             </fieldset>
 
         </div>
