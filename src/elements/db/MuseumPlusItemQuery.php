@@ -117,8 +117,6 @@ class MuseumPlusItemQuery extends ElementQuery
         }
         $this->subQuery->groupBy('museumplus_items.id');
 
-        /*echo $this->query->getRawSql();
-        exit();*/
 
         return parent::beforePrepare();
     }
