@@ -88,11 +88,6 @@ class CollectionService extends Component
         return $items;
     }
 
-    public function getAllClassifications() {
-        $records = VocabularyEntryRecord::find()->where(['type' => 'ObjClassificationVgr'])->all();
-        return $records;
-    }
-
     public function getBookmarks($limit = 10, $offset = 0) {
         if(Craft::$app->session->has('bookmarks')) {
             $bookmarks = MuseumPlusItem::find();

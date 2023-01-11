@@ -110,7 +110,15 @@ class MuseumPlusForCraftCmsVariable
     }
 
     public function getAllClassifications() {
-        return MuseumPlusForCraftCms::$plugin->collection->getAllClassifications();
+        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllClassifications();
+    }
+
+    public function getAllPlaces() {
+        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllPlaces();
+    }
+
+    public function getAllKeywords() {
+        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllKeywords();
     }
 
     public function getBookmarks($limit = 10, $offset = 0) {

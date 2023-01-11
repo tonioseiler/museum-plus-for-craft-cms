@@ -18,6 +18,7 @@ use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use Craft;
 use craft\base\Component;
 use craft\helpers\App;
+use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 
 
 /**
@@ -59,5 +60,20 @@ class VocabularyService extends Component
             ->orderBy('score')
             ->limit(10)
             ->all();
+    }
+
+    public function getAllClassifications() {
+        $records = VocabularyEntryRecord::find()->where(['type' => 'ObjClassificationVgr'])->all();
+        return $records;
+    }
+
+    public function getAllPlaces() {
+        $records = VocabularyEntryRecord::find()->where(['type' => 'GenPlaceVgr'])->all();
+        return $records;
+    }
+
+    public function getAllKeywords() {
+        $records = VocabularyEntryRecord::find()->where(['type' => 'ObjKeyWordVgr'])->all();
+        return $records;
     }
 }
