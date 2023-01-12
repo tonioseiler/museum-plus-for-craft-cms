@@ -176,6 +176,9 @@ class CollectionController extends Controller
             ->tag($tagId)
             ->orderBy('RAND()')
             ->one();
+        if(!$item) {
+            return $this->asJson([]);
+        }
         $image = $item->getAttachment();
         return $this->asJson([
             'id' => $item->id,
