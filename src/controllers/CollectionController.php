@@ -34,7 +34,7 @@ class CollectionController extends Controller
     *         The actions must be in 'kebab-case'
     * @access protected
     */
-    protected array|int|bool $allowAnonymous = ['get-items-by-tag', 'get-items-by-id', 'get-items-by-ids', 'search-items', 'show'];
+    protected array|int|bool $allowAnonymous = ['get-items-by-tag', 'get-items-by-id', 'get-items-by-ids', 'search-items', 'show', 'get-random-item-by-tag'];
 
     // Public Methods
     // =========================================================================
@@ -169,6 +169,20 @@ class CollectionController extends Controller
 
     public function actionSearchItems($params = []) {
         return MuseumPlusForCraftCms::$plugin->collection->searchItems($params);
+    }
+
+    public function actionGetRandomItemByTag($tagId) {
+        $item = MuseumPlusItem::find()
+            ->tag($tagId)
+            ->orderBy('RAND()')
+            ->one();
+        $image = $item->getAttachment();
+        return $this->asJson([
+            'id' => $item->id,
+            'title' => $item->title,
+            'url' => $item->url,
+            'image' => $image ? $image->getUrl() : null,
+        ]);
     }
 
 }

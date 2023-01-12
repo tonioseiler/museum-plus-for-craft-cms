@@ -8,6 +8,8 @@ use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 
 class VocabulariesController extends Controller
 {
+    protected array|int|bool $allowAnonymous = ['get-all'];
+
     public function actionEdit(int $vocabularyId)
     {
         $request = Craft::$app->getRequest();
@@ -21,5 +23,19 @@ class VocabulariesController extends Controller
         $variables['vocabulary'] = $vocabulary;
 
         return $this->renderTemplate('museum-plus-for-craft-cms/vocabularies/edit', $variables);
+    }
+
+    public function actionGetAll()
+    {
+        $vocabularies = MuseumPlusVocabulary::find()
+            ->type(['ObjKeyWordVgr'])
+            ->all();
+        $vocabularies = array_map(function($vocabulary) {
+            return [
+                'id' => $vocabulary->id,
+                'title' => $vocabulary->title,
+            ];
+        }, $vocabularies);
+        return $this->asJson($vocabularies);
     }
 }

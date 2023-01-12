@@ -287,6 +287,8 @@ class MuseumPlusForCraftCms extends Plugin
             'search/autocomplete/<searchString:\w+>' => 'museum-plus-for-craft-cms/search/autocomplete',
             'bookmark/save' => 'museum-plus-for-craft-cms/bookmark/save',
             'bookmark/check/<objectId>' => 'museum-plus-for-craft-cms/bookmark/check',
+            'vocabularies/get-all' => 'museum-plus-for-craft-cms/vocabularies/get-all',
+            'collection/get-random-item-by-tag/<tagId>' => 'museum-plus-for-craft-cms/collection/get-random-item-by-tag',
         ];
     }
 
