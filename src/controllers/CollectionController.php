@@ -181,7 +181,7 @@ class CollectionController extends Controller
             'id' => $item->id,
             'title' => $item->title,
             'url' => $item->url,
-            'image' => $image ? $image->getUrl() : null,
+            'image' => $image ? $image->getUrl(["width" => 800, "height" => 800, "mode" => "crop"]) : null,
         ]);
     }
 
