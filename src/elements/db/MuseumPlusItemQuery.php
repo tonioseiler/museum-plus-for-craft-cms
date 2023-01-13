@@ -104,10 +104,11 @@ class MuseumPlusItemQuery extends ElementQuery
         }
 
         if($this->objectGroup){
-            $this->subQuery->innerJoin("{{%museumplus_items_objectgroups}} itemsObjectgroups", "itemsObjectgroups.itemId = museumplus_items.id");
-            $this->subQuery->innerJoin("{{%museumplus_objectgroups}} objectgroups", "itemsObjectgroups.objectGroupId = objectgroups.id");
-
-            $this->subQuery->andWhere("objectgroups.objectGroupId = " . $this->objectGroup);
+            $subQuery = (new Query())
+                ->select(['itemId'])
+                ->from(['{{%museumplus_items_objectgroups}}'])
+                ->where(['objectGroupId' => $this->objectGroup]);
+            $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
         }
 
         if ($this->objectGroupId) {

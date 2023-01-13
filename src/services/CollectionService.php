@@ -42,6 +42,13 @@ class CollectionService extends Component
         return $objectGroupRecords;
     }
 
+    public function getObjectById($id) {
+        $object = ObjectGroupRecord::find()
+            ->where(['id' => $id])
+            ->one();
+        return $object;
+    }
+
     public function getItemsByTag($tagId) {
         return 'Todo: implement';
     }
@@ -99,4 +106,5 @@ class CollectionService extends Component
             return [];
         }
     }
+
 }
