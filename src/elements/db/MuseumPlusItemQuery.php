@@ -12,23 +12,16 @@ class MuseumPlusItemQuery extends ElementQuery
 {
     public $collectionId;
     public $assetId;
-    public $objectGroupId;
     public $geographic;
     public $classification;
     public $tag;
     public $objectGroup;
+    public $person;
 
 
     public function collectionId($value)
     {
         $this->collectionId = $value;
-
-        return $this;
-    }
-
-    public function objectGroupId($value)
-    {
-        $this->objectGroupId = $value;
 
         return $this;
     }
@@ -57,7 +50,11 @@ class MuseumPlusItemQuery extends ElementQuery
         return $this;
     }
 
-
+    public function person($value)
+    {
+        $this->person = $value;
+        return $this;
+    }
 
     protected function beforePrepare(): bool
     {
@@ -111,11 +108,14 @@ class MuseumPlusItemQuery extends ElementQuery
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
         }
 
-        if ($this->objectGroupId) {
-            $this->subQuery->innerJoin('museumplus_items_objectgroups', '[[museumplus_items.id]] = [[museumplus_items_objectgroups.itemId]]');
-
-            $this->subQuery->andWhere(Db::parseParam('museumplus_items_objectgroups.objectGroupId', $this->objectGroupId));
+        if($this->person){
+            $subQuery = (new Query())
+                ->select(['itemId'])
+                ->from(['{{%museumplus_items_people}}'])
+                ->where(['personId' => $this->person]);
+            $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
         }
+
         $this->subQuery->groupBy('museumplus_items.id');
 
 

@@ -105,6 +105,10 @@ class MuseumPlusForCraftCmsVariable
         return MuseumPlusForCraftCms::$plugin->vocabulary->getElementById($id);
     }
 
+    public function getPeopleById($id) {
+        return MuseumPlusForCraftCms::$plugin->collection->getPeopleById($id);
+    }
+
     public function getObjectById($id) {
         return MuseumPlusForCraftCms::$plugin->collection->getObjectById($id);
     }

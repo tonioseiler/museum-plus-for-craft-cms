@@ -18,6 +18,7 @@ use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use Craft;
 use craft\base\Component;
 use craft\helpers\App;
+use furbo\museumplusforcraftcms\records\PersonRecord;
 use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 
 
@@ -47,6 +48,13 @@ class CollectionService extends Component
             ->where(['id' => $id])
             ->one();
         return $object;
+    }
+
+    public function getPeopleById($id) {
+        $people = PersonRecord::find()
+            ->where(['id' => $id])
+            ->one();
+        return $people;
     }
 
     public function getItemsByTag($tagId) {
@@ -87,6 +95,10 @@ class CollectionService extends Component
         if(isset($params['objectGroup'])) {
             $items = $items->objectGroup($params['objectGroup']);
             $criteria['objectGroup'] = $params['objectGroup'];
+        }
+        if(isset($params['person'])) {
+            $items = $items->person($params['person']);
+            $criteria['person'] = $params['person'];
         }
 
         Craft::$app->session->set('museumPlusCriteria', $items);
