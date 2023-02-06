@@ -16,6 +16,7 @@ class MuseumPlusItemQuery extends ElementQuery
     public $classification;
     public $tag;
     public $objectGroup;
+    public $objectGroupId;
     public $person;
 
 
@@ -47,6 +48,12 @@ class MuseumPlusItemQuery extends ElementQuery
     public function objectGroup($value)
     {
         $this->objectGroup = $value;
+        return $this;
+    }
+
+    public function objectGroupId($value)
+    {
+        $this->objectGroupId = $value;
         return $this;
     }
 
@@ -105,6 +112,14 @@ class MuseumPlusItemQuery extends ElementQuery
                 ->select(['itemId'])
                 ->from(['{{%museumplus_items_objectgroups}}'])
                 ->where(['objectGroupId' => $this->objectGroup]);
+            $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
+        }
+
+        if($this->objectGroupId){
+            $subQuery = (new Query())
+                ->select(['itemId'])
+                ->from(['{{%museumplus_items_objectgroups}}'])
+                ->where(['objectGroupId' => $this->objectGroupId]);
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
         }
 

@@ -136,4 +136,9 @@ class MuseumPlusForCraftCmsVariable
     public function getBookmarks($limit = 10, $offset = 0) {
         return MuseumPlusForCraftCms::$plugin->collection->getBookmarks($limit, $offset);
     }
+
+    public function isBookmarked($id) {
+        return MuseumPlusForCraftCms::$plugin->collection->isBookmarked($id);
+    }
+
 }

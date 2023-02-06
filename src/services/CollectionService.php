@@ -119,4 +119,17 @@ class CollectionService extends Component
         }
     }
 
+    public function isBookmarked($id) {
+        if(Craft::$app->session->has('bookmarks')) {
+            $bookmarks = Craft::$app->session->get('bookmarks');
+            if(in_array($id, $bookmarks)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
 }
