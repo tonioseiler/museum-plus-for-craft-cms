@@ -17,9 +17,13 @@ use craft\db\ActiveRecord;
 abstract class DataRecord extends ActiveRecord
 {
 
+    protected $parsedData = null;
+
     public function getDataAttributes() {
-        $data = json_decode($this->data, true);
-        return $data;
+        if (empty($this->parsedData)) {
+            $this->parsedData = json_decode($this->data, true);
+        }
+        return $this->parsedData;
     }
 
     public function getDataAttribute($name) {

@@ -172,7 +172,7 @@ class MuseumPlusItemRecord extends DataRecord
     }
 
     public function getRepeatableGroupValues($groupName, $attribute) {
-        $data = json_decode($this->data, true);
+        $data = $this->getDataAttributes();
         $ret = [];
         foreach($data['repeatableGroups'] as $group) {
             if ($group['name'] == $groupName) {
