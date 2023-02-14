@@ -114,7 +114,14 @@ class MuseumPlusForCraftCmsVariable
     }
 
     public function getAllObjectGroups() {
-        return MuseumPlusForCraftCms::$plugin->collection->getAllObjectGroups();
+        $cache = Craft::$app->getCache();
+        $key = 'museumplusforcraftcms_all_object_groups';
+        $data = $cache->get($key);
+        if ($data === false) {
+            $data = MuseumPlusForCraftCms::$plugin->collection->getAllObjectGroups();
+            $cache->set($key, $data, 3600 * 24 * 365);
+        }
+        return $data;
     }
 
     public function searchItems($params, $limit = 10, $offset = 0) {
@@ -122,15 +129,36 @@ class MuseumPlusForCraftCmsVariable
     }
 
     public function getAllClassifications() {
-        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllClassifications();
+        $cache = Craft::$app->getCache();
+        $key = 'museumplusforcraftcms_all_classifications';
+        $data = $cache->get($key);
+        if ($data === false) {
+            $data = MuseumPlusForCraftCms::$plugin->vocabulary->getAllClassifications();
+            $cache->set($key, $data, 3600 * 24 * 365);
+        }
+        return $data;
     }
 
     public function getAllPlaces() {
-        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllPlaces();
+        $cache = Craft::$app->getCache();
+        $key = 'museumplusforcraftcms_all_places';
+        $data = $cache->get($key);
+        if ($data === false) {
+            $data = MuseumPlusForCraftCms::$plugin->vocabulary->getAllPlaces();
+            $cache->set($key, $data, 3600 * 24 * 365);
+        }
+        return $data;
     }
 
     public function getAllKeywords() {
-        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllKeywords();
+        $cache = Craft::$app->getCache();
+        $key = 'museumplusforcraftcms_all_keywords';
+        $data = $cache->get($key);
+        if ($data === false) {
+            $data = MuseumPlusForCraftCms::$plugin->vocabulary->getAllKeywords();
+            $cache->set($key, $data, 3600 * 24 * 365);
+        }
+        return $data;
     }
 
     public function getBookmarks($limit = 10, $offset = 0) {
