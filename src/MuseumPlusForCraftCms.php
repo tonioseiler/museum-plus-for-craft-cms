@@ -283,8 +283,8 @@ class MuseumPlusForCraftCms extends Plugin
     protected function getRoutes(): array
     {
         return [
-            'search/items/<searchString:\w+>' => 'museum-plus-for-craft-cms/search/search-items',
-            'search/autocomplete/<searchString:\w+>' => 'museum-plus-for-craft-cms/search/autocomplete',
+            'search/items/<searchString>' => 'museum-plus-for-craft-cms/search/search-items',
+            'search/autocomplete/<searchString>' => 'museum-plus-for-craft-cms/search/autocomplete',
             'bookmark/save' => 'museum-plus-for-craft-cms/bookmark/save',
             'bookmark/check/<objectId>' => 'museum-plus-for-craft-cms/bookmark/check',
             'vocabularies/get-all' => 'museum-plus-for-craft-cms/vocabularies/get-all',

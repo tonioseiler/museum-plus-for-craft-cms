@@ -114,14 +114,7 @@ class MuseumPlusForCraftCmsVariable
     }
 
     public function getAllObjectGroups() {
-        $cache = Craft::$app->getCache();
-        $key = 'museumplusforcraftcms_all_object_groups';
-        $data = $cache->get($key);
-        if ($data === false) {
-            $data = MuseumPlusForCraftCms::$plugin->collection->getAllObjectGroups();
-            $cache->set($key, $data, 3600 * 24 * 365);
-        }
-        return $data;
+        return MuseumPlusForCraftCms::$plugin->collection->getAllObjectGroups();
     }
 
     public function searchItems($params, $limit = 10, $offset = 0) {
@@ -129,36 +122,15 @@ class MuseumPlusForCraftCmsVariable
     }
 
     public function getAllClassifications() {
-        $cache = Craft::$app->getCache();
-        $key = 'museumplusforcraftcms_all_classifications';
-        $data = $cache->get($key);
-        if ($data === false) {
-            $data = MuseumPlusForCraftCms::$plugin->vocabulary->getAllClassifications();
-            $cache->set($key, $data, 3600 * 24 * 365);
-        }
-        return $data;
+        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllClassifications();
     }
 
     public function getAllPlaces() {
-        $cache = Craft::$app->getCache();
-        $key = 'museumplusforcraftcms_all_places';
-        $data = $cache->get($key);
-        if ($data === false) {
-            $data = MuseumPlusForCraftCms::$plugin->vocabulary->getAllPlaces();
-            $cache->set($key, $data, 3600 * 24 * 365);
-        }
-        return $data;
+        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllPlaces();
     }
 
     public function getAllKeywords() {
-        $cache = Craft::$app->getCache();
-        $key = 'museumplusforcraftcms_all_keywords';
-        $data = $cache->get($key);
-        if ($data === false) {
-            $data = MuseumPlusForCraftCms::$plugin->vocabulary->getAllKeywords();
-            $cache->set($key, $data, 3600 * 24 * 365);
-        }
-        return $data;
+        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllKeywords();
     }
 
     public function getBookmarks($limit = 10, $offset = 0) {

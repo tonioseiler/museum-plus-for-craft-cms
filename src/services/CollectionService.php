@@ -20,6 +20,7 @@ use craft\base\Component;
 use craft\helpers\App;
 use furbo\museumplusforcraftcms\records\PersonRecord;
 use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
+use yii\db\Expression;
 
 
 /**
@@ -102,6 +103,21 @@ class CollectionService extends Component
         }
 
         Craft::$app->session->set('museumPlusCriteria', $items);
+
+        if(isset($params['firstObjectId'])) {
+            $firstObject = MuseumPlusItem::find()->id($params['firstObjectId']);
+            if($firstObject) {
+                $ids = $items->ids();
+                //remove element from array by value
+                $key = array_search($params['firstObjectId'], $ids);
+                if($key !== false) {
+                    unset($ids[$key]);
+                }
+                //add element to the beginning of the array
+                array_unshift($ids, intval($params['firstObjectId']));
+                $items = $items->orderBy([new Expression('FIELD (museumplus_items.id, ' . implode(',', $ids) . ')')]);
+            }
+        }
 
         $items = $items->limit($limit)->offset($offset);
         return $items;
