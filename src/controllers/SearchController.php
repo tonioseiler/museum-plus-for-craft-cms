@@ -14,6 +14,7 @@ class SearchController extends Controller
     {
         $query = MuseumPlusItem::find()
             ->search($searchString)
+            //->where(['like', 'title', $searchString])
             ->orderBy('score')
             ->limit(10)
             ->all();
@@ -23,10 +24,17 @@ class SearchController extends Controller
             foreach ($item->getAssociationPeople()->all() as $person) {
                 $people[] = $person->getDataAttribute('PerPersonTxt');
             }
+
             $dates = [];
             foreach ($item->getDating() as $date) {
                 $dates[] = $date;
             }
+
+            $objectIds = [];
+            foreach ($item->getObjectGroups()->all() as $object) {
+                $objectIds[] = $object->id;
+            }
+
             $image = $item->getAttachment();
             $items[] = [
                 'id' => $item->id,
@@ -35,6 +43,7 @@ class SearchController extends Controller
                 'image' => $image ? $image->getUrl(['width' => 600]) : null,
                 'number' => $item->getDataAttribute('ObjObjectNumberTxt'),
                 'people' => implode(', ', $people),
+                'objectIds' => $objectIds,
                 'dates' => implode(', ', $dates),
             ];
 
