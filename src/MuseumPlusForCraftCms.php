@@ -10,7 +10,11 @@
 
 namespace furbo\museumplusforcraftcms;
 
+use craft\events\DefineAttributeKeywordsEvent;
+use craft\events\IndexKeywordsEvent;
+use craft\events\RegisterElementSearchableAttributesEvent;
 use craft\helpers\App;
+use craft\services\Search;
 use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\services\MuseumPlusService;
 use furbo\museumplusforcraftcms\variables\MuseumPlusForCraftCmsVariable;
@@ -208,6 +212,70 @@ class MuseumPlusForCraftCms extends Plugin
 
 
 
+                }
+            }
+        );
+
+        Event::on(
+            Search::class,
+            Search::EVENT_BEFORE_INDEX_KEYWORDS,
+            function(IndexKeywordsEvent $e) {
+                // Element being indexed:
+                $element = $e->element;
+
+                // Current attribute name:
+                $attribute = $e->attribute;
+
+                if($attribute == 'data'){
+                    $data = "";
+
+                    foreach($element->getAssociationPeople()->all() as $person){
+                        if(is_array($person->getDataAttribute('PerPersonTxt'))){
+                            foreach($person->getDataAttribute('PerPersonTxt') as $personTxt){
+                                $data .= $personTxt . " ";
+                            }
+                        }else{
+                            $data .= $person->getDataAttribute('PerPersonTxt') . " ";
+                        }
+                    }
+
+                    foreach ($element->getDating() as $date){
+                        $data .= $date . " ";
+                    }
+
+                    $data .= $element->getDataAttribute('ObjObjectNumberTxt') . " ";
+
+                    foreach($element->getGeographicReferences()->all() as $geo){
+                        $data .= $geo->title . " ";
+                    }
+
+                    foreach($element->getMaterial() as $material){
+                        $data .= $material . " ";
+                    }
+
+                    foreach($element->getClassification()->all() as $classification){
+                        $data .= $classification->title . " ";
+                    }
+
+                    foreach($element->getObjectGroups()->all() as $objectGroup){
+                        $data .= $objectGroup->title . " ";
+                    }
+
+                    foreach($element->getOwnerships()->all() as $ownership){
+                        $data .= $ownership->getDataAttribute('OwsOwnershipVrt') . " ";
+                    }
+
+                    foreach($element->getTags()->all() as $tag){
+                        $data .= $tag->title . " ";
+                    }
+
+                    $data .= $element->getDetailText() . " ";
+
+                    foreach($element->getLiterature()->all() as $literature){
+                         $data .= $literature->title . " ";
+                    }
+
+                    $e->keywords = $data;
                 }
             }
         );

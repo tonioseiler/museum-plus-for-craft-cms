@@ -402,9 +402,10 @@ class MuseumPlusItem  extends Element
         ];
     }
 
+
     protected static function defineSearchableAttributes(): array
     {
-        return ['collectionId'];
+        return ['data'];
     }
 
     public function __toString(): string

@@ -17,6 +17,7 @@ use craft\models\VolumeFolder;
 use craft\helpers\App;
 
 use craft\queue\jobs\ResaveElements;
+use craft\queue\jobs\UpdateSearchIndex;
 use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
@@ -391,6 +392,13 @@ class CollectionController extends Controller
                 'unique' => true,
                 'status' => null,
             ],
+        ]));
+    }
+
+    public function actionUpdateSearchIndex()
+    {
+        Craft::$app->getQueue()->push(new UpdateSearchIndex([
+            'elementType' => MuseumPlusItem::class,
         ]));
     }
 
