@@ -405,7 +405,7 @@ class MuseumPlusItem  extends Element
 
     protected static function defineSearchableAttributes(): array
     {
-        return ['data'];
+        return [ 'collectionId', 'data'];
     }
 
     public function __toString(): string
