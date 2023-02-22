@@ -250,9 +250,9 @@ class MuseumPlusForCraftCms extends Plugin
                             $data .= $geo->title . " ";
                         }
 
-                        // foreach($element->getMaterial() as $material){
-                        //     $data .= $material . " ";
-                        // }
+                        foreach($element->getMaterial() as $material){
+                            $data .= $material . " ";
+                        }
 
                         // foreach($element->getClassification()->all() as $classification){
                         //     $data .= $classification->title . " ";
