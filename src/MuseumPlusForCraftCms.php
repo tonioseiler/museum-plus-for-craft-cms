@@ -243,7 +243,7 @@ class MuseumPlusForCraftCms extends Plugin
                     //     $data .= $date . " ";
                     // }
 
-                    // $data .= $element->getDataAttribute('ObjObjectNumberTxt') . " ";
+                    $data .= $element->getDataAttribute('ObjObjectNumberTxt') . " ";
 
                     // foreach($element->getGeographicReferences()->all() as $geo){
                     //     $data .= $geo->title . " ";
@@ -269,7 +269,7 @@ class MuseumPlusForCraftCms extends Plugin
                     //     $data .= $tag->title . " ";
                     // }
 
-                    // $data .= $element->getDetailText() . " ";
+                    $data .= $element->getDetailText() . " ";
 
                     // foreach($element->getLiterature()->all() as $literature){
                     //      $data .= $literature->title . " ";
