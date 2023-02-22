@@ -397,9 +397,14 @@ class CollectionController extends Controller
 
     public function actionUpdateSearchIndex()
     {
-        Craft::$app->getQueue()->push(new UpdateSearchIndex([
-            'elementType' => MuseumPlusItem::class,
-        ]));
+        $items = MuseumPlusItem::find()->all();
+        foreach ($items as $item) {
+            Craft::$app->getQueue()->push(new UpdateSearchIndex([
+                'elementType' => MuseumPlusItem::class,
+                'elementId' => $item->id,
+            ]));
+        }
+
     }
 
     private function downloadObjectGroups() {
