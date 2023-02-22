@@ -78,7 +78,9 @@ class CollectionService extends Component
         $items = MuseumPlusItem::find();
         $items->orderBy(['score' => SORT_DESC]);
         if(isset($params['search'])) {
-            $items = $items->search($params['search']);
+            //escape special characters
+            $params['search'] = str_replace(array(".", "-"), "* *", $params['search']);
+            $items = $items->search("*" . $params['search'] . "*");
             $criteria['search'] = $params['search'];
         }
         if(isset($params['geographic'])) {
