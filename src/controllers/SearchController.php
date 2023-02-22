@@ -12,6 +12,7 @@ class SearchController extends Controller
 
     public function actionSearchItems($searchString = null)
     {
+        $searchString = str_replace(array(".", "-"), "* *", $searchString);
         $query = MuseumPlusItem::find()
             ->search($searchString)
             //->where(['like', 'title', $searchString])
