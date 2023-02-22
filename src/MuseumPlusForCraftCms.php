@@ -240,9 +240,9 @@ class MuseumPlusForCraftCms extends Plugin
                             }
                         }
 
-                        // foreach ($element->getDating() as $date){
-                        //     $data .= $date . " ";
-                        // }
+                        foreach ($element->getDating() as $date){
+                            $data .= $date . " ";
+                        }
 
                         //$data .= $element->getDataAttribute('ObjObjectNumberTxt') . " ";
 
