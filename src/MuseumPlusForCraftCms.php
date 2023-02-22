@@ -269,7 +269,7 @@ class MuseumPlusForCraftCms extends Plugin
                     //     $data .= $tag->title . " ";
                     // }
 
-                    $data .= $element->getDetailText() . " ";
+                    //$data .= $element->getDetailText() . " ";
 
                     // foreach($element->getLiterature()->all() as $literature){
                     //      $data .= $literature->title . " ";
