@@ -229,15 +229,15 @@ class MuseumPlusForCraftCms extends Plugin
                 if($attribute == 'data'){
                     $data = "";
 
-                    // foreach($element->getAssociationPeople()->all() as $person){
-                    //     if(is_array($person->getDataAttribute('PerPersonTxt'))){
-                    //         foreach($person->getDataAttribute('PerPersonTxt') as $personTxt){
-                    //             $data .= $personTxt . " ";
-                    //         }
-                    //     }else{
-                    //         $data .= $person->getDataAttribute('PerPersonTxt') . " ";
-                    //     }
-                    // }
+                    foreach($element->getAssociationPeople()->all() as $person){
+                        if(is_array($person->getDataAttribute('PerPersonTxt'))){
+                            foreach($person->getDataAttribute('PerPersonTxt') as $personTxt){
+                                $data .= $personTxt . " ";
+                            }
+                        }else{
+                            $data .= $person->getDataAttribute('PerPersonTxt') . " ";
+                        }
+                    }
 
                     // foreach ($element->getDating() as $date){
                     //     $data .= $date . " ";
@@ -269,7 +269,7 @@ class MuseumPlusForCraftCms extends Plugin
                     //     $data .= $tag->title . " ";
                     // }
 
-                    $data .= $element->getDetailText() . " ";
+                    //$data .= $element->getDetailText() . " ";
 
                     // foreach($element->getLiterature()->all() as $literature){
                     //      $data .= $literature->title . " ";
