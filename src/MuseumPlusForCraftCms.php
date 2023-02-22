@@ -240,15 +240,15 @@ class MuseumPlusForCraftCms extends Plugin
                             }
                         }
 
-                        foreach ($element->getDating() as $date){
-                            $data .= $date . " ";
-                        }
+                        // foreach ($element->getDating() as $date){
+                        //     $data .= $date . " ";
+                        // }
 
                         //$data .= $element->getDataAttribute('ObjObjectNumberTxt') . " ";
 
-                        // foreach($element->getGeographicReferences()->all() as $geo){
-                        //     $data .= $geo->title . " ";
-                        // }
+                        foreach($element->getGeographicReferences()->all() as $geo){
+                            $data .= $geo->title . " ";
+                        }
 
                         // foreach($element->getMaterial() as $material){
                         //     $data .= $material . " ";
