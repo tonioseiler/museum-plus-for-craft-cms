@@ -227,55 +227,58 @@ class MuseumPlusForCraftCms extends Plugin
                 $attribute = $e->attribute;
 
                 if($attribute == 'data'){
-                    $data = "";
-
-                    foreach($element->getAssociationPeople()->all() as $person){
-                        if(is_array($person->getDataAttribute('PerPersonTxt'))){
-                            foreach($person->getDataAttribute('PerPersonTxt') as $personTxt){
-                                $data .= $personTxt . " ";
+                    
+                        $data = "";
+                    try {
+                        foreach($element->getAssociationPeople()->all() as $person){
+                            if(is_array($person->getDataAttribute('PerPersonTxt'))){
+                                foreach($person->getDataAttribute('PerPersonTxt') as $personTxt){
+                                    $data .= $personTxt . " ";
+                                }
+                            }else{
+                                $data .= $person->getDataAttribute('PerPersonTxt') . " ";
                             }
-                        }else{
-                            $data .= $person->getDataAttribute('PerPersonTxt') . " ";
                         }
-                    }
 
-                    // foreach ($element->getDating() as $date){
-                    //     $data .= $date . " ";
-                    // }
+                        // foreach ($element->getDating() as $date){
+                        //     $data .= $date . " ";
+                        // }
 
-                    //$data .= $element->getDataAttribute('ObjObjectNumberTxt') . " ";
+                        //$data .= $element->getDataAttribute('ObjObjectNumberTxt') . " ";
 
-                    // foreach($element->getGeographicReferences()->all() as $geo){
-                    //     $data .= $geo->title . " ";
-                    // }
+                        // foreach($element->getGeographicReferences()->all() as $geo){
+                        //     $data .= $geo->title . " ";
+                        // }
 
-                    // foreach($element->getMaterial() as $material){
-                    //     $data .= $material . " ";
-                    // }
+                        // foreach($element->getMaterial() as $material){
+                        //     $data .= $material . " ";
+                        // }
 
-                    // foreach($element->getClassification()->all() as $classification){
-                    //     $data .= $classification->title . " ";
-                    // }
+                        // foreach($element->getClassification()->all() as $classification){
+                        //     $data .= $classification->title . " ";
+                        // }
 
-                    // foreach($element->getObjectGroups()->all() as $objectGroup){
-                    //     $data .= $objectGroup->title . " ";
-                    // }
+                        // foreach($element->getObjectGroups()->all() as $objectGroup){
+                        //     $data .= $objectGroup->title . " ";
+                        // }
 
-                    // foreach($element->getOwnerships()->all() as $ownership){
-                    //     $data .= $ownership->getDataAttribute('OwsOwnershipVrt') . " ";
-                    // }
+                        // foreach($element->getOwnerships()->all() as $ownership){
+                        //     $data .= $ownership->getDataAttribute('OwsOwnershipVrt') . " ";
+                        // }
 
-                    // foreach($element->getTags()->all() as $tag){
-                    //     $data .= $tag->title . " ";
-                    // }
+                        // foreach($element->getTags()->all() as $tag){
+                        //     $data .= $tag->title . " ";
+                        // }
 
-                    //$data .= $element->getDetailText() . " ";
+                        //$data .= $element->getDetailText() . " ";
 
-                    // foreach($element->getLiterature()->all() as $literature){
-                    //      $data .= $literature->title . " ";
-                    // }
-
+                        // foreach($element->getLiterature()->all() as $literature){
+                        //      $data .= $literature->title . " ";
+                        // }
+                    } catch (\Throwable $th) {}
+                    
                     $e->keywords = $data;
+                        
                 }
             }
         );
