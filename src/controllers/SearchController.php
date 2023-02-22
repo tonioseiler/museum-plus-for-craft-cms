@@ -41,7 +41,7 @@ class SearchController extends Controller
                 'id' => $item->id,
                 'title' => $item->title,
                 'url' => $item->url,
-                'image' => $image ? $image->getUrl(['width' => 600]) : null,
+                'image' => $image ? $image->getUrl("transformXS") : null,
                 'number' => $item->getDataAttribute('ObjObjectNumberTxt'),
                 'people' => implode(', ', $people),
                 'objectIds' => $objectIds,
