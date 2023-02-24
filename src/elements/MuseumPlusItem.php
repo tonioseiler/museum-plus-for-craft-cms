@@ -145,6 +145,7 @@ class MuseumPlusItem  extends Element
         return [];
     }*/
 
+
     /**
      * Returns whether the current user can edit the element.
      *
@@ -405,7 +406,7 @@ class MuseumPlusItem  extends Element
 
     protected static function defineSearchableAttributes(): array
     {
-        return [ 'collectionId', 'data'];
+        return ['data'];
     }
 
     public function __toString(): string
@@ -577,5 +578,23 @@ class MuseumPlusItem  extends Element
             $criteria->offset = 0;
         }
         return $criteria;
+    }
+
+    public function getMetaText()
+    {
+        $metaDescription = "";
+        $metaDescription .= $this->title . " ";
+        $metaDescription .= implode(" ", $this->getDating()) . " ";
+        $metaDescription .= implode(" ", $this->getMaterial()) . " ";
+        return $metaDescription;
+    }
+
+    public function getMetaKeywords()
+    {
+        $metaKeywords = [];
+        foreach ($this->getTags()->all() as $tag) {
+            $metaKeywords[] = $tag->title;
+        }
+        return implode(", ", $metaKeywords);
     }
 }

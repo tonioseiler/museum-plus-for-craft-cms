@@ -55,6 +55,12 @@
             "label": "MuseumPlus Data",
             "url": "#tab--museumplusforcraftcms-data",
             "class": null
+        },
+        "tab--museumplusforcraftcms-meta": {
+            "tabId": "tab-tab--museumplusforcraftcms-meta",
+            "label": "Meta",
+            "url": "#tab--museumplusforcraftcms-meta",
+            "class": null
         }
     } %}
 {% endif %}
@@ -365,6 +371,27 @@
                 {% endfor %}
             </div>
         {% endif %}
+        <div id="tab--museumplusforcraftcms-meta" class="flex-fields" data-id="tab--museumplusforcraftcms-meta" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-meta">
+
+            <div id="fields-metaText-field" class="field width-100">
+                <div class="heading">
+                    <label id="fields-metadescription-label" for="fields-metaText">Metadescription</label>
+                </div>
+                <div class="input ltr">
+                    <textarea id="fields-metaText" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[metaText]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{ item.metaText }}</textarea>
+                </div>
+            </div>
+
+            <div id="fields-metakeywords-field" class="field width-100">
+                <div class="heading">
+                    <label id="fields-metakeywords-label" for="fields-metaKeywords">Metakeywords</label>
+                </div>
+                <div class="input ltr">
+                    <textarea id="fields-metakeywords" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[metakeywords]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{ item.metaKeywords }}</textarea>
+                </div>
+            </div>
+
+        </div>
 
         {{ fieldsHtml|raw }}
 
