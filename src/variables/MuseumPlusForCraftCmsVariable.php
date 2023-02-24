@@ -10,6 +10,7 @@
 
 namespace furbo\museumplusforcraftcms\variables;
 
+use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 
 use Craft;
@@ -122,15 +123,24 @@ class MuseumPlusForCraftCmsVariable
     }
 
     public function getAllClassifications() {
-        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllClassifications();
+        return MuseumPlusVocabulary::find()
+            ->type(['ObjClassificationVgr'])
+            ->orderBy('title')
+            ->all();
     }
 
     public function getAllPlaces() {
-        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllPlaces();
+        return MuseumPlusVocabulary::find()
+            ->type(['GenPlaceVgr'])
+            ->orderBy('title')
+            ->all();
     }
 
     public function getAllKeywords() {
-        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllKeywords();
+        return MuseumPlusVocabulary::find()
+            ->type(['ObjKeyWordVgr'])
+            ->orderBy('title')
+            ->all();
     }
 
     public function getBookmarks($limit = 10, $offset = 0) {
