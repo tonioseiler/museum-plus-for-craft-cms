@@ -181,19 +181,12 @@ class CollectionController extends Controller
         if(!$item) {
             return $this->asJson([]);
         }
-        $tags = [];
-        $isSensitive = false;
-        foreach($item->getTags()->all() as $tag) {
-            if($tag->id == 251772) {
-                $isSensitive = true;
-            }
-        }
+
         $image = $item->getAttachment();
         return $this->asJson([
             'id' => $item->id,
             'title' => $item->title,
             'url' => $item->url,
-            'isSensitive' => $isSensitive,
             'image' => $image ? $image->getUrl(["width" => 800, "height" => 800, "mode" => "crop"]) : null,
         ]);
     }
