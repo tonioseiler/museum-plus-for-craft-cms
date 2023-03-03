@@ -174,8 +174,8 @@ class CollectionController extends Controller
     public function actionGetRandomItemByTag($tagId) {
         //sensitive tag id: 251772
         $item = MuseumPlusItem::find()
-            ->tag($tagId)
             ->tag(['not in', 251772])
+            ->tag($tagId)
             ->orderBy('RAND()')
             ->one();
         if(!$item) {
