@@ -51,7 +51,12 @@ class MuseumPlusItem  extends Element
 
     public $multiMedia = [];
 
+    public $inventoryNumber;
+
+    public $sensitive;
+
     private $record = null;
+
 
     // Static Methods
     // =========================================================================
@@ -261,6 +266,8 @@ class MuseumPlusItem  extends Element
         $itemRecord->collectionId = $this->collectionId;
         $itemRecord->data = $this->data;
         $itemRecord->assetId = $this->assetId;
+        $itemRecord->inventoryNumber = $this->inventoryNumber;
+        $itemRecord->sensitive = $this->sensitive;
 
         $itemRecord->save(false);
 

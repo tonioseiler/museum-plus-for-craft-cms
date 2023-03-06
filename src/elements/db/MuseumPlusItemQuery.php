@@ -18,6 +18,8 @@ class MuseumPlusItemQuery extends ElementQuery
     public $objectGroup;
     public $objectGroupId;
     public $person;
+    public $inventoryNumber;
+    public $sensitive;
 
 
     public function collectionId($value)
@@ -63,6 +65,18 @@ class MuseumPlusItemQuery extends ElementQuery
         return $this;
     }
 
+    public function inventoryNumber($value)
+    {
+        $this->inventoryNumber = $value;
+        return $this;
+    }
+
+    public function sensitive($value)
+    {
+        $this->sensitive = $value;
+        return $this;
+    }
+
     protected function beforePrepare(): bool
     {
         // join in the items table
@@ -104,14 +118,8 @@ class MuseumPlusItemQuery extends ElementQuery
             $subQuery = (new Query())
                 ->select(['itemId'])
                 ->from(['{{%museumplus_items_vocabulary}}']);
-            if(is_array($this->tag)){
-                foreach ($this->tag as $conditional){
-                    $subQuery = $subQuery->andWhere($conditional);
-                }
-            }else{
-                $subQuery = $subQuery->andWhere(['vocabularyId' => $tagId]);
-            }
 
+            $subQuery = $subQuery->where(['vocabularyId' => $tagId]);
 
 
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
@@ -139,6 +147,14 @@ class MuseumPlusItemQuery extends ElementQuery
                 ->from(['{{%museumplus_items_people}}'])
                 ->where(['personId' => $this->person]);
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
+        }
+
+        if($this->inventoryNumber){
+            $this->subQuery->andWhere(Db::parseParam('museumplus_items.inventoryNumber', $this->inventoryNumber));
+        }
+
+        if($this->sensitive){
+            $this->subQuery->andWhere(Db::parseParam('museumplus_items.sensitive', $this->sensitive));
         }
 
         $this->subQuery->groupBy('museumplus_items.id');

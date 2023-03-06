@@ -21,6 +21,8 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
+                'inventoryNumber' => $this->string(),
+                'sensitive' => $this->boolean(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid()

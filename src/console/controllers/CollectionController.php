@@ -10,6 +10,7 @@
 
 namespace furbo\museumplusforcraftcms\console\controllers;
 
+use craft\db\Query;
 use craft\elements\Asset;
 use craft\helpers\Assets;
 use craft\helpers\ElementHelper;
@@ -690,6 +691,40 @@ class CollectionController extends Controller
 
         $success = $person->save();
         return $person;
+    }
+
+    public function actionUpdateItemsInventory()
+    {
+        $items = MuseumPlusItem::find()->all();
+        foreach($items as $item) {
+            $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
+            if($inventoryNumber){
+                $item->inventoryNumber = $inventoryNumber;
+                if(Craft::$app->elements->saveElement($item)) {
+                    echo $item->id . " - " . $inventoryNumber;
+                    echo "\n";
+                }
+            }
+        }
+    }
+
+    public function actionUpdateItemsSensitive()
+    {
+        //251772
+        $subQuery = (new Query())
+            ->select(['itemId'])
+            ->from(['{{%museumplus_items_vocabulary}}'])
+            ->where(['vocabularyId' => 251772]);
+        $items = MuseumPlusItem::find()
+            ->where(['in', 'museumplus_items.id', $subQuery])
+            ->all();
+        foreach($items as $item) {
+            $item->sensitive = true;
+            if(Craft::$app->elements->saveElement($item)) {
+                echo $item->id . " - " . $item->title;
+                echo "\n";
+            }
+        }
     }
 
 }

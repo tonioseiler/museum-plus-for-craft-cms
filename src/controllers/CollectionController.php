@@ -176,9 +176,12 @@ class CollectionController extends Controller
         //sensitive tag id: 251772
         $item = MuseumPlusItem::find();
 
+        $item = $item->sensitive(false);
+
         if(isset($params['tagId'])){
-            $item = $item->tag([['vocabularyId' => $params['tagId']], ['not', ['vocabularyId' => 251772]]]);
+            $item = $item->tag($params['tagId']);
         }
+
 
         if(isset($params['objectGroup'])){
             $item = $item->objectGroup($params['objectGroup']);
