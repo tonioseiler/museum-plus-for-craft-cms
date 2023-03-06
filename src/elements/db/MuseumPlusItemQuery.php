@@ -97,6 +97,15 @@ class MuseumPlusItemQuery extends ElementQuery
             $this->subQuery->andWhere(Db::parseParam('museumplus_items.assetId', $this->assetId));
         }
 
+        if($this->inventoryNumber){
+            $this->subQuery->andWhere(Db::parseParam('museumplus_items.inventoryNumber', $this->inventoryNumber));
+        }
+
+        if(!is_null($this->sensitive)){
+            $this->subQuery->andWhere(Db::parseParam('museumplus_items.sensitive', null));
+        }
+
+
         if($this->geographic){
             $subQuery = (new Query())
                 ->select(['itemId'])
@@ -148,14 +157,6 @@ class MuseumPlusItemQuery extends ElementQuery
                 ->where(['personId' => $this->person]);
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
         }
-
-        if($this->inventoryNumber){
-            $this->subQuery->andWhere(Db::parseParam('museumplus_items.inventoryNumber', $this->inventoryNumber));
-        }
-
-        // if(!is_null($this->sensitive)){
-        //     $this->subQuery->andWhere(["!=", 'museumplus_items.sensitive', 1]);
-        // }
 
 
         $this->subQuery->groupBy('museumplus_items.id');
