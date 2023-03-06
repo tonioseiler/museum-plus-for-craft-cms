@@ -153,6 +153,10 @@ class MuseumPlusItemQuery extends ElementQuery
             $this->subQuery->andWhere(Db::parseParam('museumplus_items.inventoryNumber', $this->inventoryNumber));
         }
 
+        if(!is_null($this->sensitive)){
+            $this->subQuery->andWhere(['!=', 'museumplus_items.sensitive', $this->sensitive]);
+        }
+
 
         $this->subQuery->groupBy('museumplus_items.id');
 
