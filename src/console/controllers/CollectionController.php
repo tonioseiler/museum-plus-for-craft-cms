@@ -527,8 +527,8 @@ class CollectionController extends Controller
         $collectionId = $object->id;
 
         $item = MuseumPlusItem::find()
-        ->where(['collectionId' => $collectionId])
-        ->one();
+            ->where(['collectionId' => $collectionId])
+            ->one();
 
         if (empty($item)) {
             //create new

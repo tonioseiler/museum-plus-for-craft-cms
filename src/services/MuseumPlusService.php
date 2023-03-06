@@ -631,7 +631,11 @@ class MuseumPlusService extends Component
 
                 $grItems = [];
                 if (isset($repeatableGroup['repeatableGroupItem'])) {
-                    $grItems = [$repeatableGroup['repeatableGroupItem']];
+                    if (isset($repeatableGroup['repeatableGroupItem']['@attributes'])) {
+                        $grItems = [$repeatableGroup['repeatableGroupItem']];
+                    } else {
+                        $grItems = $repeatableGroup['repeatableGroupItem'];
+                    }
                 }
 
                 foreach($grItems as $grItem) {
