@@ -227,8 +227,8 @@ class MuseumPlusForCraftCms extends Plugin
                 $attribute = $e->attribute;
 
                 if($attribute == 'data'){
-                    
-                        $data = "";
+
+                    $data = "";
                     try {
                         foreach($element->getAssociationPeople()->all() as $person){
                             if(is_array($person->getDataAttribute('PerPersonTxt'))){
@@ -273,34 +273,34 @@ class MuseumPlusForCraftCms extends Plugin
                         $data .= $element->getDetailText() . " ";
 
                         foreach($element->getLiterature()->all() as $literature){
-                             $data .= $literature->title . " ";
+                            $data .= $literature->title . " ";
                         }
                     } catch (\Throwable $th) {}
-                    
+
                     $e->keywords = $data;
-                        
+
                 }
             }
         );
 
-/**
- * Logging in Craft involves using one of the following methods:
- *
- * Craft::trace(): record a message to trace how a piece of code runs. This is mainly for development use.
- * Craft::info(): record a message that conveys some useful information.
- * Craft::warning(): record a warning message that indicates something unexpected has happened.
- * Craft::error(): record a fatal error that should be investigated as soon as possible.
- *
- * Unless `devMode` is on, only Craft::warning() & Craft::error() will log to `craft/storage/logs/web.log`
- *
- * It's recommended that you pass in the magic constant `__METHOD__` as the second parameter, which sets
- * the category to the method (prefixed with the fully qualified class name) where the constant appears.
- *
- * To enable the Yii debug toolbar, go to your user account in the AdminCP and check the
- * [] Show the debug toolbar on the front end & [] Show the debug toolbar on the Control Panel
- *
- * http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
- */
+        /**
+         * Logging in Craft involves using one of the following methods:
+         *
+         * Craft::trace(): record a message to trace how a piece of code runs. This is mainly for development use.
+         * Craft::info(): record a message that conveys some useful information.
+         * Craft::warning(): record a warning message that indicates something unexpected has happened.
+         * Craft::error(): record a fatal error that should be investigated as soon as possible.
+         *
+         * Unless `devMode` is on, only Craft::warning() & Craft::error() will log to `craft/storage/logs/web.log`
+         *
+         * It's recommended that you pass in the magic constant `__METHOD__` as the second parameter, which sets
+         * the category to the method (prefixed with the fully qualified class name) where the constant appears.
+         *
+         * To enable the Yii debug toolbar, go to your user account in the AdminCP and check the
+         * [] Show the debug toolbar on the front end & [] Show the debug toolbar on the Control Panel
+         *
+         * http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
+         */
         Craft::info(
             Craft::t(
                 'museum-plus-for-craft-cms',
@@ -359,7 +359,7 @@ class MuseumPlusForCraftCms extends Plugin
             'bookmark/save' => 'museum-plus-for-craft-cms/bookmark/save',
             'bookmark/check/<objectId>' => 'museum-plus-for-craft-cms/bookmark/check',
             'vocabularies/get-all' => 'museum-plus-for-craft-cms/vocabularies/get-all',
-            'collection/get-random-item-by-tag/<tagId>' => 'museum-plus-for-craft-cms/collection/get-random-item-by-tag',
+            'collection/get-random-item' => 'museum-plus-for-craft-cms/collection/get-random-item-by-tag',
         ];
     }
 

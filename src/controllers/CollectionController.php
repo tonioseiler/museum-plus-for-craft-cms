@@ -171,13 +171,15 @@ class CollectionController extends Controller
         return MuseumPlusForCraftCms::$plugin->collection->searchItems($params);
     }
 
-    public function actionGetRandomItemByTag($tagId) {
+    public function actionGetRandomItemByTag() {
+        $params = Craft::$app->getRequest()->getQueryParams();
         //sensitive tag id: 251772
-        $item = MuseumPlusItem::find()
-            ->tag(['not in', 251772])
-            ->tag($tagId)
-            ->orderBy('RAND()')
-            ->one();
+        $item = MuseumPlusItem::find();
+            //->tag(['not in', 251772])
+        if(isset($params['tagId'])){
+            $item = $item->tag($params['tagId']);
+        }
+        $item = $item->orderBy('RAND()')->one();
         if(!$item) {
             return $this->asJson([]);
         }
