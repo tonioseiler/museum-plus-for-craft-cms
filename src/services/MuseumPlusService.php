@@ -59,8 +59,8 @@ class MuseumPlusService extends Component
 
         $that = $this;
         $cacheKey = Craft::$app->cache->buildKey('museumplus.vocabulary.'.$groupName.'.'.$nodeId);
-        $seconds = self::CACHE_DURATION;
-        $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupName, $nodeId) {
+        $seconds = 1;//self::CACHE_DURATION;
+        //$tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupName, $nodeId) {
             $this->init();
             $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application//vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
             $res = $that->client->sendAsync($request)->wait();
@@ -92,11 +92,13 @@ class MuseumPlusService extends Component
                 foreach ($tmp as $key => $value) {
                     $object->{$key} = $value;
                 }
-                $ret[] = $object;
+                if (!empty($object->isoLanguageCode) && $object->isoLanguageCode == 'de' && isset($object->category['@attributes']['logicalName']) && $object->category['@attributes']['logicalName'] != 'non-preferred') {
+                    $ret[] = $object;
+                }
             }
             return $ret;
 
-        }, $seconds);
+        //}, $seconds);
         return $tmp;
     }
 
@@ -645,6 +647,8 @@ class MuseumPlusService extends Component
                     $this->addFieldValuesToObject($groupItemObject, $grItem, 'systemField');
                     $this->addFieldValuesToObject($groupItemObject, $grItem, 'dataField');
                     $this->addFieldValuesToObject($groupItemObject, $grItem, 'virtualField');
+
+                    //TODO: add vocabulary refs ???
 
                     $gr->items[] = $groupItemObject;
 
