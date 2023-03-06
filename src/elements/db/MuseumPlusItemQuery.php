@@ -101,16 +101,20 @@ class MuseumPlusItemQuery extends ElementQuery
 
         if($this->tag){
             $tagId = $this->tag;
-            $conditional = "in";
-            if(is_array($this->tag)){
-                $tagId = $this->tag[1];
-                $conditional = $this->tag[0];
-            }
             $subQuery = (new Query())
                 ->select(['itemId'])
-                ->from(['{{%museumplus_items_vocabulary}}'])
-                ->where(['vocabularyId' => $tagId]);
-            $this->subQuery->andWhere([$conditional, 'museumplus_items.id', $subQuery]);
+                ->from(['{{%museumplus_items_vocabulary}}']);
+            if(is_array($this->tag)){
+                foreach ($this->tag as $conditional){
+                    $subQuery = $subQuery->andWhere($conditional);
+                }
+            }else{
+                $subQuery = $subQuery->andWhere(['vocabularyId' => $tagId]);
+            }
+
+
+
+            $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
         }
 
         if($this->objectGroup){
