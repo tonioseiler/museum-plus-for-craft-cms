@@ -210,144 +210,151 @@ class CollectionController extends Controller
     {
         echo 'Update item '.$collectionId.PHP_EOL;
 
-        $o = $this->museumPlus->getObjectDetail($collectionId);
-        $item = $this->createOrUpdateItem($o);
+        try {
+            $o = $this->museumPlus->getObjectDetail($collectionId);
+            $item = $this->createOrUpdateItem($o);
 
-        $moduleRefs = $item->getDataAttribute('moduleReferences');
+            $moduleRefs = $item->getDataAttribute('moduleReferences');
 
-        //add literature relations
-        $moduleRefs = $item->getDataAttribute('moduleReferences');
-        $literatureIds = [];
-        if(isset($moduleRefs['ObjLiteratureRef'])) {
-            foreach ($moduleRefs['ObjLiteratureRef']['items'] as $l){
-                $data = $this->museumPlus->getLiterature($l['id']);
-                if ($data){
-                    $literature = $this->createOrUpdateLiterature($data);
-                    if ($literature) {
-                        $literatureIds[] = $literature->id;
+            //add literature relations
+            $moduleRefs = $item->getDataAttribute('moduleReferences');
+            $literatureIds = [];
+            if(isset($moduleRefs['ObjLiteratureRef'])) {
+                foreach ($moduleRefs['ObjLiteratureRef']['items'] as $l){
+                    $data = $this->museumPlus->getLiterature($l['id']);
+                    if ($data){
+                        $literature = $this->createOrUpdateLiterature($data);
+                        if ($literature) {
+                            $literatureIds[] = $literature->id;
+                        }
                     }
                 }
             }
-        }
-        //sync
-        if(count($literatureIds)){
-            $item->syncLiteratureRelations($literatureIds);
-            echo 'l';
-        }
+            //sync
+            if(count($literatureIds)){
+                $item->syncLiteratureRelations($literatureIds);
+                echo 'l';
+            }
 
-        //add people refs
-        $peopleTypes = ['ObjAdministrationRef', 'ObjPerOwnerRef', 'ObjPerAssociationRef'];
-        foreach($peopleTypes as $peopleType) {
-            if(isset($moduleRefs[$peopleType])) {
-                $peopleIds = [];
-                foreach ($moduleRefs[$peopleType]['items'] as $p){
-                    $data = $this->museumPlus->getPerson($p['id']);
-                    $person = $this->createOrUpdatePerson($data);
-                    if ($person) {
-                        $peopleIds[] = $person->id;
+            //add people refs
+            $peopleTypes = ['ObjAdministrationRef', 'ObjPerOwnerRef', 'ObjPerAssociationRef'];
+            foreach($peopleTypes as $peopleType) {
+                if(isset($moduleRefs[$peopleType])) {
+                    $peopleIds = [];
+                    foreach ($moduleRefs[$peopleType]['items'] as $p){
+                        $data = $this->museumPlus->getPerson($p['id']);
+                        $person = $this->createOrUpdatePerson($data);
+                        if ($person) {
+                            $peopleIds[] = $person->id;
+                        }
                     }
-                }
-                //sync
-                if(count($peopleIds)){
-                    $item->syncPeopleRelations($peopleIds, $peopleType);
-                    echo 'p';
-                }
-            }
-        }
-
-        //add owenrship refs
-        $ownershipIds = [];
-        if(isset($moduleRefs['ObjOwnershipRef'])) {
-            foreach ($moduleRefs['ObjOwnershipRef']['items'] as $o){
-                $data = $this->museumPlus->getOwnership($o['id']);
-                $ownership = $this->createOrUpdateOwnership($data);
-                if ($ownership) {
-                    $ownershipIds[] = $ownership->id;
-                }
-            }
-        }
-        //sync
-        if(count($ownershipIds)){
-            $item->syncOwnershipRelations($ownershipIds);
-            echo 'o';
-        }
-
-        //add vocabulary refs
-        $vocabularyRefs = $item->getDataAttribute('vocabularyReferences');
-        $syncData = [];
-        foreach($vocabularyRefs as $vocabularyRef) {
-            $ids = [];
-            $type = $vocabularyRef['instanceName'];
-            foreach ($vocabularyRef['items'] as $vc){
-                $data = $this->museumPlus->getVocabularyNode($type,$vc['id']);
-                foreach ($data as $d) {
-                    $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
-                    if ($vocabularyEntry) {
-                        $ids[] = $vocabularyEntry->id;
+                    //sync
+                    if(count($peopleIds)){
+                        $item->syncPeopleRelations($peopleIds, $peopleType);
+                        echo 'p';
                     }
                 }
             }
-            if (isset($syncData[$type])) {
-                foreach($ids as $id) {
-                    $syncData[$type][] = $id;
-                }
-            } else {
-                $syncData[$type] = $ids;
-            }
-        }
 
-        if(count($syncData)){
-            $item->syncVocabularyRelations($syncData);
-            echo 'v';
-        }
-        echo PHP_EOL;
-
-        //add attachment
-        if (!$this->ignoreAttachments) {
-            $assetId = $this->createAttachmentFromObjectId($item->collectionId);
-            if($assetId){
-                echo "Attachment for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
-                $item->assetId = $assetId;
-                Craft::$app->elements->saveElement($item);
-            }else{
-                echo "Attachment for item " . $item->id . " AssetID: NULL" . PHP_EOL;
-            }
-        }
-
-
-        //add multimedia
-        if(!$this->ignoreMultimedia && isset($moduleRefs['ObjMultimediaRef'])) {
-
-            $assetIds = [];
-            foreach ($moduleRefs['ObjMultimediaRef']['items'] as $mm){
-                $assetId = $this->createMultimediaFromId($mm['id']);
-                if ($assetId) {
-                    $assetIds[] = $assetId;
+            //add owenrship refs
+            $ownershipIds = [];
+            if(isset($moduleRefs['ObjOwnershipRef'])) {
+                foreach ($moduleRefs['ObjOwnershipRef']['items'] as $o){
+                    $data = $this->museumPlus->getOwnership($o['id']);
+                    $ownership = $this->createOrUpdateOwnership($data);
+                    if ($ownership) {
+                        $ownershipIds[] = $ownership->id;
+                    }
                 }
             }
-
-            if(count($assetIds)){
-                $item->syncMultimediaRelations($assetIds);
-                echo "Multimedia assets for Item Id: " . $item->id . " Asset IDs: " . implode(",", $assetIds) . PHP_EOL;
+            //sync
+            if(count($ownershipIds)){
+                $item->syncOwnershipRelations($ownershipIds);
+                echo 'o';
             }
-        }
 
-        //add literature
-        if(!$this->ignoreLiterature && isset($moduleRefs['ObjLiteratureRef'])) {
+            //add vocabulary refs
+            $vocabularyRefs = $item->getDataAttribute('vocabularyReferences');
+            $syncData = [];
+            foreach($vocabularyRefs as $vocabularyRef) {
+                $ids = [];
+                $type = $vocabularyRef['instanceName'];
+                foreach ($vocabularyRef['items'] as $vc){
+                    $data = $this->museumPlus->getVocabularyNode($type,$vc['id']);
+                    foreach ($data as $d) {
+                        $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
+                        if ($vocabularyEntry) {
+                            $ids[] = $vocabularyEntry->id;
+                        }
+                    }
+                }
+                if (isset($syncData[$type])) {
+                    foreach($ids as $id) {
+                        $syncData[$type][] = $id;
+                    }
+                } else {
+                    $syncData[$type] = $ids;
+                }
+            }
 
-            $assetIds = [];
-            foreach ($moduleRefs['ObjLiteratureRef']['items'] as $l){
-                $assetId = $this->createLiteratureFromId($l['id']);
-                $literature = $this->museumPlus->getLiterature($l['id']);
-                if($assetId && $literature){
-                    echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
-                    $literature->assetId = $assetId;
-                    $literature->save();
+            if(count($syncData)){
+                $item->syncVocabularyRelations($syncData);
+                echo 'v';
+            }
+            echo PHP_EOL;
+
+            //add attachment
+            if (!$this->ignoreAttachments) {
+                $assetId = $this->createAttachmentFromObjectId($item->collectionId);
+                if($assetId){
+                    echo "Attachment for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
+                    $item->assetId = $assetId;
+                    Craft::$app->elements->saveElement($item);
                 }else{
-                    echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: NULL" . PHP_EOL;
+                    echo "Attachment for item " . $item->id . " AssetID: NULL" . PHP_EOL;
                 }
             }
+
+
+            //add multimedia
+            if(!$this->ignoreMultimedia && isset($moduleRefs['ObjMultimediaRef'])) {
+
+                $assetIds = [];
+                foreach ($moduleRefs['ObjMultimediaRef']['items'] as $mm){
+                    $assetId = $this->createMultimediaFromId($mm['id']);
+                    if ($assetId) {
+                        $assetIds[] = $assetId;
+                    }
+                }
+
+                if(count($assetIds)){
+                    $item->syncMultimediaRelations($assetIds);
+                    echo "Multimedia assets for Item Id: " . $item->id . " Asset IDs: " . implode(",", $assetIds) . PHP_EOL;
+                }
+            }
+
+            //add literature
+            if(!$this->ignoreLiterature && isset($moduleRefs['ObjLiteratureRef'])) {
+
+                $assetIds = [];
+                foreach ($moduleRefs['ObjLiteratureRef']['items'] as $l){
+                    $assetId = $this->createLiteratureFromId($l['id']);
+                    $literature = $this->museumPlus->getLiterature($l['id']);
+                    if($assetId && $literature){
+                        echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
+                        $literature->assetId = $assetId;
+                        $literature->save();
+                    }else{
+                        echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: NULL" . PHP_EOL;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            echo $item->id . " could not be fully updated." . PHP_EOL;
+            echo $e->getMessage() . PHP_EOL;;
         }
+
+        
 
 
     }
