@@ -154,7 +154,7 @@ class MuseumPlusItemQuery extends ElementQuery
         }
 
         if(!is_null($this->sensitive)){
-            $this->subQuery->andWhere(['!=', 'museumplus_items.sensitive', $this->sensitive]);
+            $this->subQuery->andWhere([$this->sensitive ? "=" : "!=", 'museumplus_items.sensitive', $this->sensitive]);
         }
 
 
