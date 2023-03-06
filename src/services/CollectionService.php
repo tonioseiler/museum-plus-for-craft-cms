@@ -76,7 +76,7 @@ class CollectionService extends Component
     public function searchItems($params, $limit = 10, $offset = 0) {
         $criteria = [];
         $items = MuseumPlusItem::find();
-        $items->orderBy(['score' => SORT_DESC]);
+        $items->orderBy(['inventoryNumber' => SORT_ASC]);
         if(isset($params['search'])) {
             //escape special characters
             $params['search'] = str_replace(array(".", "-"), "* *", $params['search']);
@@ -107,6 +107,7 @@ class CollectionService extends Component
         Craft::$app->session->set('museumPlusCriteria', $items);
 
         if(isset($params['firstObjectId'])) {
+            $params['firstObjectId'] = intval($params['firstObjectId']);
             $firstObject = MuseumPlusItem::find()->id($params['firstObjectId']);
             if($firstObject) {
                 $ids = $items->ids();
@@ -116,7 +117,7 @@ class CollectionService extends Component
                     unset($ids[$key]);
                 }
                 //add element to the beginning of the array
-                array_unshift($ids, intval($params['firstObjectId']));
+                array_unshift($ids, $params['firstObjectId']);
                 $items = $items->orderBy([new Expression('FIELD (museumplus_items.id, ' . implode(',', $ids) . ')')]);
             }
         }

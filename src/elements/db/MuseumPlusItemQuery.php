@@ -87,6 +87,8 @@ class MuseumPlusItemQuery extends ElementQuery
             'museumplus_items.collectionId',
             'museumplus_items.data',
             'museumplus_items.assetId',
+            'museumplus_items.inventoryNumber',
+            'museumplus_items.sensitive',
         ]);
 
         if ($this->collectionId) {
@@ -106,7 +108,7 @@ class MuseumPlusItemQuery extends ElementQuery
             $this->subQuery->andWhere(Db::parseParam('museumplus_items.sensitive', false));
         }
 
-        
+
 
         if($this->geographic){
             $subQuery = (new Query())
