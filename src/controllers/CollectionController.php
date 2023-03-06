@@ -179,6 +179,9 @@ class CollectionController extends Controller
         if(isset($params['tagId'])){
             $item = $item->tag($params['tagId']);
         }
+        if(isset($params['objectGroup'])){
+            $item = $item->objectGroup($params['objectGroup']);
+        }
         $item = $item->orderBy('RAND()')->one();
         if(!$item) {
             return $this->asJson([]);
