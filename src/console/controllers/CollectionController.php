@@ -164,7 +164,7 @@ class CollectionController extends Controller
                     echo 'Updating item (id: '.$o->id.')'.PHP_EOL;
                     $this->updateItemFromMuseumPlus($o->id);
                 } else {
-                    echo '.';
+                    //echo '.';
                 }
             }
         }
@@ -199,7 +199,6 @@ class CollectionController extends Controller
                     //sync
                     if(count($ids)){
                         $item->syncItemRelations($ids);
-                        echo '.';
                     }
                 }
             }
