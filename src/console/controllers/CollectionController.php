@@ -701,6 +701,7 @@ class CollectionController extends Controller
 
     public function actionUpdateItemsInventory()
     {
+        App::maxPowerCaptain();
         $items = MuseumPlusItem::find()->all();
         foreach($items as $item) {
             $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
@@ -716,6 +717,7 @@ class CollectionController extends Controller
 
     public function actionUpdateItemsSensitive()
     {
+        App::maxPowerCaptain();
         //251772
         $subQuery = (new Query())
             ->select(['itemId'])
