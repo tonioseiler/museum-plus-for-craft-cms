@@ -350,8 +350,8 @@ class CollectionController extends Controller
                 }
             }
         } catch (\Exception $e) {
-            echo $item->id . " could not be fully updated." . PHP_EOL;
-            echo $e->getMessage() . PHP_EOL;;
+        //     echo $item->id . " could not be fully updated." . PHP_EOL;
+            echo $e->getMessage() . PHP_EOL;
         }
 
         
@@ -543,6 +543,7 @@ class CollectionController extends Controller
             $item->collectionId = $collectionId;
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
+            $item->sensitive = false;
         } else {
             //update
             $item->data = json_encode($object);
