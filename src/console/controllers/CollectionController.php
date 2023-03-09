@@ -132,11 +132,12 @@ class CollectionController extends Controller
 
         if (!$item) {
             echo 'creating item (id: '.$this->collectionItemId.')'.PHP_EOL;
-            $this->updateItemFromMuseumPlus($this->collectionItemId);
         } else {
             echo 'updating item (id: '.$this->collectionItemId.')'.PHP_EOL;
-            $this->updateItemFromMuseumPlus($this->collectionItemId);
         }
+        $this->updateItemFromMuseumPlus($this->collectionItemId);
+        $this->updateItemInventory($item);
+        $this->updateItemSensitive($item);
     }
 
 
@@ -712,13 +713,18 @@ class CollectionController extends Controller
         App::maxPowerCaptain();
         $items = MuseumPlusItem::find()->all();
         foreach($items as $item) {
-            $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
-            if($inventoryNumber){
-                $item->inventoryNumber = $inventoryNumber;
-                if(Craft::$app->elements->saveElement($item)) {
-                    echo $item->id . " - " . $inventoryNumber;
-                    echo "\n";
-                }
+            $this->updateItemInventory($item);
+        }
+    }
+
+    private function updateItemInventory(MuseumPlusItem $item)
+    {
+        $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
+        if($inventoryNumber){
+            $item->inventoryNumber = $inventoryNumber;
+            if(Craft::$app->elements->saveElement($item)) {
+                echo $item->id . " - " . $inventoryNumber;
+                echo "\n";
             }
         }
     }
