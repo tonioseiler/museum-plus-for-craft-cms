@@ -171,8 +171,12 @@ class CollectionController extends Controller
             }
         }
 
-        $existingItems = MuseumPlusItem::find()->all();
-        foreach ($existingItems as $item) {
+        //delete items which do not exist anymore
+        $itemIds = MuseumPlusItem::find()->ids();
+        foreach($itemIds as $itemId) {
+            $item = MuseumPlusItem::find()
+                    ->id($itemId)
+                    ->one();
             if (!isset($objectIds[$item->collectionId])) {
                 $success = Craft::$app->elements->deleteElement($item);
                 echo 'Item deleted: '.$item->title.' ('.$item->id.')'.PHP_EOL;
@@ -191,8 +195,11 @@ class CollectionController extends Controller
         App::maxPowerCaptain();
         //create object to object relations
         echo 'Echo updating item to item relationships'.PHP_EOL;
-        $existingItems = MuseumPlusItem::find()->all();
-        foreach ($existingItems as $item) {
+        $itemIds = MuseumPlusItem::find()->ids();
+        foreach($itemIds as $itemId) {
+            $item = MuseumPlusItem::find()
+                    ->id($itemId)
+                    ->one();
             $this->updateItemToItemRelationShips($item);
         }
     }
@@ -359,8 +366,11 @@ class CollectionController extends Controller
 
     public function actionRemoveAttachments()
     {
-        $existingItems = MuseumPlusItem::find()->all();
-        foreach ($existingItems as $item) {
+        $itemIds = MuseumPlusItem::find()->ids();
+        foreach($itemIds as $itemId) {
+            $item = MuseumPlusItem::find()
+                    ->id($itemId)
+                    ->one();
             if($item->assetId) {
                 $asset = Asset::find()->id($item->assetId)->one();
                 if ($asset) {
@@ -390,11 +400,11 @@ class CollectionController extends Controller
 
     public function actionUpdateSearchIndex()
     {
-        $items = MuseumPlusItem::find()->all();
-        foreach ($items as $item) {
+        $itemIds = MuseumPlusItem::find()->ids();
+        foreach($itemIds as $itemId) {
             Craft::$app->getQueue()->push(new UpdateSearchIndex([
                 'elementType' => MuseumPlusItem::class,
-                'elementId' => $item->id,
+                'elementId' => $itemId,
             ]));
         }
 
@@ -689,9 +699,12 @@ class CollectionController extends Controller
     public function actionUpdateItemsInventory()
     {
         App::maxPowerCaptain();
-        $items = MuseumPlusItem::find()->all();
-        foreach($items as $key => $item) {
-            echo $key . " => ";
+        $itemIds = MuseumPlusItem::find()->ids();
+        foreach($itemIds as $itemId) {
+            $item = MuseumPlusItem::find()
+                    ->id($itemId)
+                    ->one();
+            echo $itemId . " => ";
             $this->updateItemInventory($item);
         }
     }
@@ -716,10 +729,13 @@ class CollectionController extends Controller
             ->select(['itemId'])
             ->from(['{{%museumplus_items_vocabulary}}'])
             ->where(['vocabularyId' => 251772]);
-        $items = MuseumPlusItem::find()
+        $itemIds = MuseumPlusItem::find()
             ->where(['in', 'museumplus_items.id', $subQuery])
-            ->all();
-        foreach($items as $item) {
+            ->ids();
+        foreach($itemIds as $itemId) {
+            $item = MuseumPlusItem::find()
+                    ->id($itemId)
+                    ->one();
             $this->updateItemSensitive($item);
         }
     }
@@ -728,10 +744,14 @@ class CollectionController extends Controller
     {
         App::maxPowerCaptain();
         
-        $items = MuseumPlusItem::find()
-            ->all();
-        foreach($items as $item) {
+        $itemIds = MuseumPlusItem::find()
+            ->ids();
+
+        foreach($itemIds as $itemId) {
             try {
+                $item = MuseumPlusItem::find()
+                    ->id($itemId)
+                    ->one();
                 $this->updateVocabularyRefs($item);
             } catch(\Exception $e) {
                 echo $e->getMessage();
