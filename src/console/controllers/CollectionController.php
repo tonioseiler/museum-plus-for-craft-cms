@@ -772,7 +772,6 @@ class CollectionController extends Controller
             $item->syncVocabularyRelations($syncData);
             echo 'v';
         }
-        echo PHP_EOL;
     }
 
 }
