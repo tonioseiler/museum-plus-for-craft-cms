@@ -177,6 +177,14 @@ class CollectionController extends Controller
             }
         }
 
+        $this->actionUpdateItemToItemRelationShips();
+        
+        return true;
+    }
+
+    public function actionUpdateItemToItemRelationShips()
+    {
+        App::maxPowerCaptain();
         //create object to object relations
         echo 'Echo updating item to item relationships'.PHP_EOL;
         $existingItems = MuseumPlusItem::find()->all();
@@ -203,7 +211,6 @@ class CollectionController extends Controller
                 }
             }
         }
-        return true;
     }
 
     private function updateItemFromMuseumPlus($collectionId)
