@@ -136,6 +136,7 @@ class CollectionController extends Controller
             echo 'updating item (id: '.$this->collectionItemId.')'.PHP_EOL;
         }
         $this->updateItemFromMuseumPlus($this->collectionItemId);
+        $this->updateItemToItemRelationShips($item);
         $this->updateItemInventory($item);
         $this->updateItemSensitive($item);
     }
@@ -192,26 +193,31 @@ class CollectionController extends Controller
         echo 'Echo updating item to item relationships'.PHP_EOL;
         $existingItems = MuseumPlusItem::find()->all();
         foreach ($existingItems as $item) {
-            $moduleRefs = $item->getDataAttribute('moduleReferences');
+            $this->updateItemToItemRelationShips($item);
+        }
+    }
 
-            $types = ['ObjObjectARef', 'ObjObjectBRef',];
+    private function updateItemToItemRelationShips(MuseumPlusItem $item)
+    {
+        $moduleRefs = $item->getDataAttribute('moduleReferences');
 
-            foreach($types as $type) {
-                if(isset($moduleRefs[$type])) {
-                    $ids = [];
-                    foreach ($moduleRefs[$type]['items'] as $i){
-                        $tmp = MuseumPlusItem::find()
-                            ->where(['collectionId' => $i['id']])
-                            ->one();
-                        if ($tmp) {
-                            $ids[] = $tmp->id;
-                        }
+        $types = ['ObjObjectARef', 'ObjObjectBRef',];
+
+        foreach($types as $type) {
+            if(isset($moduleRefs[$type])) {
+                $ids = [];
+                foreach ($moduleRefs[$type]['items'] as $i){
+                    $tmp = MuseumPlusItem::find()
+                        ->where(['collectionId' => $i['id']])
+                        ->one();
+                    if ($tmp) {
+                        $ids[] = $tmp->id;
                     }
-                    //sync
-                    if(count($ids)){
-                        $item->syncItemRelations($ids);
-                        echo '.';
-                    }
+                }
+                //sync
+                if(count($ids)){
+                    $item->syncItemRelations($ids);
+                    echo '.';
                 }
             }
         }
