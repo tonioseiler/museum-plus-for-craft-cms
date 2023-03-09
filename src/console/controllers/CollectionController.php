@@ -177,9 +177,9 @@ class CollectionController extends Controller
             }
         }
 
-        $this->actionUpdateItemToItemRelationShips();
         $this->actionUpdateItemsInventory();
         $this->actionUpdateItemsSensitive();
+        $this->actionUpdateItemToItemRelationShips();
         
         return true;
     }
@@ -735,11 +735,15 @@ class CollectionController extends Controller
             ->where(['in', 'museumplus_items.id', $subQuery])
             ->all();
         foreach($items as $item) {
-            $item->sensitive = true;
-            if(Craft::$app->elements->saveElement($item)) {
-                echo $item->id . " - " . $item->title;
-                echo "\n";
-            }
+            $this->updateItemSensitive($item);
+        }
+    }
+
+    private function updateItemSensitive(MuseumPlusItem $item) {
+        $item->sensitive = true;
+        if(Craft::$app->elements->saveElement($item)) {
+            echo $item->id . " - " . $item->title;
+            echo "\n";
         }
     }
 
