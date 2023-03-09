@@ -547,7 +547,15 @@ class MuseumPlusItem  extends Element
 
     public function getCreditLine() {
         $rec = $this->getRecord();
-        return $rec->getRepeatableGroupValues('ObjCreditlineGrp', 'CreditlineTxt');
+        $creditLineEntries = $this->getVocabularyEntries()->where(['type' => 'ObjCreditlineVgr'])->all();
+        
+        $creditLines = [];
+        foreach($creditLineEntries as $cle) {
+            $creditLines[] = $cle->getDataAttribute('content');
+        }
+        return implode(PHP_EOL, $creditLines);
+        //This is a strange data attribute used earlier
+        //return $rec->getRepeatableGroupValues('ObjCreditlineGrp', 'CreditlineTxt');
     }
 
     public function getDetailText() {
