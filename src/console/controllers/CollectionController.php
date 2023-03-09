@@ -178,6 +178,8 @@ class CollectionController extends Controller
         }
 
         $this->actionUpdateItemToItemRelationShips();
+        $this->actionUpdateItemsInventory();
+        $this->actionUpdateItemsSensitive();
         
         return true;
     }
@@ -361,9 +363,6 @@ class CollectionController extends Controller
         //     echo $item->id . " could not be fully updated." . PHP_EOL;
             echo $e->getMessage() . PHP_EOL;
         }
-
-        
-
 
     }
 
