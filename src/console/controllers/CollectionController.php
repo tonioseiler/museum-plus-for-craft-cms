@@ -731,7 +731,11 @@ class CollectionController extends Controller
         $items = MuseumPlusItem::find()
             ->all();
         foreach($items as $item) {
-            $this->updateVocabularyRefs($item);
+            try {
+                $this->updateVocabularyRefs($item);
+            } catch(\Exception $e) {
+                echo $e->getMessage();
+            }
         }
     }
 
