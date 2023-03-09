@@ -284,35 +284,7 @@ class CollectionController extends Controller
                 echo 'o';
             }
 
-            //add vocabulary refs
-            $vocabularyRefs = $item->getDataAttribute('vocabularyReferences');
-            $syncData = [];
-            foreach($vocabularyRefs as $vocabularyRef) {
-                $ids = [];
-                $type = $vocabularyRef['instanceName'];
-                foreach ($vocabularyRef['items'] as $vc){
-                    $data = $this->museumPlus->getVocabularyNode($type,$vc['id']);
-                    foreach ($data as $d) {
-                        $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
-                        if ($vocabularyEntry) {
-                            $ids[] = $vocabularyEntry->id;
-                        }
-                    }
-                }
-                if (isset($syncData[$type])) {
-                    foreach($ids as $id) {
-                        $syncData[$type][] = $id;
-                    }
-                } else {
-                    $syncData[$type] = $ids;
-                }
-            }
-
-            if(count($syncData)){
-                $item->syncVocabularyRelations($syncData);
-                echo 'v';
-            }
-            echo PHP_EOL;
+            $this->updateVocabularyRefs($item);
 
             //add attachment
             if (!$this->ignoreAttachments) {
@@ -746,12 +718,55 @@ class CollectionController extends Controller
         }
     }
 
+    public function actionUpdateVocabularyRefs()
+    {
+        App::maxPowerCaptain();
+        
+        $items = MuseumPlusItem::find()
+            ->all();
+        foreach($items as $item) {
+            $this->updateVocabularyRefs($item);
+        }
+    }
+
     private function updateItemSensitive(MuseumPlusItem $item) {
         $item->sensitive = true;
         if(Craft::$app->elements->saveElement($item)) {
             echo $item->id . " - " . $item->title;
             echo "\n";
         }
+    }
+
+    private function updateVocabularyRefs(MuseumPlusItem $item) {
+        //add vocabulary refs
+        $vocabularyRefs = $item->getDataAttribute('vocabularyReferences');
+        $syncData = [];
+        foreach($vocabularyRefs as $vocabularyRef) {
+            $ids = [];
+            $type = $vocabularyRef['instanceName'];
+            foreach ($vocabularyRef['items'] as $vc){
+                $data = $this->museumPlus->getVocabularyNode($type,$vc['id']);
+                foreach ($data as $d) {
+                    $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
+                    if ($vocabularyEntry) {
+                        $ids[] = $vocabularyEntry->id;
+                    }
+                }
+            }
+            if (isset($syncData[$type])) {
+                foreach($ids as $id) {
+                    $syncData[$type][] = $id;
+                }
+            } else {
+                $syncData[$type] = $ids;
+            }
+        }
+
+        if(count($syncData)){
+            $item->syncVocabularyRelations($syncData);
+            echo 'v';
+        }
+        echo PHP_EOL;
     }
 
 }
