@@ -207,6 +207,7 @@ class CollectionController extends Controller
                     //sync
                     if(count($ids)){
                         $item->syncItemRelations($ids);
+                        echo '.';
                     }
                 }
             }
