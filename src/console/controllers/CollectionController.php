@@ -712,7 +712,8 @@ class CollectionController extends Controller
     {
         App::maxPowerCaptain();
         $items = MuseumPlusItem::find()->all();
-        foreach($items as $item) {
+        foreach($items as $key => $item) {
+            echo $key . " => ";
             $this->updateItemInventory($item);
         }
     }
