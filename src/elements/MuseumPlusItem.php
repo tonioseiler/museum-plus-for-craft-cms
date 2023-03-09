@@ -560,7 +560,8 @@ class MuseumPlusItem  extends Element
 
     public function getDetailText() {
         $rec = $this->getRecord();
-        $tmp = $rec->getRepeatableGroupValues('ObjLabelRaisonneTextGrp', 'TextClb');
+        $tmp = $rec->getRepeatableGroupValues('ObjLabelRaisonneTextGrp', 'TextClb', ['Objekttext', 'Jahresbericht RBG']);
+        //dd($tmp);
         return implode(PHP_EOL, $tmp);
     }
 

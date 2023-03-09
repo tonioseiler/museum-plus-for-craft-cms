@@ -648,13 +648,22 @@ class MuseumPlusService extends Component
                     $this->addFieldValuesToObject($groupItemObject, $grItem, 'dataField');
                     $this->addFieldValuesToObject($groupItemObject, $grItem, 'virtualField');
 
-                    //TODO: add vocabulary refs ???
+                    //TODO: add type ???
+                    $vocabularyReferences = [];
+                    if (isset($grItem['vocabularyReference'])) {
+                        $vocabularyReferences = $this->extractArrayValues($grItem, 'vocabularyReference');
+                    }
+                    
+                    if (!empty($vocabularyReferences)) {
+                        foreach ($vocabularyReferences as $field) {
+                            $groupItemObject->{$field['@attributes']['name']} = $field['vocabularyReferenceItem']['formattedValue'];
+                        }
+                    }
 
                     $gr->items[] = $groupItemObject;
-
+                    
                 }
                 $obj->repeatableGroups[] = $gr;
-
 
             }
         }
@@ -697,7 +706,7 @@ class MuseumPlusService extends Component
         return $ret;
     }*/
 
-    private function addObjectRelations(&$obj, $arr) {
+    /*private function addObjectRelations(&$obj, $arr) {
 
         // related objects
         if (isset($arr['composite'])) {
@@ -735,7 +744,7 @@ class MuseumPlusService extends Component
             $obj->relatedObjects = $relatedObjects;
         }
 
-    }
+    }*/
 
     private function extractArrayValues(array $array, $needle)
     {
