@@ -56,7 +56,10 @@ class SearchController extends Controller
     public function actionAutocomplete($searchString = null)
     {
         $vocabularies = [];
-        $query = MuseumPlusForCraftCms::$plugin->vocabulary->search($searchString);
+        $query = MuseumPlusForCraftCms::$plugin->vocabulary->search($searchString)
+            ->orderBy('score')
+            ->limit(10)
+            ->all();
         foreach ($query as $vocabulary) {
             $vocabularies[] = $vocabulary->title;
         }
