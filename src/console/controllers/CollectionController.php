@@ -543,9 +543,7 @@ class CollectionController extends Controller
         } else {
             //update
             $item->data = json_encode($object);
-            if (empty($item->title)) {
-                $item->title = $object->ObjObjectTitleVrt;
-            }
+            $item->title = $object->ObjObjectTitleVrt;
         }
         $success = Craft::$app->elements->saveElement($item);
 
@@ -753,6 +751,29 @@ class CollectionController extends Controller
                     ->id($itemId)
                     ->one();
                 $this->updateVocabularyRefs($item);
+            } catch(\Exception $e) {
+                echo $e->getMessage();
+            }
+        }
+    }
+
+    public function actionUpdateItemTitles()
+    {
+        App::maxPowerCaptain();
+        
+        $itemIds = MuseumPlusItem::find()
+            ->ids();
+
+        foreach($itemIds as $itemId) {
+            try {
+                $item = MuseumPlusItem::find()
+                    ->id($itemId)
+                    ->one();
+                $item->title = $object->ObjObjectTitleVrt;
+                if(Craft::$app->elements->saveElement($item)) {
+                    echo $item->id . " - " . $item->title;
+                    echo "\n";
+                }
             } catch(\Exception $e) {
                 echo $e->getMessage();
             }
