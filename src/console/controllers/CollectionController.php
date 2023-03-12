@@ -769,7 +769,7 @@ class CollectionController extends Controller
                 $item = MuseumPlusItem::find()
                     ->id($itemId)
                     ->one();
-                $item->title = $object->ObjObjectTitleVrt;
+                $item->title = $item->getDataAttribute('ObjObjectTitleVrt');
                 if(Craft::$app->elements->saveElement($item)) {
                     echo $item->id . " - " . $item->title;
                     echo "\n";
