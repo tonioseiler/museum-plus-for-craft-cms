@@ -182,9 +182,10 @@ class MuseumPlusItemRecord extends DataRecord
                             $ret[] = $i[$attribute];
                         }
                     } else {
-                        //dd($filterTypes);
-                        if (in_array($i['TypeVoc'], $filterTypes)) {
-                            $ret[] = $i[$attribute];
+                        if(isset($i['TypeVoc'])){
+                            if (in_array($i['TypeVoc'], $filterTypes)) {
+                                $ret[] = $i[$attribute];
+                            }
                         }
                     }
                     
