@@ -57,9 +57,9 @@ class SearchController extends Controller
     {
         $vocabularies = [];
         $query = MuseumPlusForCraftCms::$plugin->vocabulary->search($searchString);
-        /*foreach ($query as $vocabulary) {
+        foreach ($query as $vocabulary) {
             $vocabularies[] = $vocabulary->title;
-        }*/
+        }
         return $this->asJson($vocabularies);
     }
 }
