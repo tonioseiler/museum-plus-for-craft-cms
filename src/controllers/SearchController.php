@@ -42,7 +42,7 @@ class SearchController extends Controller
                 'title' => $item->title,
                 'url' => $item->url,
                 'image' => $image ? $image->getUrl("transformXS") : null,
-                'number' => $item->getDataAttribute('ObjObjectNumberTxt'),
+                'number' => $item->inventoryNumber,
                 'people' => implode(', ', $people),
                 'objectIds' => $objectIds,
                 'dates' => implode(', ', $dates),
@@ -57,9 +57,9 @@ class SearchController extends Controller
     {
         $vocabularies = [];
         $query = MuseumPlusForCraftCms::$plugin->vocabulary->search($searchString);
-        foreach ($query as $vocabulary) {
+        /*foreach ($query as $vocabulary) {
             $vocabularies[] = $vocabulary->title;
-        }
+        }*/
         return $this->asJson($vocabularies);
     }
 }
