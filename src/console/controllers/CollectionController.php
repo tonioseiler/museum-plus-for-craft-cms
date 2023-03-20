@@ -187,6 +187,9 @@ class CollectionController extends Controller
         $this->actionUpdateItemsSensitive();
         $this->actionUpdateItemToItemRelationShips();
         
+
+        //TODO: optimize table searchinde
+
         return true;
     }
 
