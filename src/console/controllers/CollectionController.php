@@ -186,6 +186,7 @@ class CollectionController extends Controller
         $this->actionUpdateItemsInventory();
         $this->actionUpdateItemsSensitive();
         $this->actionUpdateItemToItemRelationShips();
+        $this->optimizeSearchIndex();
         
         return true;
     }
@@ -817,6 +818,15 @@ class CollectionController extends Controller
             $item->syncVocabularyRelations($syncData);
             echo 'v';
         }
+    }
+
+    public function actionOptimizeSearchIndex()
+    {
+        $this->optimizeSearchIndex();
+    }
+
+    private function optimizeSearchIndex() {
+        Craft::$app->db->createCommand("OPTIMIZE TABLE searchindex")->execute();
     }
 
 }
