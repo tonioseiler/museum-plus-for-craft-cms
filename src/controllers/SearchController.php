@@ -2,6 +2,7 @@
 
 namespace furbo\museumplusforcraftcms\controllers;
 
+use Craft;
 use \craft\web\Controller;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
@@ -10,8 +11,9 @@ class SearchController extends Controller
 {
     protected array|int|bool $allowAnonymous = ['search-items', 'autocomplete'];
 
-    public function actionSearchItems($searchString = null)
+    public function actionSearchItems()
     {
+        $searchString = Craft::$app->getRequest()->getQueryParam('searchString');
         $searchString = str_replace(array(".", "-"), "* *", $searchString);
         $query = MuseumPlusItem::find()
             ->search($searchString)
@@ -53,8 +55,9 @@ class SearchController extends Controller
         return $this->asJson($items);
     }
 
-    public function actionAutocomplete($searchString = null)
+    public function actionAutocomplete()
     {
+        $searchString = Craft::$app->getRequest()->getQueryParam('searchString');
         $vocabularies = [];
         $query = MuseumPlusForCraftCms::$plugin->vocabulary->search($searchString);
         foreach ($query as $vocabulary) {
