@@ -44,7 +44,7 @@ class SearchController extends Controller
                 'title' => $item->title,
                 'url' => $item->url,
                 'image' => $image ? $image->getUrl("transformXS") : null,
-                'number' => $item->getDataAttribute('ObjObjectNumberTxt'),
+                'number' => $item->inventoryNumber,
                 'people' => implode(', ', $people),
                 'objectIds' => $objectIds,
                 'dates' => implode(', ', $dates),
