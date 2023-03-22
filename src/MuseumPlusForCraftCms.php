@@ -246,7 +246,7 @@ class MuseumPlusForCraftCms extends Plugin
 
                         $data .= $element->getDataAttribute('ObjObjectNumberTxt') . " ";
 
-                        $data .= $element->getDataAttribute('ObjObjectVrt') . " ";
+                        $data .= $element->getDataAttribute('ObjScopeContentClb') . " ";
 
                         foreach($element->getGeographicReferences()->all() as $geo){
                             $data .= $geo->title . " ";
