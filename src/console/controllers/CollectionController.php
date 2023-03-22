@@ -188,6 +188,9 @@ class CollectionController extends Controller
         $this->actionUpdateItemToItemRelationShips();
         $this->optimizeSearchIndex();
         
+
+        //TODO: optimize table searchinde
+
         return true;
     }
 
