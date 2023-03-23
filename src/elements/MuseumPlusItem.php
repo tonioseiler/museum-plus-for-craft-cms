@@ -242,6 +242,10 @@ class MuseumPlusItem  extends Element
      */
     public function beforeSave(bool $isNew): bool
     {
+
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $this->inventoryNumber)));
+        $this->slug = $slug;
+
         return true;
     }
 
