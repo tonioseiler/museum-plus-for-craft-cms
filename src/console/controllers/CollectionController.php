@@ -714,6 +714,9 @@ class CollectionController extends Controller
     private function updateItemInventory(MuseumPlusItem $item)
     {
         $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
+        if (empty($inventoryNumber))
+            $inventoryNumber = $item->getDataAttribute('ObjObjectNumberVrt');
+        
         if($inventoryNumber){
             $item->inventoryNumber = $inventoryNumber;
             if(Craft::$app->elements->saveElement($item)) {
