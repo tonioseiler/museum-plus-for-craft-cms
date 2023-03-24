@@ -714,9 +714,9 @@ class CollectionController extends Controller
 
     private function updateItemInventory(MuseumPlusItem $item)
     {
-        $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
+        $inventoryNumber = $item->getDataAttribute('ObjObjectNumberVrt');
         if (empty($inventoryNumber))
-            $inventoryNumber = $item->getDataAttribute('ObjObjectNumberVrt');
+            $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
         
         if($inventoryNumber){
             $item->inventoryNumber = $inventoryNumber;
