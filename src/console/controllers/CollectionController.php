@@ -187,9 +187,6 @@ class CollectionController extends Controller
         $this->actionUpdateItemsSensitive();
         $this->actionUpdateItemToItemRelationShips();
         $this->optimizeSearchIndex();
-        
-
-        //TODO: optimize table searchinde
 
         return true;
     }
@@ -722,6 +719,8 @@ class CollectionController extends Controller
             if(Craft::$app->elements->saveElement($item)) {
                 echo $item->id . " - " . $inventoryNumber;
                 echo "\n";
+            } else {
+                echo 'Could not save item' . PHP_EOL;
             }
         }
     }
