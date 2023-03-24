@@ -386,6 +386,10 @@ class MuseumPlusItem  extends Element
                     return Cp::elementPreviewHtml($assets, Cp::ELEMENT_SIZE_SMALL, false, true, true, false);
                 }
                 return '-';
+            case 'collectionId':
+                return $this->collectionId;
+            case 'inventoryNumber':
+                return $this->inventoryNumber;
         }
         return parent::tableAttributeHtml($attribute);
     }

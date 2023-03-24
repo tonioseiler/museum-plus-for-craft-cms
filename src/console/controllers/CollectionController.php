@@ -704,7 +704,11 @@ class CollectionController extends Controller
                     ->id($itemId)
                     ->one();
             echo $itemId . " => ";
-            $this->updateItemInventory($item);
+            try {
+                $this->updateItemInventory($item);
+            } catch (\Exception $e) {
+                echo $e->getMessage();
+            }
         }
     }
 
@@ -716,7 +720,7 @@ class CollectionController extends Controller
         
         if($inventoryNumber){
             $item->inventoryNumber = $inventoryNumber;
-            if(Craft::$app->elements->saveElement($item)) {
+            if(Craft::$app->elements->saveElement($item, false, false)) {
                 echo $item->id . " - " . $inventoryNumber;
                 echo "\n";
             } else {
