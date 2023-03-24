@@ -726,6 +726,8 @@ class CollectionController extends Controller
             } else {
                 echo 'Could not save item' . PHP_EOL;
             }
+        } else {
+            echo $item->id . PHP_EOL;
         }
     }
 
