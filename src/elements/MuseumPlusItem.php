@@ -411,7 +411,8 @@ class MuseumPlusItem  extends Element
     {
         return [
             'title' => \Craft::t('app', 'Title'),
-            'collectionId' => 'MuseumPlus Id'
+            'collectionId' => 'MuseumPlus Id',
+            'inventoryNumber' => 'Inventory Number'
         ];
     }
 
