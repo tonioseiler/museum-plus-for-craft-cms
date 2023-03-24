@@ -722,13 +722,13 @@ class CollectionController extends Controller
             $item->inventoryNumber = $inventoryNumber;
             if(Craft::$app->elements->saveElement($item, false, false)) {
                 echo $item->id . " - " . $inventoryNumber;
-                echo "\n";
             } else {
-                echo 'Could not save item' . PHP_EOL;
+                echo 'Could not save item';
             }
         } else {
-            echo $item->id . PHP_EOL;
+            echo $item->id;
         }
+        echo "\n";
     }
 
     public function actionUpdateItemsSensitive()
