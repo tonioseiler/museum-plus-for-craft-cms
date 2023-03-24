@@ -564,8 +564,6 @@ class MuseumPlusItem  extends Element
             $creditLines[] = $cle->getDataAttribute('content');
         }
         return implode(PHP_EOL, $creditLines);
-        //This is a strange data attribute used earlier
-        //return $rec->getRepeatableGroupValues('ObjCreditlineGrp', 'CreditlineTxt');
     }
 
     public function getDetailText() {

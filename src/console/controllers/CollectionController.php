@@ -660,7 +660,7 @@ class CollectionController extends Controller
         $vocabularyEntry->parentId = $data->parentId;
         $vocabularyEntry->language = $data->isoLanguageCode;
         $vocabularyEntry->data = json_encode($data);
-        $success = Craft::$app->elements->saveElement($vocabularyEntry);
+        $success = Craft::$app->elements->saveElement($vocabularyEntry, false);
         return $vocabularyEntry;
     }
 
@@ -812,7 +812,8 @@ class CollectionController extends Controller
                 foreach ($data as $d) {
                     $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
                     if ($vocabularyEntry) {
-                        $ids[] = $vocabularyEntry->id;
+                        if (!empty($vocabularyEntry->id))
+                            $ids[] = $vocabularyEntry->id;
                     }
                 }
             }
