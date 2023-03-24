@@ -393,6 +393,7 @@ class MuseumPlusItem  extends Element
     protected static function defineTableAttributes(): array
     {
         return [
+            'inventoryNumber' => 'Inventory Number',
             'collectionId' => 'MuseumPlus Id',
             'assetId' => 'Main Image',
             'multimedia' => 'Media',
