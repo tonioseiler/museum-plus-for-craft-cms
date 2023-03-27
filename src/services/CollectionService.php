@@ -76,7 +76,7 @@ class CollectionService extends Component
     public function searchItems($params, $limit = 10, $offset = 0) {
         $criteria = [];
         $items = MuseumPlusItem::find();
-        $items->orderBy(['inventoryNumber' => SORT_ASC]);
+        $items->orderBy(['sort' => SORT_ASC]);
         if(isset($params['search'])) {
             //escape special characters
             $params['search'] = str_replace(array(".", "-"), "* *", $params['search']);
