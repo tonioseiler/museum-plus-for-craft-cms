@@ -53,6 +53,8 @@ class MuseumPlusItem  extends Element
 
     public $inventoryNumber;
 
+    public $sort;
+
     public $sensitive;
 
     private $record = null;
