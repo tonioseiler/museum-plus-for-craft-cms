@@ -661,7 +661,7 @@ class CollectionController extends Controller
         $vocabularyEntry->parentId = $data->parentId;
         $vocabularyEntry->language = $data->isoLanguageCode;
         $vocabularyEntry->data = json_encode($data);
-        $success = Craft::$app->elements->saveElement($vocabularyEntry);
+        $success = Craft::$app->elements->saveElement($vocabularyEntry, false);
         return $vocabularyEntry;
     }
 
@@ -702,22 +702,34 @@ class CollectionController extends Controller
         $itemIds = MuseumPlusItem::find()->ids();
         foreach($itemIds as $itemId) {
             $item = MuseumPlusItem::find()
-                ->id($itemId)
-                ->one();
-            $this->updateItemInventory($item);
+                    ->id($itemId)
+                    ->one();
+            echo $itemId . " => ";
+            try {
+                $this->updateItemInventory($item);
+            } catch (\Exception $e) {
+                echo $e->getMessage();
+            }
         }
     }
 
     private function updateItemInventory(MuseumPlusItem $item)
     {
-        $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
+        $inventoryNumber = $item->getDataAttribute('ObjObjectNumberVrt');
+        if (empty($inventoryNumber))
+            $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
+        
         if($inventoryNumber){
             $item->inventoryNumber = $inventoryNumber;
-            if(Craft::$app->elements->saveElement($item)) {
+            if(Craft::$app->elements->saveElement($item, false, false)) {
                 echo $item->id . " - " . $inventoryNumber;
-                echo "\n";
+            } else {
+                echo 'Could not save item';
             }
+        } else {
+            echo $item->id;
         }
+        echo "\n";
     }
 
     public function actionUpdateItemsSort()
@@ -830,7 +842,8 @@ class CollectionController extends Controller
                 foreach ($data as $d) {
                     $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
                     if ($vocabularyEntry) {
-                        $ids[] = $vocabularyEntry->id;
+                        if (!empty($vocabularyEntry->id))
+                            $ids[] = $vocabularyEntry->id;
                     }
                 }
             }

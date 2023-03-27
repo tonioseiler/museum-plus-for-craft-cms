@@ -244,6 +244,10 @@ class MuseumPlusItem  extends Element
      */
     public function beforeSave(bool $isNew): bool
     {
+
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $this->inventoryNumber)));
+        $this->slug = $slug;
+
         return true;
     }
 
@@ -384,6 +388,10 @@ class MuseumPlusItem  extends Element
                     return Cp::elementPreviewHtml($assets, Cp::ELEMENT_SIZE_SMALL, false, true, true, false);
                 }
                 return '-';
+            case 'collectionId':
+                return $this->collectionId;
+            case 'inventoryNumber':
+                return $this->inventoryNumber;
         }
         return parent::tableAttributeHtml($attribute);
     }
@@ -391,6 +399,7 @@ class MuseumPlusItem  extends Element
     protected static function defineTableAttributes(): array
     {
         return [
+            'inventoryNumber' => 'Inventory Number',
             'collectionId' => 'MuseumPlus Id',
             'assetId' => 'Main Image',
             'multimedia' => 'Media',
@@ -408,7 +417,8 @@ class MuseumPlusItem  extends Element
     {
         return [
             'title' => \Craft::t('app', 'Title'),
-            'collectionId' => 'MuseumPlus Id'
+            'collectionId' => 'MuseumPlus Id',
+            'inventoryNumber' => 'Inventory Number'
         ];
     }
 
@@ -556,15 +566,16 @@ class MuseumPlusItem  extends Element
             $creditLines[] = $cle->getDataAttribute('content');
         }
         return implode(PHP_EOL, $creditLines);
-        //This is a strange data attribute used earlier
-        //return $rec->getRepeatableGroupValues('ObjCreditlineGrp', 'CreditlineTxt');
     }
 
     public function getDetailText() {
         $rec = $this->getRecord();
         $tmp = $rec->getRepeatableGroupValues('ObjLabelRaisonneTextGrp', 'TextClb', ['Objekttext', 'Jahresbericht RBG']);
-        //dd($tmp);
-        return implode(PHP_EOL, $tmp);
+        $tmp = implode(PHP_EOL, $tmp);
+        
+        $tmp .= $rec->getDataAttribute('ObjScopeContentClb');
+        
+        return $tmp;
     }
 
     public function getDataAttributes() {

@@ -79,12 +79,15 @@ class CollectionController extends Controller
 
     public function actionSync()
     {
+
         $this->requirePostRequest();
         $request = Craft::$app->getRequest();
         $itemId = $request->getBodyParam('itemId');
         $item = MuseumPlusForCraftCms::$plugin->collection->getItemById($itemId);
+
         MuseumPlusForCraftCms::$plugin->getInstance()->controllerNamespace = 'furbo\museumplusforcraftcms\console\controllers';
         $command = MuseumPlusForCraftCms::$plugin->getInstance()->runAction('collection/update-item', ['collectionItemId' => $item->collectionId]);
+        
         Craft::$app->getSession()->setNotice(Craft::t('museum-plus-for-craft-cms', 'Item synchronized.'));
         return $this->redirectToPostedUrl($item);
     }
@@ -105,12 +108,9 @@ class CollectionController extends Controller
         $fieldsLocation = $request->getParam('fieldsLocation', 'fields');
         $item->setFieldValuesFromRequest($fieldsLocation);
 
-        //dd($request->getBodyParams());
-
         $item->setScenario(\craft\base\Element::SCENARIO_DEFAULT);
 
         // Save it
-        // TODO: why does validation always fails
         if (!Craft::$app->getElements()->saveElement($item, true)) {
             if ($request->getAcceptsJson()) {
                 return $this->asJson([
