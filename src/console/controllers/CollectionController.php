@@ -753,6 +753,8 @@ class CollectionController extends Controller
                 if (Craft::$app->elements->saveElement($item)) {
                     echo $item->id . " - " . $sort;
                     echo "\n";
+                } else {
+                    echo 'Could not save item';
                 }
             }
         } catch (\Exception $e) {
