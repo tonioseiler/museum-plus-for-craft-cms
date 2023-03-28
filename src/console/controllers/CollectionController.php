@@ -237,6 +237,7 @@ class CollectionController extends Controller
 
         try {
             $o = $this->museumPlus->getObjectDetail($collectionId);
+            
             $item = $this->createOrUpdateItem($o);
 
             $moduleRefs = $item->getDataAttribute('moduleReferences');
@@ -546,7 +547,7 @@ class CollectionController extends Controller
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
         }
-        $success = Craft::$app->elements->saveElement($item);
+        $success = Craft::$app->elements->saveElement($item, false);
 
         //insert object relations if they do not exist
         $itemRecord = $item->getRecord();
