@@ -174,21 +174,23 @@ class MuseumPlusItemRecord extends DataRecord
     public function getRepeatableGroupValues($groupName, $attribute, $filterTypes = []) {
         $data = $this->getDataAttributes();
         $ret = [];
-        foreach($data['repeatableGroups'] as $group) {
-            if ($group['name'] == $groupName) {
-                foreach($group['items'] as $i) {
-                    if (empty($filterTypes)) {
-                        if (isset($i[$attribute])) {
-                            $ret[] = $i[$attribute];
-                        }
-                    } else {
-                        if(isset($i['TypeVoc'])){
-                            if (in_array($i['TypeVoc'], $filterTypes)) {
+        if (isset($data['repeatableGroups'])) {
+            foreach($data['repeatableGroups'] as $group) {
+                if ($group['name'] == $groupName) {
+                    foreach($group['items'] as $i) {
+                        if (empty($filterTypes)) {
+                            if (isset($i[$attribute])) {
                                 $ret[] = $i[$attribute];
                             }
+                        } else {
+                            if(isset($i['TypeVoc'])){
+                                if (in_array($i['TypeVoc'], $filterTypes)) {
+                                    $ret[] = $i[$attribute];
+                                }
+                            }
                         }
+                        
                     }
-                    
                 }
             }
         }
