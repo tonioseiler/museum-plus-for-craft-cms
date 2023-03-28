@@ -1,12 +1,12 @@
 <?php
 /**
-* MuseumPlus for CraftCMS plugin for Craft CMS 3.x
-*
-* Allows to import MuseumsPlus Collection data to Craft CMS and publish data. Additioanl Web Specific Data can be added to the imported data.
-*
-* @link      https://furbo.ch
-* @copyright Copyright (c) 2022 Furbo GmbH
-*/
+ * MuseumPlus for CraftCMS plugin for Craft CMS 3.x
+ *
+ * Allows to import MuseumsPlus Collection data to Craft CMS and publish data. Additioanl Web Specific Data can be added to the imported data.
+ *
+ * @link      https://furbo.ch
+ * @copyright Copyright (c) 2022 Furbo GmbH
+ */
 
 namespace furbo\museumplusforcraftcms\console\controllers;
 
@@ -33,50 +33,50 @@ use yii\console\Controller;
 use yii\helpers\Console;
 
 /**
-* Collection Command
-*
-* The first line of this class docblock is displayed as the description
-* of the Console Command in ./craft help
-*
-* Craft can be invoked via commandline console by using the `./craft` command
-* from the project root.
-*
-* Console Commands are just controllers that are invoked to handle console
-* actions. The segment routing is plugin-name/controller-name/action-name
-*
-* The actionIndex() method is what is executed if no sub-commands are supplied, e.g.:
-*
-* ./craft museum-plus-for-craft-cms/collection
-*
-* Actions must be in 'kebab-case' so actionDoSomething() maps to 'do-something',
-* and would be invoked via:
-*
-* ./craft museum-plus-for-craft-cms/collection/do-something
-*
-* @author    Furbo GmbH
-* @package   MuseumPlusForCraftCms
-* @since     1.0.0
-*/
+ * Collection Command
+ *
+ * The first line of this class docblock is displayed as the description
+ * of the Console Command in ./craft help
+ *
+ * Craft can be invoked via commandline console by using the `./craft` command
+ * from the project root.
+ *
+ * Console Commands are just controllers that are invoked to handle console
+ * actions. The segment routing is plugin-name/controller-name/action-name
+ *
+ * The actionIndex() method is what is executed if no sub-commands are supplied, e.g.:
+ *
+ * ./craft museum-plus-for-craft-cms/collection
+ *
+ * Actions must be in 'kebab-case' so actionDoSomething() maps to 'do-something',
+ * and would be invoked via:
+ *
+ * ./craft museum-plus-for-craft-cms/collection/do-something
+ *
+ * @author    Furbo GmbH
+ * @package   MuseumPlusForCraftCms
+ * @since     1.0.0
+ */
 class CollectionController extends Controller
 {
     /**
-    * @var bool|null if true - script will download all data.
-    */
+     * @var bool|null if true - script will download all data.
+     */
     public $forceAll;
 
     /**
-    * @var int|null if set, script will downoad only this item.
-    */
+     * @var int|null if set, script will downoad only this item.
+     */
     public $collectionItemId;
 
     /**
-    * @var bool|null if true - script will not download attachments.
-    */
+     * @var bool|null if true - script will not download attachments.
+     */
     public $ignoreAttachments;
 
     /**
-    * @var bool|null if true - script will not download multimedia.
-    */
+     * @var bool|null if true - script will not download multimedia.
+     */
     public $ignoreMultimedia;
 
     /**
@@ -127,8 +127,8 @@ class CollectionController extends Controller
         }
 
         $item = MuseumPlusItem::find()
-                ->where(['collectionId' => $this->collectionItemId])
-                ->one();
+            ->where(['collectionId' => $this->collectionItemId])
+            ->one();
 
         if (!$item) {
             echo 'creating item (id: '.$this->collectionItemId.')'.PHP_EOL;
@@ -138,6 +138,7 @@ class CollectionController extends Controller
         $this->updateItemFromMuseumPlus($this->collectionItemId);
         $this->updateItemToItemRelationShips($item);
         $this->updateItemInventory($item);
+        $this->updateItemSort($item);
         $this->updateItemSensitive($item);
     }
 
@@ -156,8 +157,8 @@ class CollectionController extends Controller
                 //check if item exists and if last mod is before last mod in mplus
                 $objectLastModified = new \DateTime($o->__lastModified);
                 $item = MuseumPlusItem::find()
-                        ->where(['collectionId' => $o->id])
-                        ->one();
+                    ->where(['collectionId' => $o->id])
+                    ->one();
 
                 if (!$item) {
                     echo 'Creating item (id: '.$o->id.')'.PHP_EOL;
@@ -175,8 +176,8 @@ class CollectionController extends Controller
         $itemIds = MuseumPlusItem::find()->ids();
         foreach($itemIds as $itemId) {
             $item = MuseumPlusItem::find()
-                    ->id($itemId)
-                    ->one();
+                ->id($itemId)
+                ->one();
             if (!isset($objectIds[$item->collectionId])) {
                 $success = Craft::$app->elements->deleteElement($item);
                 echo 'Item deleted: '.$item->title.' ('.$item->id.')'.PHP_EOL;
@@ -199,8 +200,8 @@ class CollectionController extends Controller
         $itemIds = MuseumPlusItem::find()->ids();
         foreach($itemIds as $itemId) {
             $item = MuseumPlusItem::find()
-                    ->id($itemId)
-                    ->one();
+                ->id($itemId)
+                ->one();
             $this->updateItemToItemRelationShips($item);
         }
     }
@@ -348,7 +349,7 @@ class CollectionController extends Controller
                 }
             }
         } catch (\Exception $e) {
-        //     echo $item->id . " could not be fully updated." . PHP_EOL;
+            //     echo $item->id . " could not be fully updated." . PHP_EOL;
             echo $e->getMessage() . PHP_EOL;
         }
 
@@ -371,8 +372,8 @@ class CollectionController extends Controller
         $itemIds = MuseumPlusItem::find()->ids();
         foreach($itemIds as $itemId) {
             $item = MuseumPlusItem::find()
-                    ->id($itemId)
-                    ->one();
+                ->id($itemId)
+                ->one();
             if($item->assetId) {
                 $asset = Asset::find()->id($item->assetId)->one();
                 if ($asset) {
@@ -558,7 +559,7 @@ class CollectionController extends Controller
             foreach($moduleReferences['ObjObjectGroupsRef']['items'] as $og) {
                 $objectGroup = ObjectGroupRecord::find()->where(['collectionId' => $og['id']])->one();
                 if ($objectGroup)
-                $itemRecord->link('objectGroups', $objectGroup);
+                    $itemRecord->link('objectGroups', $objectGroup);
             }
         }
         echo 'i';
@@ -569,8 +570,8 @@ class CollectionController extends Controller
         $collectionId = $data->id;
 
         $objectGroup = ObjectGroupRecord::find()
-        ->where(['collectionId' => $collectionId])
-        ->one();
+            ->where(['collectionId' => $collectionId])
+            ->one();
 
         if (empty($objectGroup)) {
             //create new
@@ -732,6 +733,37 @@ class CollectionController extends Controller
         echo "\n";
     }
 
+    public function actionUpdateItemsSort()
+    {
+        App::maxPowerCaptain();
+        $itemIds = MuseumPlusItem::find()->ids();
+        foreach($itemIds as $itemId) {
+            $item = MuseumPlusItem::find()
+                ->id($itemId)
+                ->one();
+            $this->updateItemSort($item);
+        }
+    }
+
+    private function updateItemSort(MuseumPlusItem $item)
+    {
+        try {
+            $sort = $item->getDataAttribute('ObjObjectNumberSortedVrt');
+            if ($sort) {
+                $item->sort = $sort;
+                if (Craft::$app->elements->saveElement($item)) {
+                    echo $item->id . " - " . $sort;
+                    echo "\n";
+                } else {
+                    echo 'Could not save item';
+                }
+            }
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+            echo "\n";
+        }
+    }
+
     public function actionUpdateItemsSensitive()
     {
         App::maxPowerCaptain();
@@ -745,8 +777,8 @@ class CollectionController extends Controller
             ->ids();
         foreach($itemIds as $itemId) {
             $item = MuseumPlusItem::find()
-                    ->id($itemId)
-                    ->one();
+                ->id($itemId)
+                ->one();
             $this->updateItemSensitive($item);
         }
     }
@@ -754,7 +786,7 @@ class CollectionController extends Controller
     public function actionUpdateVocabularyRefs()
     {
         App::maxPowerCaptain();
-        
+
         $itemIds = MuseumPlusItem::find()
             ->ids();
 
@@ -773,7 +805,7 @@ class CollectionController extends Controller
     public function actionUpdateItemTitles()
     {
         App::maxPowerCaptain();
-        
+
         $itemIds = MuseumPlusItem::find()
             ->ids();
 
