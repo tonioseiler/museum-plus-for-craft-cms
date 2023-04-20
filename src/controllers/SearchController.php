@@ -18,7 +18,7 @@ class SearchController extends Controller
         $query = MuseumPlusItem::find()
             ->search($searchString)
             //->where(['like', 'title', $searchString])
-            ->orderBy('inventoryNumber')
+            ->orderBy('sort')
             ->limit(10)
             ->all();
         $items = [];
