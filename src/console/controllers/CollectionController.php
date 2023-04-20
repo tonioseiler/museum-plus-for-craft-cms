@@ -136,10 +136,10 @@ class CollectionController extends Controller
             echo 'updating item (id: '.$this->collectionItemId.')'.PHP_EOL;
         }
         $this->updateItemFromMuseumPlus($this->collectionItemId);
-        $this->updateItemToItemRelationShips($item);
-        $this->updateItemInventory($item);
-        $this->updateItemSort($item);
-        $this->updateItemSensitive($item);
+        $this->updateItemToItemRelationShips($this->collectionItemId);
+        $this->updateItemInventory($this->collectionItemId);
+        $this->updateItemSort($this->collectionItemId);
+        $this->updateItemSensitive($this->collectionItemId);
     }
 
 
@@ -202,12 +202,17 @@ class CollectionController extends Controller
             $item = MuseumPlusItem::find()
                 ->id($itemId)
                 ->one();
-            $this->updateItemToItemRelationShips($item);
+            $this->updateItemToItemRelationShips($item->collectionId);
         }
     }
 
-    private function updateItemToItemRelationShips(MuseumPlusItem $item)
+    private function updateItemToItemRelationShips($collectionId)
     {
+
+        $item = MuseumPlusItem::find()
+            ->where(['collectionId' => $collectionId])
+            ->one();
+        
         $moduleRefs = $item->getDataAttribute('moduleReferences');
 
         $types = ['ObjObjectARef', 'ObjObjectBRef',];
@@ -239,9 +244,10 @@ class CollectionController extends Controller
         try {
             $o = $this->museumPlus->getObjectDetail($collectionId);
             $item = $this->createOrUpdateItem($o);
-
+           
+            
             $moduleRefs = $item->getDataAttribute('moduleReferences');
-
+            
             //add literature relations
             $moduleRefs = $item->getDataAttribute('moduleReferences');
             $literatureIds = [];
@@ -256,6 +262,7 @@ class CollectionController extends Controller
                     }
                 }
             }
+
             //sync
             if(count($literatureIds)){
                 $item->syncLiteratureRelations($literatureIds);
@@ -547,7 +554,7 @@ class CollectionController extends Controller
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
         }
-        $success = Craft::$app->elements->saveElement($item);
+        $success = Craft::$app->elements->saveElement($item, false);
 
         //insert object relations if they do not exist
         $itemRecord = $item->getRecord();
@@ -706,22 +713,27 @@ class CollectionController extends Controller
                     ->one();
             echo $itemId . " => ";
             try {
-                $this->updateItemInventory($item);
+                $this->updateItemInventory($item->collectionId);
             } catch (\Exception $e) {
                 echo $e->getMessage();
             }
         }
     }
 
-    private function updateItemInventory(MuseumPlusItem $item)
+    private function updateItemInventory($collectionId)
     {
+
+        $item = MuseumPlusItem::find()
+            ->where(['collectionId' => $collectionId])
+            ->one();
+
         $inventoryNumber = $item->getDataAttribute('ObjObjectNumberVrt');
         if (empty($inventoryNumber))
             $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
         
         if($inventoryNumber){
             $item->inventoryNumber = $inventoryNumber;
-            if(Craft::$app->elements->saveElement($item, false, false)) {
+            if(Craft::$app->elements->saveElement($item, false)) {
                 echo $item->id . " - " . $inventoryNumber;
             } else {
                 echo 'Could not save item';
@@ -740,12 +752,17 @@ class CollectionController extends Controller
             $item = MuseumPlusItem::find()
                 ->id($itemId)
                 ->one();
-            $this->updateItemSort($item);
+            $this->updateItemSort($item->collectionId);
         }
     }
 
-    private function updateItemSort(MuseumPlusItem $item)
+    private function updateItemSort($collectionId)
     {
+
+        $item = MuseumPlusItem::find()
+            ->where(['collectionId' => $collectionId])
+            ->one();
+
         try {
             $sort = $item->getDataAttribute('ObjObjectNumberSortedVrt');
             if ($sort) {
@@ -778,7 +795,7 @@ class CollectionController extends Controller
             $item = MuseumPlusItem::find()
                 ->id($itemId)
                 ->one();
-            $this->updateItemSensitive($item);
+            $this->updateItemSensitive($item->collectionId);
         }
     }
 
@@ -824,7 +841,12 @@ class CollectionController extends Controller
         }
     }
 
-    private function updateItemSensitive(MuseumPlusItem $item) {
+    private function updateItemSensitive($collectionId) {
+
+        $item = MuseumPlusItem::find()
+            ->where(['collectionId' => $collectionId])
+            ->one();
+
         $item->sensitive = true;
         if(Craft::$app->elements->saveElement($item)) {
             echo $item->id . " - " . $item->title;
