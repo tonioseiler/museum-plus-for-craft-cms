@@ -253,12 +253,16 @@ class CollectionController extends Controller
             $literatureIds = [];
             if(isset($moduleRefs['ObjLiteratureRef'])) {
                 foreach ($moduleRefs['ObjLiteratureRef']['items'] as $l){
-                    $data = $this->museumPlus->getLiterature($l['id']);
-                    if ($data){
-                        $literature = $this->createOrUpdateLiterature($data);
-                        if ($literature) {
-                            $literatureIds[] = $literature->id;
+                    try {
+                        $data = $this->museumPlus->getLiterature($l['id']);
+                        if ($data){
+                            $literature = $this->createOrUpdateLiterature($data);
+                            if ($literature) {
+                                $literatureIds[] = $literature->id;
+                            }
                         }
+                    } catch (\GuzzleHttp\Exception\ClientException $e) {
+                        echo "WARNING: ".$e->getMessage().PHP_EOL;
                     }
                 }
             }
@@ -275,10 +279,14 @@ class CollectionController extends Controller
                 if(isset($moduleRefs[$peopleType])) {
                     $peopleIds = [];
                     foreach ($moduleRefs[$peopleType]['items'] as $p){
-                        $data = $this->museumPlus->getPerson($p['id']);
-                        $person = $this->createOrUpdatePerson($data);
-                        if ($person) {
-                            $peopleIds[] = $person->id;
+                        try {
+                            $data = $this->museumPlus->getPerson($p['id']);
+                            $person = $this->createOrUpdatePerson($data);
+                            if ($person) {
+                                $peopleIds[] = $person->id;
+                            }
+                        } catch (\GuzzleHttp\Exception\ClientException $e) {
+                            echo "WARNING: ".$e->getMessage().PHP_EOL;
                         }
                     }
                     //sync
@@ -293,10 +301,14 @@ class CollectionController extends Controller
             $ownershipIds = [];
             if(isset($moduleRefs['ObjOwnershipRef'])) {
                 foreach ($moduleRefs['ObjOwnershipRef']['items'] as $o){
-                    $data = $this->museumPlus->getOwnership($o['id']);
-                    $ownership = $this->createOrUpdateOwnership($data);
-                    if ($ownership) {
-                        $ownershipIds[] = $ownership->id;
+                    try {
+                        $data = $this->museumPlus->getOwnership($o['id']);
+                        $ownership = $this->createOrUpdateOwnership($data);
+                        if ($ownership) {
+                            $ownershipIds[] = $ownership->id;
+                        }
+                    } catch (\GuzzleHttp\Exception\ClientException $e) {
+                        echo "WARNING: ".$e->getMessage().PHP_EOL;
                     }
                 }
             }
@@ -315,7 +327,7 @@ class CollectionController extends Controller
                     echo "Attachment for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
                     $item->assetId = $assetId;
                     Craft::$app->elements->saveElement($item);
-                }else{
+                } else {
                     echo "Attachment for item " . $item->id . " AssetID: NULL" . PHP_EOL;
                 }
             }
@@ -323,7 +335,6 @@ class CollectionController extends Controller
 
             //add multimedia
             if(!$this->ignoreMultimedia && isset($moduleRefs['ObjMultimediaRef'])) {
-
                 $assetIds = [];
                 foreach ($moduleRefs['ObjMultimediaRef']['items'] as $mm){
                     $assetId = $this->createMultimediaFromId($mm['id']);
@@ -340,7 +351,6 @@ class CollectionController extends Controller
 
             //add literature
             if(!$this->ignoreLiterature && isset($moduleRefs['ObjLiteratureRef'])) {
-
                 $assetIds = [];
                 foreach ($moduleRefs['ObjLiteratureRef']['items'] as $l){
                     $assetId = $this->createLiteratureFromId($l['id']);
@@ -715,7 +725,7 @@ class CollectionController extends Controller
             try {
                 $this->updateItemInventory($item->collectionId);
             } catch (\Exception $e) {
-                echo $e->getMessage();
+                echo $e->getMessage().PHP_EOL;
             }
         }
     }
@@ -775,8 +785,7 @@ class CollectionController extends Controller
                 }
             }
         } catch (\Exception $e) {
-            echo $e->getMessage();
-            echo "\n";
+            echo $e->getMessage().PHP_EOL;
         }
     }
 
@@ -813,7 +822,7 @@ class CollectionController extends Controller
                     ->one();
                 $this->updateVocabularyRefs($item);
             } catch(\Exception $e) {
-                echo $e->getMessage();
+                echo $e->getMessage().PHP_EOL;
             }
         }
     }
@@ -836,7 +845,7 @@ class CollectionController extends Controller
                     echo "\n";
                 }
             } catch(\Exception $e) {
-                echo $e->getMessage();
+                echo $e->getMessage().PHP_EOL;
             }
         }
     }
@@ -862,13 +871,17 @@ class CollectionController extends Controller
             $ids = [];
             $type = $vocabularyRef['instanceName'];
             foreach ($vocabularyRef['items'] as $vc){
-                $data = $this->museumPlus->getVocabularyNode($type,$vc['id']);
-                foreach ($data as $d) {
-                    $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
-                    if ($vocabularyEntry) {
-                        if (!empty($vocabularyEntry->id))
-                            $ids[] = $vocabularyEntry->id;
+                try {
+                    $data = $this->museumPlus->getVocabularyNode($type,$vc['id']);
+                    foreach ($data as $d) {
+                        $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
+                        if ($vocabularyEntry) {
+                            if (!empty($vocabularyEntry->id))
+                                $ids[] = $vocabularyEntry->id;
+                        }
                     }
+                } catch (\GuzzleHttp\Exception\ClientException $e) {
+                    echo "WARNING: ".$e->getMessage().PHP_EOL;
                 }
             }
             if (isset($syncData[$type])) {
