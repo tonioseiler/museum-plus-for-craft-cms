@@ -265,7 +265,8 @@ class MuseumPlusService extends Component
             $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/ObjectGroup/search', $this->requestHeaders, $body);
             $res = $this->client->sendAsync($request)->wait();
             $tmp = $this->createDataFromResponse($res);
-            $objectGroups = $objectGroups + $tmp['data'];
+            // $objectGroups = $objectGroups + $tmp['data'];
+            $objectGroups = array_merge($objectGroups,$tmp['data']);
             $size = $tmp['size'];
             $offset += self::QUERY_LIMIT;
         }
