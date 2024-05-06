@@ -316,6 +316,8 @@
                         {% for literature in item.getLiterature().all() %}
                             <div style="margin-bottom: 5px;">
                                 <div style="margin-bottom: 5px;"> - {{ literature.getDataAttribute('LitLiteratureVrt') }}</div>
+
+                                {# TODO can a literature have an asset?
                                 {% if literature.assetId %}
                                     {% set myAsset = craft.assets().id(literature.assetId).one() %}
                                     {% if myAsset %}
@@ -330,6 +332,7 @@
                                         </a>
                                     {% endif %}
                                 {% endif %}
+                                #}
                             </div>
                         {% endfor %}
                     </div>
