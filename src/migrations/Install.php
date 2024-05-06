@@ -23,6 +23,7 @@ class Install extends Migration
                 'collectionId' => $this->integer()->notNull(),
                 'inventoryNumber' => $this->string(),
                 'sensitive' => $this->boolean(),
+                'sort' => $this->string(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid()
