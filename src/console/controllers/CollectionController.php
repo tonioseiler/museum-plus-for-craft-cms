@@ -454,7 +454,8 @@ class CollectionController extends Controller
     {
         $folderId = $this->settings['attachmentVolumeId'];
         $folder = $this->assets->findFolder(['id' => $folderId]);
-        $parentFolder = $this->createFolder("Items", $folderId);
+        //$parentFolder = $this->createFolder("Items", $folderId);
+        $parentFolder = $this->createFolder("Items");
         $attachment = $this->museumPlus->getAttachmentByObjectId($id);
 
         if ($attachment) {
@@ -471,7 +472,8 @@ class CollectionController extends Controller
     {
         $folderId = $this->settings['attachmentVolumeId'];
         $folder = $this->assets->findFolder(['id' => $folderId]);
-        $parentFolder = $this->createFolder("Multimedia", $folderId);
+        //$parentFolder = $this->createFolder("Multimedia", $folderId);
+        $parentFolder = $this->createFolder("Multimedia");
         $attachment = $this->museumPlus->getMultimediaById($id);
 
         if ($attachment) {
@@ -487,7 +489,8 @@ class CollectionController extends Controller
     {
         $folderId = $this->settings['attachmentVolumeId'];
         $folder = $this->assets->findFolder(['id' => $folderId]);
-        $parentFolder = $this->createFolder("Literature", $folderId);
+        //$parentFolder = $this->createFolder("Literature", $folderId);
+        $parentFolder = $this->createFolder("Literature");
         $attachment = $this->museumPlus->getLiteratureById($id);
 
         if ($attachment) {
@@ -529,18 +532,35 @@ class CollectionController extends Controller
         return false;
     }
 
-    private function createFolder($folderName, $parentFolderId)
+    //private function createFolder($folderName, $parentFolderId)
+    private function createFolder($folderName)
     {
-        $folder = $this->assets->findFolder(['name' => $folderName, 'parentId' => $parentFolderId]);
-        if (is_null($folder)) {
+        $volumeId = $this->settings['attachmentVolumeId'];
+        $volume = Craft::$app->volumes->getVolumeById($volumeId);
+        if (!$volume) {
+            Craft::error("Volume with ID {$volumeId} not found.", __METHOD__);
+            return false;
+        }
+        // Find the root folder for this volume
+        $rootFolder = Craft::$app->assets->getRootFolderByVolumeId($volumeId);
+        if (!$rootFolder) {
+            Craft::error("Root folder for volume ID {$volumeId} not found.", __METHOD__);
+            return false;
+        }
+        // Check if the folder already exists
+        $existingFolder = Craft::$app->assets->findFolder([
+            'name' => $folderName,
+            'parentId' => $rootFolder->id
+        ]);
+        if ($existingFolder) {
+            return $existingFolder;
+        } else {
             $folder = new VolumeFolder();
-            $folder->parentId = $parentFolderId;
+            $folder->parentId = $rootFolder->id;
             $folder->name = $folderName;
-            $folder->volumeId = $this->settings['attachmentVolumeId'];
+            $folder->volumeId = $volumeId;
             $folder->path = $folderName . '/';
             $this->assets->createFolder($folder);
-            return $folder;
-        } else {
             return $folder;
         }
     }
