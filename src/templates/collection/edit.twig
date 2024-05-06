@@ -61,6 +61,12 @@
             "label": "Meta",
             "url": "#tab--museumplusforcraftcms-meta",
             "class": null
+        },
+        "tab--extracontent": {
+            "tabId": "tab-tab--extracontent",
+            "label": "Extra content",
+            "url": "#tab--extracontent",
+            "class": null
         }
     } %}
 {% endif %}
@@ -395,6 +401,17 @@
                 </div>
             </div>
 
+        </div>
+
+        <div id="tab--museumplusforcraftcms-extracontent" class="flex-fields hidden" data-id="tab--museumplusforcraftcms-extracontent" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-meta">
+            <div id="fields-extracontentText-field" class="field width-100">
+                <div class="heading">
+                    <label id="fields-extracontentText-label" for="fields-extracontentText">Text</label>
+                </div>
+                <div class="input ltr">
+                    <textarea id="fields-extracontentText"  class="nicetext text fullwidth" name="fields[extracontentText]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{ item.extracontentText }}</textarea>
+                </div>
+            </div>
         </div>
 
         {{ fieldsHtml|raw }}
