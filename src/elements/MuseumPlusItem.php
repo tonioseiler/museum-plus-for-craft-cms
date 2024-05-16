@@ -121,15 +121,15 @@ class MuseumPlusItem  extends Element
     protected static function defineSources(string $context = null): array
     {
         $sources = [
-           [
-               'key' => '*',
-               'label' => Craft::t('app', 'All'),
-               'criteria' => [],
-               'hasThumbs' => false
-           ],
-           [
-               'heading' => 'Object Groups',
-           ],
+            [
+                'key' => '*',
+                'label' => Craft::t('app', 'All'),
+                'criteria' => [],
+                'hasThumbs' => false
+            ],
+            [
+                'heading' => 'Object Groups',
+            ],
         ];
 
         $objectGroups = MuseumPlusForCraftCms::$plugin->collection->getAllObjectGroups();
@@ -537,6 +537,42 @@ class MuseumPlusItem  extends Element
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'GenPlaceVgr']);
     }
+    public function getGeographyCulture() {
+        // TODO Paolo work in progress
+        $result = [];
+        $rec = $this->getRecord();
+        $result['CultureVoc'] = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'CultureVoc');
+        if(!isset($result['CultureVoc'][0])) {
+            $result['CultureVoc'][0] = '';
+        }
+        $uncertainty = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'UncertaintyBoo');
+        if( isset($uncertainty[0])) {
+            if ($uncertainty[0]=='true'){
+                $result['CultureVoc'][0] .= '?';
+            }
+        }
+        $result['PreviewDEVrt'] = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'PreviewDEVrt');
+        $result['PreviewENVrt'] = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'PreviewENVrt');
+        $result['PreviewFRVrt'] = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'PreviewFRVrt');
+        //$result['PoliticalVoc'] = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'PoliticalVoc');
+        $result['TypeVoc'] = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'TypeVoc');
+        if(!isset($result['CultureVoc'][0])) {
+            $result['CultureVoc'][0] = '';
+        }
+        if(!isset($result['PreviewDEVrt'][0])) {
+            $result['PreviewDEVrt'][0] = '';
+        }
+        if(!isset($result['PreviewENVrt'][0])) {
+            $result['PreviewENVrt'][0] = '';
+        }
+        if(!isset($result['PreviewFRVrt'][0])) {
+            $result['PreviewFRVrt'][0] = '';
+        }
+        if(!isset($result['TypeVoc'][0])) {
+            $result['TypeVoc'][0] = '';
+        }
+        return $result;
+    }
 
     public function getTags() {
         $rec = $this->getRecord();
@@ -561,7 +597,7 @@ class MuseumPlusItem  extends Element
     public function getCreditLine() {
         $rec = $this->getRecord();
         $creditLineEntries = $this->getVocabularyEntries()->where(['type' => 'ObjCreditlineVgr'])->all();
-        
+
         $creditLines = [];
         foreach($creditLineEntries as $cle) {
             $creditLines[] = $cle->getDataAttribute('content');
@@ -573,9 +609,9 @@ class MuseumPlusItem  extends Element
         $rec = $this->getRecord();
         $tmp = $rec->getRepeatableGroupValues('ObjLabelRaisonneTextGrp', 'TextClb', ['Objekttext', 'Jahresbericht RBG']);
         $tmp = implode(PHP_EOL, $tmp);
-        
+
         $tmp .= $rec->getDataAttribute('ObjScopeContentClb');
-        
+
         return $tmp;
     }
 
