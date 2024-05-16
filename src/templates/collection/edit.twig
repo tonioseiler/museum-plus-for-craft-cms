@@ -182,7 +182,7 @@
 
                 <div class="field" data-attribute="geographical-references">
                     <div class="heading">
-                        <label id="fields-geographical-references-label" for="fields-geographical-references">{{ 'Geographical References'|t('museum-plus-for-craft-cms') }}</label>
+                        <label id="fields-geographical-references-label" for="fields-geographical-references">{{ 'Geographical References (old)'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
                     {% set geoValues = [] %}
@@ -193,9 +193,9 @@
                         <textarea id="fields-geographical-references" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{ geoValues|join('\n – ') }}</textarea>
                     </div>
                 </div>
-                <div class="field" data-attribute="geographical-references-new">
+                <div class="field" data-attribute="geographical-style-culture">
                     <div class="heading">
-                        <label id="fields-geographical-references-label" for="fields-geographical-references">{{ 'Style/Culture (new)'|t('museum-plus-for-craft-cms') }}</label>
+                        <label id="fields-geographical-style-culture-label" for="fields-geographical-style-culture">{{ 'Style/Culture (new)'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
                     {% set geographyCulture = item.getGeographyCulture() %}
@@ -209,7 +209,16 @@
                     %}
 
                     <div class="input ltr">
-                        <textarea id="fields-geographical-references" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{ styleCultureText }}</textarea>
+                        <textarea id="fields-geographical-style-culture" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{ styleCultureText }}</textarea>
+                    </div>
+                </div>
+                <div class="field" data-attribute="geographical-references">
+                    <div class="heading">
+                        <label id="fields-geographical-references-label" for="fields-geographical-references">{{ 'Geographical References'|t('museum-plus-for-craft-cms') }}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <div class="input ltr">
+                        <textarea id="fields-geographical-references" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">not implemented yet</textarea>
                     </div>
                 </div>
 
