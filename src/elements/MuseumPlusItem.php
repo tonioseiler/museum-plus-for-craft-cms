@@ -16,10 +16,14 @@ use craft\elements\User;
 use craft\helpers\Cp;
 
 use craft\helpers\UrlHelper;
+use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\db\MuseumPlusItemQuery;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
+
+//use furbo\museumplusforcraftcms\elements\db\MuseumPlusVocabularyQuery;
+//use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 
 use Craft;
 use craft\base\Element;
@@ -533,24 +537,99 @@ class MuseumPlusItem  extends Element
         return $rec->getRepeatableGroupValues('ObjDateGrp', 'DateTxt');
     }
 
-    public function getGeographicReferences() {
+    public function getGeographicReferencesOld() {
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'GenPlaceVgr']);
     }
+
+    public function getGeographicReferences() {
+        $rec = $this->getRecord();
+        return $this->getVocabularyEntries()->where(['type' => 'GenGeoPoliticalVgr']);
+    }
+
     public function getGeographyCulture() {
+        $rec = $this->getRecord();
+        return $this->getVocabularyEntries()->where(['type' => 'GenGeoCultureVgr']);
+    }
+
+    public function getGeographyCultureAlt() {
         // TODO Paolo work in progress
         $result = [];
         $rec = $this->getRecord();
+        $itemTitle = $rec->getDataAttribute('ObjObjectTitleVrt');
+
+        //dump(['d item record: '.$itemTitle => $rec, 'at' => __CLASS__.'.'.__METHOD__.'.'.__LINE__]);
+        // Paolo:
+
+
+
         $result['CultureVoc'] = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'CultureVoc');
+        /*
+         inside repeatableGroups:
+            7 => array:2 [▼
+              "name" => "ObjGeographyCultureGrp"
+              "items" => array:1 [▼
+                0 => array:7 [▼
+                  "SortLnu" => "1"
+                  "UncertaintyBoo" => "false"
+                  "PreviewDEVrt" => "Stil/Kultur:  Luba"
+                  "PreviewENVrt" => "Stil/Kultur:  Luba"
+                  "PreviewFRVrt" => "Stil/Kultur:  Luba"
+                  "CultureVoc" => "Luba"
+                  "TypeVoc" => "Stil/Kultur"
+                ]
+              ]
+            ]
+        so no ID of the voc entry
+
+        This means I need to search in the vocabulary for the title (and TypeVoc) and get the ID
+        after that I can create the link to the voc entry
+
+         */
+        //dump(['d item CultureVoc' => $result['CultureVoc'], 'at' => __CLASS__.'.'.__METHOD__.'.'.__LINE__]);
+
         if(!isset($result['CultureVoc'][0])) {
             $result['CultureVoc'][0] = '';
-        }
-        $uncertainty = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'UncertaintyBoo');
-        if( isset($uncertainty[0])) {
-            if ($uncertainty[0]=='true'){
-                $result['CultureVoc'][0] .= '?';
+        } else {
+            // TODO Paolo add link to voc entry
+            // entry type: GenGeoCultureVgr
+            // entry title:
+
+            //die('title: '.$result['ObjObjectTitleVrt'][0]);
+            $vocTitle = $result['CultureVoc'][0];
+
+            $voc = new MuseumPlusVocabulary();
+            $voc->id = 633096; // 328286
+
+            $vocEntry = $voc->getRecord();
+            //$attributeValue = $entry->getDataAttribute('attributeName'); // Replace 'attributeName' with the actual attribute name you need.
+            //dump(['d $vocEntry record found by hardcoded ID' => $vocEntry, 'at' => __CLASS__.'.'.__METHOD__.'.'.__LINE__]);
+            $vocEntryData = $voc->getDataAttributes();
+            //dump(['d $vocEntryData (json)' => $vocEntryData, 'at' => __CLASS__.'.'.__METHOD__.'.'.__LINE__]);
+            //dump(['d $vocEntryData[id]' => $vocEntryData['id'], 'at' => __CLASS__.'.'.__METHOD__.'.'.__LINE__]);
+            //dump(['d $vocEntryData[content]' => $vocEntryData['content'], 'at' => __CLASS__.'.'.__METHOD__.'.'.__LINE__]);
+
+            // vod title: $vocEntryData['content']
+
+            // I have to search by title and then get the id
+
+
+            $result['CultureVocUrl']='[to be implemented]';
+
+
+
+
+            $uncertainty = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'UncertaintyBoo');
+            if( isset($uncertainty[0])) {
+                if ($uncertainty[0]=='true'){
+                    $result['CultureVoc'][0] .= '?';
+                }
             }
         }
+
+
+
+
         $result['PreviewDEVrt'] = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'PreviewDEVrt');
         $result['PreviewENVrt'] = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'PreviewENVrt');
         $result['PreviewFRVrt'] = $rec->getRepeatableGroupValues('ObjGeographyCultureGrp', 'PreviewFRVrt');
@@ -573,6 +652,8 @@ class MuseumPlusItem  extends Element
         }
         return $result;
     }
+
+
 
     public function getTags() {
         $rec = $this->getRecord();

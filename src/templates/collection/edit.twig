@@ -180,28 +180,34 @@
                     </div>
                 </div>
 
-                <div class="field" data-attribute="geographical-references">
+
+
+
+                <div class="field" data-attribute="geographical-references-style-culture">
                     <div class="heading">
-                        <label id="fields-geographical-references-label" for="fields-geographical-references">{{ 'Geographical References (old)'|t('museum-plus-for-craft-cms') }}</label>
+                        <label id="fields-geographical-references-style-culture-label" for="fields-geographical-references-style-culture">{{ 'Geographical References: Style/Culture'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
-                    {% set geoValues = [] %}
-                    {% for geo in item.getGeographicReferences().all() %}
-                        {% set geoValues = geoValues|merge([geo.title]) %}
-                    {% endfor %}
-                    <div class="input ltr">
-                        <textarea id="fields-geographical-references" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{ geoValues|join('\n – ') }}</textarea>
-                    </div>
+                    <ul>
+                        {% for geo in item.getGeographyCulture().all() %}
+                            <li>
+                                <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
+
+                {#
                 <div class="field" data-attribute="geographical-style-culture">
                     <div class="heading">
-                        <label id="fields-geographical-style-culture-label" for="fields-geographical-style-culture">{{ 'Style/Culture (new)'|t('museum-plus-for-craft-cms') }}</label>
+                        <label id="fields-geographical-style-culture-label" for="fields-geographical-style-culture">{{ 'Style/Culture (remove)'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
                     {% set geographyCulture = item.getGeographyCulture() %}
 
                     {% set styleCultureText =
                         'CultureVoc: ' ~ geographyCulture['CultureVoc'][0]  ~ '\n' ~
+                        'CultureVoc url: ' ~ geographyCulture['CultureVocUrl']  ~ '\n\n' ~
                         'PreviewDEVrt: ' ~ geographyCulture['PreviewDEVrt'][0]  ~ '\n' ~
                         'PreviewENVrt: ' ~ geographyCulture['PreviewENVrt'][0]  ~ '\n' ~
                         'PreviewFRVrt: ' ~ geographyCulture['PreviewFRVrt'][0]  ~ '\n' ~
@@ -212,13 +218,34 @@
                         <textarea id="fields-geographical-style-culture" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{ styleCultureText }}</textarea>
                     </div>
                 </div>
+                #}
+
+
                 <div class="field" data-attribute="geographical-references">
                     <div class="heading">
-                        <label id="fields-geographical-references-label" for="fields-geographical-references">{{ 'Geographical References'|t('museum-plus-for-craft-cms') }}</label>
+                        <label id="fields-geographical-references" for="fields-geographical-references">{{ 'Geographical References'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
+                    <ul>
+                        {% for geo in item.getGeographicReferences().all() %}
+                            <li>
+                                <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="field" data-attribute="geographical-references">
+                    <div class="heading">
+                        <label id="fields-geographical-references-label" for="fields-geographical-references">{{ 'Geographical References (old)'|t('museum-plus-for-craft-cms') }}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    {% set geoValues = [] %}
+                    {% for geo in item.getGeographicReferencesOld().all() %}
+                        {% set geoValues = geoValues|merge([geo.title]) %}
+                    {% endfor %}
                     <div class="input ltr">
-                        <textarea id="fields-geographical-references" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">not implemented yet</textarea>
+                        <textarea id="fields-geographical-references" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{ geoValues|join('\n – ') }}</textarea>
                     </div>
                 </div>
 
