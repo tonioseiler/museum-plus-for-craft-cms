@@ -546,6 +546,14 @@ class MuseumPlusItem  extends Element
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'GenGeoPoliticalVgr']);
     }
+    public function getGeographicReferencesHistory() {
+        $rec = $this->getRecord();
+        return $this->getVocabularyEntries()->where(['type' => 'GenGeoHistoryVgr']);
+    }
+    public function getGeographicReferencesGeography() {
+        $rec = $this->getRecord();
+        return $this->getVocabularyEntries()->where(['type' => 'GenGeoGeographyVgr']);
+    }
 
     public function getGeographyCulture() {
         $rec = $this->getRecord();

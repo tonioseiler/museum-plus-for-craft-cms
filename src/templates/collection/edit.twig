@@ -237,6 +237,34 @@
 
                 <div class="field" data-attribute="geographical-references">
                     <div class="heading">
+                        <label id="fields-geographical-references" for="fields-geographical-references">{{ 'Geographical References: Historic'|t('museum-plus-for-craft-cms') }}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <ul>
+                        {% for geo in item.getGeographicReferencesHistory().all() %}
+                            <li>
+                                <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="field" data-attribute="geographical-references">
+                    <div class="heading">
+                        <label id="fields-geographical-references" for="fields-geographical-references">{{ 'Geographical References: Geographic'|t('museum-plus-for-craft-cms') }}</label>
+                        <div class="flex-grow"></div>
+                    </div>
+                    <ul>
+                        {% for geo in item.getGeographicReferencesGeography().all() %}
+                            <li>
+                                <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="field" data-attribute="geographical-references">
+                    <div class="heading">
                         <label id="fields-geographical-references-label" for="fields-geographical-references">{{ 'Geographical References (old)'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
