@@ -124,7 +124,10 @@
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
+                        {{ item.title }}
+                        {#
                         <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{ item.title }}">
+                        #}
                     </div>
                 </div>
 
@@ -134,9 +137,14 @@
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
-                        {% for person in item.getAssociationPeople().all() %}
-                            <input type="text" id="fields-originator-{{ person.id }}" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[originator]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{ person.getDataAttribute('PerPersonTxt') }}">
-                        {% endfor %}
+                        <ul>
+                            {% for person in item.getAssociationPeople().all() %}
+                                <li>{{ person.getDataAttribute('PerPersonTxt') }}</li>
+                                {#
+                                <input type="text" id="fields-originator-{{ person.id }}" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[originator]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{ person.getDataAttribute('PerPersonTxt') }}">
+                                #}
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
 
@@ -146,7 +154,10 @@
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
+                        {{ item.getDating()|join(', ') }}
+                        {#
                         <input type="text" id="fields-dating" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[dating]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{ item.getDating()|join(', ') }}">
+                        #}
                     </div>
                 </div>
 
@@ -156,7 +167,10 @@
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
+                        {{ item.inventoryNumber }}
+                        {#
                         <input type="text" id="fields-inventory-number" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[inventory-number]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{ item.inventoryNumber }}">
+                        #}
                     </div>
                 </div>
 
@@ -166,7 +180,10 @@
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
+                        {{ item.getMaterial()|join }}
+                        {#
                         <input type="text" id="fields-material" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[material]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{ item.getMaterial()|join }}">
+                        #}
                     </div>
                 </div>
 
@@ -176,12 +193,12 @@
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
+                        {{ item.getDimensions()|join }}
+                        {#
                         <input type="text" id="fields-dimension" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[dimension]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{ item.getDimensions()|join }}">
+                        #}
                     </div>
                 </div>
-
-
-
 
                 <div class="field" data-attribute="geographical-references-style-culture">
                     <div class="heading">
@@ -354,18 +371,21 @@
                     </div>
                 </div>
 
-                <div class="field" data-attribute="provenance">
+                <div class="field" data-attribute="geographical-references">
                     <div class="heading">
-                        <label id="fields-provenance-label" for="fields-provenance">{{ 'Provenance'|t('museum-plus-for-craft-cms') }}</label>
+                        <label id="fields-geographical-references" for="fields-geographical-references">{{ 'Provenance (ownership)'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
-                    {% set ownershipValues = [] %}
-                    {% for ownership in item.getOwnerships().all() %}
-                        {% set ownershipValues = ownershipValues|merge([ownership.getDataAttribute('OwsOwnershipVrt')]) %}
-                    {% endfor %}
-                    <div class="input ltr">
-                        <textarea id="fields-provenance" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[provenance]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{ ownershipValues|join('\n – ') }}</textarea>
-                    </div>
+                    <ul>
+                        {% for ownership in item.getOwnerships().all() %}
+                            <li>
+                                {#
+                                <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ ownership.id }}">&raquo; {{ ownership.title }}</a>
+                                #}
+                                &raquo; {{ ownership.title }}
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
 
                 <div class="field" data-attribute="credit-line">
