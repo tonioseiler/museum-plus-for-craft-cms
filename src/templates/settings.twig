@@ -118,6 +118,15 @@
                     value: settings['attachmentVolumeId']})
                 }}
 
+                {{ forms.textField({
+                    label: 'Attachment file types',
+                    instructions: '',
+                    id: 'attachmentFileTypes',
+                    name: 'attachmentFileTypes',
+                    value: settings['attachmentFileTypes']})
+                }}
+                File extensions comma separated, e.g. jpg, jpeg, gif, pdf etc. Leave empty to allow all files.
+
             </div>
 
             <hr />
@@ -143,11 +152,11 @@
                 <div id="settings-cpTitle-instructions" class="instructions"><p>Select the Exhibitions you want to import</p></div>
 
                 {{ forms.multiSelect({
-                    id: 'exhibitions',
-                    name: 'exhibitions',
-                    options: craft.museumPlusForCraftCms.getExhibitions(),
-                    values: settings['exhibitions']})
-                }}
+                id: 'exhibitions',
+                name: 'exhibitions',
+                options: craft.museumPlusForCraftCms.getExhibitions(),
+                values: settings['exhibitions']})
+            }}
 
             </div>
             -->

@@ -212,7 +212,7 @@ class CollectionController extends Controller
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
-        
+
         $moduleRefs = $item->getDataAttribute('moduleReferences');
 
         $types = ['ObjObjectARef', 'ObjObjectBRef',];
@@ -244,10 +244,10 @@ class CollectionController extends Controller
         try {
             $o = $this->museumPlus->getObjectDetail($collectionId);
             $item = $this->createOrUpdateItem($o);
-           
-            
+
+
             $moduleRefs = $item->getDataAttribute('moduleReferences');
-            
+
             //add literature relations
             $moduleRefs = $item->getDataAttribute('moduleReferences');
             $literatureIds = [];
@@ -476,10 +476,24 @@ class CollectionController extends Controller
         $parentFolder = $this->createFolder("Multimedia");
         $attachment = $this->museumPlus->getMultimediaById($id);
 
+
         if ($attachment) {
-            $asset = $this->createAsset($id, $attachment, $parentFolder);
-            if($asset){
-                return $asset->id;
+            $fileTypes = $this->settings['attachmentFileTypes'];
+            if (!empty($fileTypes)) {
+                // only allow file types defined in plugin settings.
+                $pattern = '/\.(' . str_replace(', ', '|', $fileTypes) . ')$/i';
+                if (preg_match($pattern, $attachment)) {
+                    $asset = $this->createAsset($id, $attachment, $parentFolder);
+                    if ($asset) {
+                        return $asset->id;
+                    }
+                }
+            } else {
+                // only allow any file type
+                $asset = $this->createAsset($id, $attachment, $parentFolder);
+                if ($asset) {
+                    return $asset->id;
+                }
             }
         }
         return false;
@@ -739,8 +753,8 @@ class CollectionController extends Controller
         $itemIds = MuseumPlusItem::find()->ids();
         foreach($itemIds as $itemId) {
             $item = MuseumPlusItem::find()
-                    ->id($itemId)
-                    ->one();
+                ->id($itemId)
+                ->one();
             echo $itemId . " => ";
             try {
                 $this->updateItemInventory($item->collectionId);
@@ -760,7 +774,7 @@ class CollectionController extends Controller
         $inventoryNumber = $item->getDataAttribute('ObjObjectNumberVrt');
         if (empty($inventoryNumber))
             $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
-        
+
         if($inventoryNumber){
             $item->inventoryNumber = $inventoryNumber;
             if(Craft::$app->elements->saveElement($item, false)) {

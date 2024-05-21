@@ -1,12 +1,12 @@
 <?php
 /**
-* MuseumPlus for CraftCMS plugin for Craft CMS 3.x
-*
-* Allows to import MuseumsPlus Collection data to Craft CMS and publish data. Additioanl Web Specific Data can be added to the imported data.
-*
-* @link      https://furbo.ch
-* @copyright Copyright (c) 2022 Furbo GmbH
-*/
+ * MuseumPlus for CraftCMS plugin for Craft CMS 3.x
+ *
+ * Allows to import MuseumsPlus Collection data to Craft CMS and publish data. Additioanl Web Specific Data can be added to the imported data.
+ *
+ * @link      https://furbo.ch
+ * @copyright Copyright (c) 2022 Furbo GmbH
+ */
 
 namespace furbo\museumplusforcraftcms\services;
 
@@ -22,17 +22,17 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 
 /**
-* MuseumPlus Service
-*
-* From any other plugin file, call it like this:
-*
-*     MuseumPlusForCraftCms::$plugin->museumPlus->someMethod()
-*
-*
-* @author    Furbo GmbH
-* @package   MuseumPlusForCraftCms
-* @since     1.0.0
-*/
+ * MuseumPlus Service
+ *
+ * From any other plugin file, call it like this:
+ *
+ *     MuseumPlusForCraftCms::$plugin->museumPlus->someMethod()
+ *
+ *
+ * @author    Furbo GmbH
+ * @package   MuseumPlusForCraftCms
+ * @since     1.0.0
+ */
 class MuseumPlusService extends Component
 {
 
@@ -45,6 +45,8 @@ class MuseumPlusService extends Component
     private $classifier = null;
     private $hostname = null;
     private $requestHeaders = null;
+
+    private $attachmentFileTypes = null;
 
     public function getObjectDetail($objectId)
     {
@@ -278,7 +280,7 @@ class MuseumPlusService extends Component
 
         //sort
         usort($objectGroups, function($a, $b) {
-             return strcmp($a->OgrNameTxt, $b->OgrNameTxt);
+            return strcmp($a->OgrNameTxt, $b->OgrNameTxt);
         });
         return $objectGroups;
 
@@ -325,7 +327,7 @@ class MuseumPlusService extends Component
 
         //sort
         usort($exhibitions, function($a, $b) {
-             return strcmp($a->ExhExhibitionTitleVrt, $b->ExhExhibitionTitleVrt);
+            return strcmp($a->ExhExhibitionTitleVrt, $b->ExhExhibitionTitleVrt);
         });
         return $exhibitions;
     }
@@ -654,7 +656,7 @@ class MuseumPlusService extends Component
                     if (isset($grItem['vocabularyReference'])) {
                         $vocabularyReferences = $this->extractArrayValues($grItem, 'vocabularyReference');
                     }
-                    
+
                     if (!empty($vocabularyReferences)) {
                         foreach ($vocabularyReferences as $field) {
                             $groupItemObject->{$field['@attributes']['name']} = $field['vocabularyReferenceItem']['formattedValue'];
@@ -662,7 +664,7 @@ class MuseumPlusService extends Component
                     }
 
                     $gr->items[] = $groupItemObject;
-                    
+
                 }
                 $obj->repeatableGroups[] = $gr;
 
