@@ -211,7 +211,6 @@ class MuseumPlusForCraftCms extends Plugin
                     Craft::$app->getFields()->saveLayout($fieldLayout);
 
 
-
                 }
             }
         );
@@ -219,28 +218,28 @@ class MuseumPlusForCraftCms extends Plugin
         Event::on(
             Search::class,
             Search::EVENT_BEFORE_INDEX_KEYWORDS,
-            function(IndexKeywordsEvent $e) {
+            function (IndexKeywordsEvent $e) {
                 // Element being indexed:
                 $element = $e->element;
 
                 // Current attribute name:
                 $attribute = $e->attribute;
 
-                if($attribute == 'data'){
+                if ($attribute == 'data') {
 
                     $data = "";
                     try {
-                        foreach($element->getAssociationPeople()->all() as $person){
-                            if(is_array($person->getDataAttribute('PerPersonTxt'))){
-                                foreach($person->getDataAttribute('PerPersonTxt') as $personTxt){
+                        foreach ($element->getAssociationPeople()->all() as $person) {
+                            if (is_array($person->getDataAttribute('PerPersonTxt'))) {
+                                foreach ($person->getDataAttribute('PerPersonTxt') as $personTxt) {
                                     $data .= $personTxt . " ";
                                 }
-                            }else{
+                            } else {
                                 $data .= $person->getDataAttribute('PerPersonTxt') . " ";
                             }
                         }
 
-                        foreach ($element->getDating() as $date){
+                        foreach ($element->getDating() as $date) {
                             $data .= $date . " ";
                         }
 
@@ -248,36 +247,37 @@ class MuseumPlusForCraftCms extends Plugin
 
                         $data .= $element->getDataAttribute('ObjScopeContentClb') . " ";
 
-                        foreach($element->getGeographicReferences()->all() as $geo){
+                        foreach ($element->getGeographicReferences()->all() as $geo) {
                             $data .= $geo->title . " ";
                         }
 
-                        foreach($element->getMaterial() as $material){
+                        foreach ($element->getMaterial() as $material) {
                             $data .= $material . " ";
                         }
 
-                        foreach($element->getClassification()->all() as $classification){
+                        foreach ($element->getClassification()->all() as $classification) {
                             $data .= $classification->title . " ";
                         }
 
-                        foreach($element->getObjectGroups()->all() as $objectGroup){
+                        foreach ($element->getObjectGroups()->all() as $objectGroup) {
                             $data .= $objectGroup->title . " ";
                         }
 
-                        foreach($element->getOwnerships()->all() as $ownership){
+                        foreach ($element->getOwnerships()->all() as $ownership) {
                             $data .= $ownership->getDataAttribute('OwsOwnershipVrt') . " ";
                         }
 
-                        foreach($element->getTags()->all() as $tag){
+                        foreach ($element->getTags()->all() as $tag) {
                             $data .= $tag->title . " ";
                         }
 
                         $data .= $element->getDetailText() . " ";
 
-                        foreach($element->getLiterature()->all() as $literature){
+                        foreach ($element->getLiterature()->all() as $literature) {
                             $data .= $literature->title . " ";
                         }
-                    } catch (\Throwable $th) {}
+                    } catch (\Throwable $th) {
+                    }
 
                     $e->keywords = $data;
 
@@ -345,7 +345,7 @@ class MuseumPlusForCraftCms extends Plugin
     protected function getCpRoutes(): array
     {
         return [
-            'museum-plus-for-craft-cms' => [ 'template' => 'museum-plus-for-craft-cms' ],
+            'museum-plus-for-craft-cms' => ['template' => 'museum-plus-for-craft-cms'],
             'museum-plus-for-craft-cms/collection' => ['template' => 'museum-plus-for-craft-cms/collection'],
             'museum-plus-for-craft-cms/collection/<itemId:\d+>' => 'museum-plus-for-craft-cms/collection/edit',
             'museum-plus-for-craft-cms/vocabularies' => ['template' => 'museum-plus-for-craft-cms/vocabularies'],
@@ -377,9 +377,9 @@ class MuseumPlusForCraftCms extends Plugin
         $cpNavItem['subnav'] = [];
 
         $cpNavItem['subnav']['items'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Items'), 'url' => 'museum-plus-for-craft-cms/collection'];
-
-        $cpNavItem['subnav']['vocabularies'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Vocabularies'), 'url' => 'museum-plus-for-craft-cms/vocabularies'];
-
+        if (Craft::$app->getUser()->getIsAdmin()) {
+            $cpNavItem['subnav']['vocabularies'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Vocabularies'), 'url' => 'museum-plus-for-craft-cms/vocabularies'];
+        }
 
         return $cpNavItem;
     }
