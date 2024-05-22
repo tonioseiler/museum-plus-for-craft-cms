@@ -205,51 +205,43 @@
                         <label id="fields-geographical-references-style-culture-label" for="fields-geographical-references-style-culture">{{ 'Geographical References: Style/Culture'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
-                    <ul>
-                        {% for geo in item.getGeographyCulture().all() %}
-                            <li>
-                                <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {% set geographyCulture = item.getGeographyCulture().all() %}
+                    {% if geographyCulture|length %}
+                        <ul>
+                            {% for geo in geographyCulture %}
+                                <li>
+                                    {#
+                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                                    #}
+                                    {{ geo.title }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        n.a.
+                    {% endif %}
                 </div>
-
-                {#
-                <div class="field" data-attribute="geographical-style-culture">
-                    <div class="heading">
-                        <label id="fields-geographical-style-culture-label" for="fields-geographical-style-culture">{{ 'Style/Culture (remove)'|t('museum-plus-for-craft-cms') }}</label>
-                        <div class="flex-grow"></div>
-                    </div>
-                    {% set geographyCulture = item.getGeographyCulture() %}
-
-                    {% set styleCultureText =
-                        'CultureVoc: ' ~ geographyCulture['CultureVoc'][0]  ~ '\n' ~
-                        'CultureVoc url: ' ~ geographyCulture['CultureVocUrl']  ~ '\n\n' ~
-                        'PreviewDEVrt: ' ~ geographyCulture['PreviewDEVrt'][0]  ~ '\n' ~
-                        'PreviewENVrt: ' ~ geographyCulture['PreviewENVrt'][0]  ~ '\n' ~
-                        'PreviewFRVrt: ' ~ geographyCulture['PreviewFRVrt'][0]  ~ '\n' ~
-                        'TypeVoc: ' ~ geographyCulture['TypeVoc'][0]  ~ '\n'
-                    %}
-
-                    <div class="input ltr">
-                        <textarea id="fields-geographical-style-culture" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{ styleCultureText }}</textarea>
-                    </div>
-                </div>
-                #}
-
 
                 <div class="field" data-attribute="geographical-references">
                     <div class="heading">
                         <label id="fields-geographical-references" for="fields-geographical-references">{{ 'Geographical References: Political'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
-                    <ul>
-                        {% for geo in item.getGeographicReferences().all() %}
-                            <li>
-                                <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {% set geographyPolitical = item.getGeographicReferences().all() %}
+                    {% if geographyPolitical|length %}
+                        <ul>
+                            {% for geo in geographyPolitical %}
+                                <li>
+                                    {#
+                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                                    #}
+                                    {{ geo.title }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        n.a.
+                    {% endif %}
                 </div>
 
                 <div class="field" data-attribute="geographical-references">
@@ -257,13 +249,21 @@
                         <label id="fields-geographical-references" for="fields-geographical-references">{{ 'Geographical References: Historic'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
-                    <ul>
-                        {% for geo in item.getGeographicReferencesHistory().all() %}
-                            <li>
-                                <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {% set geographyHistoric = item.getGeographicReferencesHistory().all() %}
+                    {% if geographyHistoric|length %}
+                        <ul>
+                            {% for geo in geographyHistoric %}
+                                <li>
+                                    {#
+                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                                    #}
+                                    {{ geo.title }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        n.a.
+                    {% endif %}
                 </div>
 
                 <div class="field" data-attribute="geographical-references">
@@ -271,13 +271,21 @@
                         <label id="fields-geographical-references" for="fields-geographical-references">{{ 'Geographical References: Geographic'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
-                    <ul>
-                        {% for geo in item.getGeographicReferencesGeography().all() %}
-                            <li>
-                                <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {% set geographyGeo = item.getGeographicReferencesGeography().all() %}
+                    {% if geographyGeo|length %}
+                        <ul>
+                            {% for geo in geographyGeo %}
+                                <li>
+                                    {#
+                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                                    #}
+                                    {{ geo.title }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        n.a.
+                    {% endif %}
                 </div>
 
                 <div class="field" data-attribute="geographical-references">
@@ -285,13 +293,21 @@
                         <label id="fields-geographical-references-label" for="fields-geographical-references">{{ 'Geographical References (old)'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
-                    {% set geoValues = [] %}
-                    {% for geo in item.getGeographicReferencesOld().all() %}
-                        {% set geoValues = geoValues|merge([geo.title]) %}
-                    {% endfor %}
-                    <div class="input ltr">
-                        <textarea id="fields-geographical-references" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[geographical-references]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{ geoValues|join('\n – ') }}</textarea>
-                    </div>
+                    {% set geographyOld = item.getGeographicReferencesOld().all() %}
+                    {% if geographyOld|length %}
+                        <ul>
+                            {% for geo in geographyOld %}
+                                <li>
+                                    {#
+                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                                    #}
+                                    {{ geo.title }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        n.a.
+                    {% endif %}
                 </div>
 
                 <div class="field" data-attribute="tags">
@@ -299,15 +315,21 @@
                         <label id="fields-tags-label" for="fields-tags">{{ 'Tags'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
-
-                    {% set tagValues = [] %}
-                    {% for tag in item.getTags().all() %}
-                        {% set tagValues = tagValues|merge([tag.title]) %}
-                    {% endfor %}
-                    <div class="input ltr">
-                        <textarea id="fields-tags" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[tags]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{ tagValues|join('\n – ') }}</textarea>
-                    </div>
-
+                    {% set tags = item.getTags().all() %}
+                    {% if tags|length %}
+                        <ul>
+                            {% for tag in tags %}
+                                <li>
+                                    {#
+                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                                    #}
+                                    {{ tag.title }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        n.a.
+                    {% endif %}
                 </div>
 
 
@@ -367,7 +389,12 @@
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
-                        <textarea id="fields-detail-text" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[detail-text]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{ item.getDetailText() }}</textarea>
+                        {% set text = item.getDetailText() %}
+                        {% if text|length %}
+                            {{ text }}
+                        {% else %}
+                            n.a.
+                        {% endif %}
                     </div>
                 </div>
 
@@ -382,7 +409,7 @@
                                 {#
                                 <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ ownership.id }}">&raquo; {{ ownership.title }}</a>
                                 #}
-                                &raquo; {{ ownership.title }}
+                                {{ ownership.title }}
                             </li>
                         {% endfor %}
                     </ul>
@@ -394,7 +421,12 @@
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
-                        <textarea id="fields-credit-line" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[credit-line]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{ item.getCreditLine() }}</textarea>
+                        {% set text = item.getCreditLine() %}
+                        {% if text|length %}
+                            {{text }}
+                        {% else %}
+                            n.a.
+                        {% endif %}
                     </div>
                 </div>
 
@@ -403,6 +435,23 @@
                         <label>Related Items</label>
                         <div class="flex-grow"></div>
                     </div>
+
+                    {% set relatedItems = item.getRelatedItems().all() %}
+                    {% if relatedItems|length %}
+                        <ul>
+                            {% for realtedItem in relatedItems %}
+                                <li>
+                                    {#
+                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                                    #}
+                                    {{ relatedItem.getDataAttribute('ObjObjectTitleVrt') }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        n.a.
+                    {% endif %}
+                    {#
                     {% set rItemValues = [] %}
                     {% for relatedItem in item.getRelatedItems().all() %}
                         {% set rItemValues = rItemValues|merge([relatedItem.getDataAttribute('ObjObjectTitleVrt')]) %}
@@ -410,6 +459,7 @@
                     <div class="input ltr">
                         <textarea id="fields-related-items" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[related-items]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{ rItemValues|join('\n – ') }}</textarea>
                     </div>
+                    #}
                 </div>
 
                 <div class="field" data-attribute="literature">
@@ -418,29 +468,25 @@
                         <div class="flex-grow"></div>
                     </div>
                     <div class="input ltr">
-                        {% set literatureValues = [] %}
-                        {% for literature in item.getLiterature().all() %}
-                            <div style="margin-bottom: 5px;">
-                                <div style="margin-bottom: 5px;"> - {{ literature.getDataAttribute('LitLiteratureVrt') }}</div>
 
-                                {# TODO can a literature have an asset?
-                                {% if literature.assetId %}
-                                    {% set myAsset = craft.assets().id(literature.assetId).one() %}
-                                    {% if myAsset %}
-                                        {% set thumb = {
-                                            width: 300,
-                                            quality: 75
-                                        } %}
-                                        {% set myAssetUrl = myAsset.getUrl(thumb) %}
+                        {% set literatures = item.getLiterature().all() %}
+                        {% if literatures|length %}
+                            <ul>
+                                {% for literature in literatures %}
+                                    <li>
+                                        {#
+                                        <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                                        #}
+                                        {{ literature.getDataAttribute('LitLiteratureVrt') }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            n.a.
+                        {% endif %}
 
-                                        <a href="{{ myAsset.getCpEditUrl() }}">
-                                            <img src="{{ myAssetUrl }}" width="150" />
-                                        </a>
-                                    {% endif %}
-                                {% endif %}
-                                #}
-                            </div>
-                        {% endfor %}
+
+
                     </div>
                 </div>
 
