@@ -200,6 +200,8 @@
                     </div>
                 </div>
 
+                <hr>
+
                 <div class="field" data-attribute="geographical-references-style-culture">
                     <div class="heading">
                         <label id="fields-geographical-references-style-culture-label" for="fields-geographical-references-style-culture">{{ 'Geographical References: Style/Culture'|t('museum-plus-for-craft-cms') }}</label>
@@ -210,10 +212,7 @@
                         <ul>
                             {% for geo in geographyCulture %}
                                 <li>
-                                    {#
                                     <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
-                                    #}
-                                    {{ geo.title }}
                                 </li>
                             {% endfor %}
                         </ul>
@@ -232,10 +231,7 @@
                         <ul>
                             {% for geo in geographyPolitical %}
                                 <li>
-                                    {#
                                     <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
-                                    #}
-                                    {{ geo.title }}
                                 </li>
                             {% endfor %}
                         </ul>
@@ -254,10 +250,7 @@
                         <ul>
                             {% for geo in geographyHistoric %}
                                 <li>
-                                    {#
                                     <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
-                                    #}
-                                    {{ geo.title }}
                                 </li>
                             {% endfor %}
                         </ul>
@@ -276,10 +269,7 @@
                         <ul>
                             {% for geo in geographyGeo %}
                                 <li>
-                                    {#
                                     <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
-                                    #}
-                                    {{ geo.title }}
                                 </li>
                             {% endfor %}
                         </ul>
@@ -309,6 +299,7 @@
                         n.a.
                     {% endif %}
                 </div>
+                <hr>
 
                 <div class="field" data-attribute="tags">
                     <div class="heading">
