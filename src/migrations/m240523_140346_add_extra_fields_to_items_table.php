@@ -19,7 +19,7 @@ class m240523_140346_add_extra_fields_to_items_table extends Migration
             $this->addColumn('{{%museumplus_items}}', 'extraTitle', $this->text()->after('sensitive'));
         }
         if (!$this->db->columnExists('{{%museumplus_items}}', 'extraDescription')) {
-            $this->addColumn('{{%items}}', 'extraDescription', $this->longText()->after('extraTitle'));
+            $this->addColumn('{{%museumplus_items}}', 'extraDescription', $this->longText()->after('extraTitle'));
         }
         return true;
     }
