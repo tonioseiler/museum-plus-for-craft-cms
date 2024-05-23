@@ -1,12 +1,12 @@
 <?php
 /**
-* MuseumPlus for CraftCMS plugin for Craft CMS 3.x
-*
-* Allows to import MuseumsPlus Collection data to Craft CMS and publish data. Additioanl Web Specific Data can be added to the imported data.
-*
-* @link      https://furbo.ch
-* @copyright Copyright (c) 2022 Furbo GmbH
-*/
+ * MuseumPlus for CraftCMS plugin for Craft CMS 3.x
+ *
+ * Allows to import MuseumsPlus Collection data to Craft CMS and publish data. Additioanl Web Specific Data can be added to the imported data.
+ *
+ * @link      https://furbo.ch
+ * @copyright Copyright (c) 2022 Furbo GmbH
+ */
 
 namespace furbo\museumplusforcraftcms\controllers;
 
@@ -17,12 +17,12 @@ use Craft;
 use craft\web\Controller;
 
 /**
-* Collection Controller
-*
-* @author    Furbo GmbH
-* @package   MuseumPlusForCraftCms
-* @since     1.0.0
-*/
+ * Collection Controller
+ *
+ * @author    Furbo GmbH
+ * @package   MuseumPlusForCraftCms
+ * @since     1.0.0
+ */
 class CollectionController extends Controller
 {
 
@@ -30,10 +30,10 @@ class CollectionController extends Controller
     // =========================================================================
 
     /**
-    * @var    bool|array Allows anonymous access to this controller's actions.
-    *         The actions must be in 'kebab-case'
-    * @access protected
-    */
+     * @var    bool|array Allows anonymous access to this controller's actions.
+     *         The actions must be in 'kebab-case'
+     * @access protected
+     */
     protected array|int|bool $allowAnonymous = ['get-items-by-tag', 'get-items-by-id', 'get-items-by-ids', 'search-items', 'show', 'get-random-item-by-tag'];
 
     // Public Methods
@@ -77,6 +77,7 @@ class CollectionController extends Controller
         return $this->renderTemplate('museum-plus-for-craft-cms/collection/edit', $variables);
     }
 
+
     public function actionSync()
     {
 
@@ -96,6 +97,12 @@ class CollectionController extends Controller
     {
         $this->requirePostRequest();
         $request = Craft::$app->getRequest();
+
+
+        $params = \Craft::$app->getRequest()->getBodyParams();
+        //dump(['d' => $params, 'at' => __CLASS__.'.'.__METHOD__.'.'.__LINE__]);
+
+
         $itemId = $request->getBodyParam('itemId');
         $item = MuseumPlusItem::find()
             ->id($itemId)
@@ -103,7 +110,11 @@ class CollectionController extends Controller
 
         // Set the title
         $item->title = $request->getBodyParam('title', $item->title);
-
+        $item->extraTitle = $request->getBodyParam('fields[extraTitle]', $item->extraTitle);
+        $item->extraDescription = $request->getBodyParam('fields[extraDescription]', $item->extraDescription);
+        //dump(['d $item->extraTitle' => $item->extraTitle, 'at' => __CLASS__.'.'.__METHOD__.'.'.__LINE__]);
+        //dump(['d' => $item, 'at' => __CLASS__.'.'.__METHOD__.'.'.__LINE__]);
+        // die('eeee');
         //set the custom fields
         $fieldsLocation = $request->getParam('fieldsLocation', 'fields');
         $item->setFieldValuesFromRequest($fieldsLocation);

@@ -540,13 +540,22 @@
 
         </div>
 
+
         <div id="tab--museumplusforcraftcms-extracontent" class="flex-fields hidden" data-id="tab--museumplusforcraftcms-extracontent" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-meta">
             <div id="fields-extracontentText-field" class="field width-100">
                 <div class="heading">
-                    <label id="fields-extracontentText-label" for="fields-extracontentText">Text</label>
+                    <label id="fields-extracontentExtraTitle-label" for="fields-extracontentExtraTitle">Extra Title</label>
                 </div>
                 <div class="input ltr">
-                    <textarea id="fields-extracontentText" class="nicetext text fullwidth" name="fields[extracontentText]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{ item.extracontentText }}</textarea>
+                    <input type="text" id="fields-extracontentExtraTitle" class="nicetext text fullwidth" name="fields[extraTitle]" value="{{ item.extraTitle }}" dir="ltr" placeholder="" data-show-chars-left=""></input>
+                </div>
+            </div>
+            <div id="fields-extracontentDesctiption-field" class="field width-100">
+                <div class="heading">
+                    <label id="fields-extracontentExtraDescription-label" for="fields-extracontentExtraDescription">Extra Desctription</label>
+                </div>
+                <div class="input ltr">
+                    <textarea id="fields-extracontentText" class="nicetext text fullwidth" name="fields[extraDescription]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{ item.extraDescription }}</textarea>
                 </div>
             </div>
         </div>

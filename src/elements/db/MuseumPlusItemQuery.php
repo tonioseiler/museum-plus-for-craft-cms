@@ -19,6 +19,8 @@ class MuseumPlusItemQuery extends ElementQuery
     public $objectGroupId;
     public $person;
     public $inventoryNumber;
+    public $extraTitle;
+    public $extraDescription;
     public $sensitive;
 
 
@@ -77,6 +79,18 @@ class MuseumPlusItemQuery extends ElementQuery
         return $this;
     }
 
+    public function extraTitle($value)
+    {
+        $this->extraTitle = $value;
+        return $this;
+    }
+
+    public function extraDescription($value)
+    {
+        $this->extraDescription = $value;
+        return $this;
+    }
+
     protected function beforePrepare(): bool
     {
         // join in the items table
@@ -89,6 +103,8 @@ class MuseumPlusItemQuery extends ElementQuery
             'museumplus_items.assetId',
             'museumplus_items.inventoryNumber',
             'museumplus_items.sensitive',
+            'museumplus_items.extraTitle',
+            'museumplus_items.extraDescription',
         ]);
 
         if ($this->collectionId) {
@@ -106,6 +122,14 @@ class MuseumPlusItemQuery extends ElementQuery
 
         if(!is_null($this->sensitive)){
             $this->subQuery->andWhere(Db::parseParam('museumplus_items.sensitive', false));
+        }
+
+        if(!is_null($this->extraTitle)){
+            $this->subQuery->andWhere(Db::parseParam('museumplus_items.extraTitle', false));
+        }
+
+        if(!is_null($this->extraDescription)){
+            $this->subQuery->andWhere(Db::parseParam('museumplus_items.extraDescription', false));
         }
 
 
