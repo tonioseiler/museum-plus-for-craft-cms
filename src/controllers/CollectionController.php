@@ -78,6 +78,24 @@ class CollectionController extends Controller
     }
 
 
+    public function actionGetExtraContentAi()
+    {
+        $aiData = [];
+        $request = Craft::$app->getRequest();
+        $params = \Craft::$app->getRequest()->getBodyParams();
+        $itemId = $request->getBodyParam('itemId');
+
+        // 1 prepare the prompt using some fields and the main image url
+        $item = MuseumPlusItem::find()->id($itemId)->one();
+
+        // 2 call the AI service and get the response
+
+        //$item->title;
+        $aiData['extraTitle'] = 'from controller, generated title';
+        $aiData['extraDescription'] = 'from controller, generated descr';
+        return $this->asJson($aiData);
+    }
+
     public function actionSync()
     {
 
@@ -166,40 +184,45 @@ class CollectionController extends Controller
         dd("show");
     }
 
-    public function actionGetItemsByTag($tagId) {
+    public function actionGetItemsByTag($tagId)
+    {
         return MuseumPlusForCraftCms::$plugin->collection->getItemsByTag($tagId);
     }
 
-    public function actionGetItemsById($id) {
+    public function actionGetItemsById($id)
+    {
         return MuseumPlusForCraftCms::$plugin->collection->getItemsById($id);
     }
 
-    public function actionGetItemsByIds($ids) {
+    public function actionGetItemsByIds($ids)
+    {
         return MuseumPlusForCraftCms::$plugin->collection->getItemsById($ids);
     }
 
-    public function actionSearchItems($params = []) {
+    public function actionSearchItems($params = [])
+    {
         return MuseumPlusForCraftCms::$plugin->collection->searchItems($params);
     }
 
-    public function actionGetRandomItemByTag() {
+    public function actionGetRandomItemByTag()
+    {
         $params = Craft::$app->getRequest()->getQueryParams();
         //sensitive tag id: 251772
         $item = MuseumPlusItem::find();
 
         $item = $item->sensitive(false);
 
-        if(isset($params['tagId'])){
+        if (isset($params['tagId'])) {
             $item = $item->tag($params['tagId']);
         }
 
 
-        if(isset($params['objectGroup'])){
+        if (isset($params['objectGroup'])) {
             $item = $item->objectGroup($params['objectGroup']);
         }
         $item = $item->orderBy('RAND()')->one();
 
-        if(!$item) {
+        if (!$item) {
             return $this->asJson([]);
         }
 

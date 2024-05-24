@@ -414,7 +414,7 @@
                     <div class="input ltr">
                         {% set text = item.getCreditLine() %}
                         {% if text|length %}
-                            {{text }}
+                            {{ text }}
                         {% else %}
                             n.a.
                         {% endif %}
@@ -475,7 +475,6 @@
                         {% else %}
                             n.a.
                         {% endif %}
-
 
 
                     </div>
@@ -558,13 +557,40 @@
                     <textarea id="fields-extracontentText" class="nicetext text fullwidth" name="fields[extraDescription]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;">{{ item.extraDescription }}</textarea>
                 </div>
             </div>
+            <div class="btngroup">
+                <br><br><br><button id="get-ai-data-btn" class="btn">Generate extra content (AI)</button>
+                <script>
+                    window.csrfTokenName = "{{ craft.app.config.general.csrfTokenName }}";
+                    window.csrfTokenValue = "{{ craft.app.request.csrfToken }}";
+                    document.getElementById('get-ai-data-btn').addEventListener('click', function () {
+                        const btn = this;
+                        btn.disabled = true; // disable button to prevent multiple clicks
+                        const itemId = {{ item.id }};
+                        var data = {itemId: itemId };
+                        data[window.csrfTokenName] = window.csrfTokenValue;
+                        $.ajax({
+                            url: '/actions/museum-plus-for-craft-cms/collection/get-extra-content-ai',
+                            type: 'POST',
+                            dataType: 'json',
+                            data:data,
+                            success: function(response) {
+                                console.log(response);
+                                btn.disabled = false;
+                                $('#fields-extracontentExtraTitle').val(response.extraTitle);
+                                $('#fields-extracontentText').val(response.extraDescription);
+                            },
+                            error: function(xhr, textStatus, errorThrown) {
+                                console.error('AJAX Error:', errorThrown);
+                                btn.disabled = false;
+                            }
+                        });
+                    });
+                </script>
+            </div>
         </div>
-
         {{ fieldsHtml|raw }}
-
     </div>
 {% endblock %}
-
 
 {% block details %}
     <fieldset>
