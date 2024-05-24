@@ -23,7 +23,7 @@
     ],
     "require": {
         "craftcms/cms": "^4.0.0",
-        "google-gemini-php/client": "^1.0"
+        "gemini-api-php/client": "^1.4"
     },
     "autoload": {
         "psr-4": {
