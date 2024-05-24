@@ -57,6 +57,8 @@ class Settings extends Model
 
     public $attachmentFileTypes = '';
 
+    public $googleGeminiApiKey = '';
+
 
     public $sites = [];
 

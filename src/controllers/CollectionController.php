@@ -16,7 +16,6 @@ use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 //use Gemini;
 
 
-
 use GeminiAPI\Client;
 use GeminiAPI\Enums\MimeType;
 use GeminiAPI\Resources\Parts\ImagePart;
@@ -90,43 +89,19 @@ class CollectionController extends Controller
 
     public function actionGetExtraContentAi()
     {
-
-
-
-
         $aiData = [];
         $request = Craft::$app->getRequest();
         $params = \Craft::$app->getRequest()->getBodyParams();
         $itemId = $request->getBodyParam('itemId');
-
         // 1 prepare the prompt using some fields and the main image url
         $item = MuseumPlusItem::find()->id($itemId)->one();
-        $prompt = "Generate a title for the museum object in the image. The name of the image is ".$item->title;
-        //$prompt = "Generate a title for the museum object in the image. The name of the image is ".$item->title;
-        // $prompt = "Hello";
-        $mainImage=$item->getAttachment();
+        $prompt = "Generate a title for the museum object in the image. The name of the image is " . $item->title;
+        // TODO prepare a complete prompt based on the available item's data
+        $mainImage = $item->getAttachment();
         $imagePath = $mainImage->getUrl();
-        // 2 call the AI service and get the response
-
-
         $imageEncoded = base64_encode(file_get_contents($imagePath));
-
-
-
-        /*
-         $client = Gemini::client('AIzaSyBnT3u9wXXxl16QVSg-wEMJOPMwsM4WXoo');
-        $result = $client
-            ->geminiProVision()
-            ->generateContent([
-                'inputs' => [
-                    'image' => $imageEncoded,
-                    'text' => $prompt
-                ]
-            ]);
-        */
-        $client = new Client('AIzaSyBnT3u9wXXxl16QVSg-wEMJOPMwsM4WXoo');
-
-
+        $pluginsettings = MuseumPlusForCraftCms::$plugin->getSettings();
+        $client = new Client($pluginsettings['googleGeminiApiKey']);
         $result = $client->geminiProVision()->generateContent(
             new TextPart($prompt),
             new ImagePart(
@@ -134,23 +109,6 @@ class CollectionController extends Controller
                 $imageEncoded,
             ),
         );
-
-
-
-        //$result = $client->geminiPro()->generateContent($prompt); this works
-
-        /*
-        $result = $client->geminiProVision()->generateContent(
-            new TextPart('$prompt'),
-            new ImagePart(
-                MimeType::IMAGE_JPEG,
-                $imageEncoded,
-            ),
-        );
-        */
-
-
-        //$item->title;
         $aiData['extraTitle'] = $result->text();
         $aiData['extraDescription'] = 'not implemented yet';
         return json_encode($aiData);

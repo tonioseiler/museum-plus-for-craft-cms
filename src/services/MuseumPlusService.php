@@ -47,6 +47,7 @@ class MuseumPlusService extends Component
     private $requestHeaders = null;
 
     private $attachmentFileTypes = null;
+    private $googleGeminiApiKey = null;
 
     public function getObjectDetail($objectId)
     {

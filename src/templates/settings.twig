@@ -106,6 +106,15 @@
                 value: settings['password']})
             }}
 
+            {{ forms.textField({
+                label: 'Google Gemini API Key (Gemini 1.0 Pro with billing account linked)',
+                instructions: 'The api key can be created <a href="https://aistudio.google.com/app/apikey" target="_blank">here</a>',
+                id: 'googleGeminiApiKey',
+                name: 'googleGeminiApiKey',
+                value: settings['googleGeminiApiKey']})
+            }}
+
+
             <hr />
 
             <div class="field">
@@ -120,12 +129,12 @@
 
                 {{ forms.textField({
                     label: 'Attachment file types',
-                    instructions: '',
+                    instructions: 'File extensions comma separated, e.g. jpg, jpeg, gif, pdf etc. Leave empty to allow all files.',
                     id: 'attachmentFileTypes',
                     name: 'attachmentFileTypes',
                     value: settings['attachmentFileTypes']})
                 }}
-                File extensions comma separated, e.g. jpg, jpeg, gif, pdf etc. Leave empty to allow all files.
+
 
             </div>
 
