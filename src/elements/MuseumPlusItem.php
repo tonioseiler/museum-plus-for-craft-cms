@@ -300,6 +300,7 @@ class MuseumPlusItem  extends Element
             ->select(['assetId'])
             ->from('{{%museumplus_items_assets}}')
             ->where(['itemId' => $this->id])
+            ->orderBy(['id' => SORT_ASC])
             ->all();
 
         foreach($multiMedia as $asset){
