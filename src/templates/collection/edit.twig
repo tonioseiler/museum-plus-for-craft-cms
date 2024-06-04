@@ -36,7 +36,7 @@
 {% set firstTabs = {
     "tab--museumplusforcraftcms-item": {
         "tabId": "tab-tab--museumplusforcraftcms-item",
-        "label": "Content",
+        "label": "Item",
         "url": "#tab--museumplusforcraftcms-item",
         "class": null
     }
@@ -46,13 +46,13 @@
     {% set firstTabs = {
         "tab--museumplusforcraftcms-item": {
             "tabId": "tab-tab--museumplusforcraftcms-item",
-            "label": "Content",
+            "label": "Item",
             "url": "#tab--museumplusforcraftcms-item",
             "class": null
         },
         "tab--museumplusforcraftcms-data": {
             "tabId": "tab-tab--museumplusforcraftcms-data",
-            "label": "MuseumPlus Data",
+            "label": "Data",
             "url": "#tab--museumplusforcraftcms-data",
             "class": null
         },
@@ -64,7 +64,7 @@
         },
         "tab--museumplusforcraftcms-extracontent": {
             "tabId": "tab-tab--museumplusforcraftcms-extracontent",
-            "label": "Extra content",
+            "label": "Content",
             "url": "#tab--museumplusforcraftcms-extracontent",
             "class": null
         }
@@ -558,7 +558,7 @@
                 </div>
             </div>
             <div class="btngroup">
-                <br><br><br><button id="get-ai-data-btn" class="btn">Generate extra content (AI)</button>
+                <br><br><br><button id="get-ai-data-btn" class="btn">Generate content (AI)</button>
                 <script>
                     window.csrfTokenName = "{{ craft.app.config.general.csrfTokenName }}";
                     window.csrfTokenValue = "{{ craft.app.request.csrfToken }}";
