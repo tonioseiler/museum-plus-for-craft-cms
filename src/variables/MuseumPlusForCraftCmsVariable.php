@@ -19,7 +19,7 @@ use Craft;
  * MuseumPlus for CraftCMS Variable
  *
  * Craft allows plugins to provide their own template variables, accessible from
- * the {{ craft }} global variable (e.g. {{ craft.museumPlusForCraftCms }}).
+ * the {{ craft }} global variable (e.g. {{ craft.museumPlus }}).
  *
  * https://craftcms.com/docs/plugins/variables
  *
@@ -34,8 +34,8 @@ class MuseumPlusForCraftCmsVariable
 
     /**
      *
-     *     {{ craft.museumPlusForCraftCms.cpTitle }} or
-     *     {{ craft.museumPlusForCraftCms.cpTitle(twigValue) }}
+     *     {{ craft.museumPlus.cpTitle }} or
+     *     {{ craft.museumPlus.cpTitle(twigValue) }}
      *
      * @param null $optional
      * @return string

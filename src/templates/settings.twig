@@ -1,7 +1,7 @@
 {% import "_includes/forms" as forms %}
 
 {# The title of this CP section #}
-{% set title = craft.museumPlusForCraftCms.cpTitle~' - Settings' %}
+{% set title = craft.museumPlus.cpTitle~' - Settings' %}
 
 {% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\museumplusforcraftcms\\MuseumPlusForCraftCmsAsset") %}
 
@@ -123,7 +123,7 @@
                 {{ forms.select({
                     id: 'attachmentVolumeId',
                     name: 'attachmentVolumeId',
-                    options: craft.museumPlusForCraftCms.getVolumes(),
+                    options: craft.museumPlus.getVolumes(),
                     value: settings['attachmentVolumeId']})
                 }}
 
@@ -147,7 +147,7 @@
                 {{ forms.checkboxSelect({
                     id: 'objectGroups',
                     name: 'objectGroups',
-                    options: craft.museumPlusForCraftCms.getObjectGroups(),
+                    options: craft.museumPlus.getObjectGroups(),
                     values: settings['objectGroups']})
                 }}
 
@@ -163,7 +163,7 @@
                 {{ forms.multiSelect({
                 id: 'exhibitions',
                 name: 'exhibitions',
-                options: craft.museumPlusForCraftCms.getExhibitions(),
+                options: craft.museumPlus.getExhibitions(),
                 values: settings['exhibitions']})
             }}
 
