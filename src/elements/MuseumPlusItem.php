@@ -15,6 +15,7 @@ use craft\db\Query;
 use craft\elements\User;
 use craft\helpers\Cp;
 
+use craft\helpers\Html;
 use craft\helpers\UrlHelper;
 use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
@@ -403,6 +404,18 @@ class MuseumPlusItem  extends Element
                 return $this->collectionId;
             case 'inventoryNumber':
                 return $this->inventoryNumber;
+            case 'frontendLink':
+                $url = $this->getUrl();
+                if ($url !== null) {
+                    return Html::a('', $url, [
+                        'rel' => 'noopener',
+                        'target' => '_blank',
+                        'data-icon' => 'world',
+                        'title' => Craft::t('app', 'Visit webpage'),
+                        'aria-label' => Craft::t('app', 'View'),
+                    ]);
+                }
+                return '';
         }
         return parent::tableAttributeHtml($attribute);
     }
@@ -415,12 +428,13 @@ class MuseumPlusItem  extends Element
             'assetId' => 'Main Image',
             'multimedia' => 'Media',
             'id' => ['label' => Craft::t('app', 'ID')],
+            'frontendLink' => ['label' => Craft::t('app', 'Link'), 'icon' => 'world'],
         ];
     }
 
     protected static function defineDefaultTableAttributes(string $source): array
     {
-        return ['collectionId', 'assetId', 'multimedia'];
+        return ['collectionId', 'assetId', 'multimedia','frontendLink'];
     }
 
 
