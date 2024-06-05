@@ -126,14 +126,15 @@ class CollectionController extends Controller
             return false;
         }
 
+
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $this->collectionItemId])
             ->one();
 
         if (!$item) {
-            echo 'creating item (id: '.$this->collectionItemId.')'.PHP_EOL;
+            echo 'Creating item (id: '.$this->collectionItemId.')'.PHP_EOL;
         } else {
-            echo 'updating item (id: '.$this->collectionItemId.')'.PHP_EOL;
+            echo 'Updating item (id: '.$this->collectionItemId.')'.PHP_EOL;
         }
         $this->updateItemFromMuseumPlus($this->collectionItemId);
         $this->updateItemToItemRelationShips($this->collectionItemId);
@@ -145,21 +146,22 @@ class CollectionController extends Controller
 
     public function actionUpdateItems()
     {
+        // TODO paolo remove
+        $this->forceAll = true;
 
+        echo 'Downloading list of object groups'.PHP_EOL;
         $this->downloadObjectGroups();
-
+        echo 'Updating Items'.PHP_EOL;
         $objectIds = [];
         foreach ($this->settings['objectGroups'] as $objectGroupId) {
             $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
             foreach ($objects as $o) {
                 $objectIds[$o->id] = $o->id;
-
                 //check if item exists and if last mod is before last mod in mplus
                 $objectLastModified = new \DateTime($o->__lastModified);
                 $item = MuseumPlusItem::find()
                     ->where(['collectionId' => $o->id])
                     ->one();
-
                 if (!$item) {
                     echo 'Creating item (id: '.$o->id.')'.PHP_EOL;
                     $this->updateItemFromMuseumPlus($o->id);
@@ -196,7 +198,7 @@ class CollectionController extends Controller
     {
         App::maxPowerCaptain();
         //create object to object relations
-        echo 'Echo updating item to item relationships'.PHP_EOL;
+        echo 'Updating item to item relationships'.PHP_EOL;
         $itemIds = MuseumPlusItem::find()->ids();
         foreach($itemIds as $itemId) {
             $item = MuseumPlusItem::find()
@@ -239,14 +241,41 @@ class CollectionController extends Controller
 
     private function updateItemFromMuseumPlus($collectionId)
     {
-        echo 'Update item '.$collectionId.PHP_EOL;
-
+        //echo 'Update item '.$collectionId.PHP_EOL;
         try {
             $o = $this->museumPlus->getObjectDetail($collectionId);
             $item = $this->createOrUpdateItem($o);
 
+            //add attachment
+            //echo '- Main image'.PHP_EOL;
+            if (!$this->ignoreAttachments) {
+                $assetId = $this->createAttachmentFromObjectId($item->collectionId);
+                if($assetId){
+                    //echo "Attachment for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
+                    $item->assetId = $assetId;
+                    Craft::$app->elements->saveElement($item);
+                } else {
+                    //echo "Attachment for item " . $item->id . " AssetID: NULL" . PHP_EOL;
+                }
+            }
 
             $moduleRefs = $item->getDataAttribute('moduleReferences');
+
+            //add multimedia
+            //echo '- Multimedia files'.PHP_EOL;
+            if(!$this->ignoreMultimedia && isset($moduleRefs['ObjMultimediaRef'])) {
+                $assetIds = [];
+                foreach ($moduleRefs['ObjMultimediaRef']['items'] as $mm){
+                    $assetId = $this->createMultimediaFromId($mm['id'],$collectionId);
+                    if ($assetId) {
+                        $assetIds[] = $assetId;
+                    }
+                }
+                if(count($assetIds)){
+                    $item->syncMultimediaRelations($assetIds);
+                    //echo "Multimedia assets for Item Id: " . $item->id . " Asset IDs: " . implode(",", $assetIds) . PHP_EOL;
+                }
+            }
 
             //add literature relations
             $moduleRefs = $item->getDataAttribute('moduleReferences');
@@ -270,7 +299,7 @@ class CollectionController extends Controller
             //sync
             if(count($literatureIds)){
                 $item->syncLiteratureRelations($literatureIds);
-                echo 'l';
+                //echo 'l';
             }
 
             //add people refs
@@ -292,7 +321,7 @@ class CollectionController extends Controller
                     //sync
                     if(count($peopleIds)){
                         $item->syncPeopleRelations($peopleIds, $peopleType);
-                        echo 'p';
+                        //echo 'p';
                     }
                 }
             }
@@ -315,39 +344,12 @@ class CollectionController extends Controller
             //sync
             if(count($ownershipIds)){
                 $item->syncOwnershipRelations($ownershipIds);
-                echo 'o';
+                //echo 'o';
             }
 
             $this->updateVocabularyRefs($item);
 
-            //add attachment
-            if (!$this->ignoreAttachments) {
-                $assetId = $this->createAttachmentFromObjectId($item->collectionId);
-                if($assetId){
-                    echo "Attachment for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
-                    $item->assetId = $assetId;
-                    Craft::$app->elements->saveElement($item);
-                } else {
-                    echo "Attachment for item " . $item->id . " AssetID: NULL" . PHP_EOL;
-                }
-            }
 
-
-            //add multimedia
-            if(!$this->ignoreMultimedia && isset($moduleRefs['ObjMultimediaRef'])) {
-                $assetIds = [];
-                foreach ($moduleRefs['ObjMultimediaRef']['items'] as $mm){
-                    $assetId = $this->createMultimediaFromId($mm['id']);
-                    if ($assetId) {
-                        $assetIds[] = $assetId;
-                    }
-                }
-
-                if(count($assetIds)){
-                    $item->syncMultimediaRelations($assetIds);
-                    echo "Multimedia assets for Item Id: " . $item->id . " Asset IDs: " . implode(",", $assetIds) . PHP_EOL;
-                }
-            }
 
             //add literature
             if(!$this->ignoreLiterature && isset($moduleRefs['ObjLiteratureRef'])) {
@@ -356,14 +358,15 @@ class CollectionController extends Controller
                     $assetId = $this->createLiteratureFromId($l['id']);
                     $literature = $this->museumPlus->getLiterature($l['id']);
                     if($assetId && $literature){
-                        echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
+                        //echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
                         $literature->assetId = $assetId;
                         $literature->save();
                     }else{
-                        echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: NULL" . PHP_EOL;
+                        //echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: NULL" . PHP_EOL;
                     }
                 }
             }
+
         } catch (\Exception $e) {
             //     echo $item->id . " could not be fully updated." . PHP_EOL;
             echo $e->getMessage() . PHP_EOL;
@@ -430,7 +433,6 @@ class CollectionController extends Controller
     }
 
     private function downloadObjectGroups() {
-        echo 'Downloading object groups.'.PHP_EOL;
         $objectGroupIds = $this->settings['objectGroups'];
         $objectGroupsData = $this->museumPlus->getObjectGroups();
         foreach ($objectGroupsData as $ogd) {
@@ -443,7 +445,7 @@ class CollectionController extends Controller
         foreach ($existingObjectGroups as $objectGroup) {
             if (!in_array($objectGroup->collectionId, $objectGroupIds)) {
                 $success = $objectGroup->delete();
-                echo 'x';
+                //echo 'x';
             }
         }
 
@@ -452,45 +454,41 @@ class CollectionController extends Controller
 
     private function createAttachmentFromObjectId($id)
     {
+        $attachment = $this->museumPlus->getAttachmentByObjectId($id);
         $folderId = $this->settings['attachmentVolumeId'];
         $folder = $this->assets->findFolder(['id' => $folderId]);
-        //$parentFolder = $this->createFolder("Items", $folderId);
         $parentFolder = $this->createFolder("Items");
-        $attachment = $this->museumPlus->getAttachmentByObjectId($id);
-
+        $itemFolder = $this->createFolder($id,$parentFolder->id,$parentFolder->path);
         if ($attachment) {
-            $asset = $this->createAsset($id, $attachment, $parentFolder);
+            $asset = $this->createAsset($id, $attachment, $itemFolder);
             if($asset){
                 return $asset->id;
             }
-
         }
         return false;
     }
 
-    private function createMultimediaFromId($id)
+    private function createMultimediaFromId($id, $itemId = null)
     {
+        $attachment = $this->museumPlus->getMultimediaById($id);
         $folderId = $this->settings['attachmentVolumeId'];
         $folder = $this->assets->findFolder(['id' => $folderId]);
-        //$parentFolder = $this->createFolder("Multimedia", $folderId);
         $parentFolder = $this->createFolder("Multimedia");
-        $attachment = $this->museumPlus->getMultimediaById($id);
-
-
+        $itemFolder = $this->createFolder($itemId,$parentFolder->id,$parentFolder->path);
         if ($attachment) {
             $fileTypes = $this->settings['attachmentFileTypes'];
             if (!empty($fileTypes)) {
                 // only allow file types defined in plugin settings.
                 $pattern = '/\.(' . str_replace(', ', '|', $fileTypes) . ')$/i';
                 if (preg_match($pattern, $attachment)) {
-                    $asset = $this->createAsset($id, $attachment, $parentFolder);
+                    $asset = $this->createAsset($id, $attachment, $itemFolder);
                     if ($asset) {
                         return $asset->id;
                     }
                 }
             } else {
-                // only allow any file type
-                $asset = $this->createAsset($id, $attachment, $parentFolder);
+                // allow any file type
+                $asset = $this->createAsset($id, $attachment, $itemFolder);
                 if ($asset) {
                     return $asset->id;
                 }
@@ -536,6 +534,7 @@ class CollectionController extends Controller
 
             $result = Craft::$app->getElements()->saveElement($asset);
             if ($result){
+                //echo '- File '.$id.PHP_EOL;
                 return $asset;
             }else{
                 return false;
@@ -546,8 +545,7 @@ class CollectionController extends Controller
         return false;
     }
 
-    //private function createFolder($folderName, $parentFolderId)
-    private function createFolder($folderName)
+    private function createFolder($folderName, $parentFolderId = null,$parentFolderPath = null)
     {
         $volumeId = $this->settings['attachmentVolumeId'];
         $volume = Craft::$app->volumes->getVolumeById($volumeId);
@@ -561,22 +559,44 @@ class CollectionController extends Controller
             Craft::error("Root folder for volume ID {$volumeId} not found.", __METHOD__);
             return false;
         }
-        // Check if the folder already exists
-        $existingFolder = Craft::$app->assets->findFolder([
-            'name' => $folderName,
-            'parentId' => $rootFolder->id
-        ]);
-        if ($existingFolder) {
-            return $existingFolder;
+
+        if ($parentFolderId !== null) {
+            // Check if the folder already exists
+            $existingFolder = Craft::$app->assets->findFolder([
+                'name' => $folderName,
+                'parentId' => $parentFolderId
+            ]);
+            if ($existingFolder) {
+                return $existingFolder;
+            } else {
+                $folder = new VolumeFolder();
+                $folder->parentId = $parentFolderId;
+                $folder->name = $folderName;
+                $folder->volumeId = $volumeId;
+                $folder->path = $parentFolderPath . $folderName . '/';
+                $this->assets->createFolder($folder);
+                return $folder;
+            }
         } else {
-            $folder = new VolumeFolder();
-            $folder->parentId = $rootFolder->id;
-            $folder->name = $folderName;
-            $folder->volumeId = $volumeId;
-            $folder->path = $folderName . '/';
-            $this->assets->createFolder($folder);
-            return $folder;
-        }
+// Check if the folder already exists
+            $existingFolder = Craft::$app->assets->findFolder([
+                'name' => $folderName,
+                'parentId' => $rootFolder->id
+            ]);
+            if ($existingFolder) {
+                return $existingFolder;
+            } else {
+                $folder = new VolumeFolder();
+                $folder->parentId = $rootFolder->id;
+                $folder->name = $folderName;
+                $folder->volumeId = $volumeId;
+                $folder->path = $folderName . '/';
+                $this->assets->createFolder($folder);
+                return $folder;
+            }        }
+
+
+
     }
 
     private function createOrUpdateItem($object) {
@@ -612,7 +632,7 @@ class CollectionController extends Controller
                     $itemRecord->link('objectGroups', $objectGroup);
             }
         }
-        echo 'i';
+        //echo 'i';
         return $item;
     }
 
@@ -929,7 +949,7 @@ class CollectionController extends Controller
 
         if(count($syncData)){
             $item->syncVocabularyRelations($syncData);
-            echo 'v';
+            //echo 'v';
         }
     }
 
