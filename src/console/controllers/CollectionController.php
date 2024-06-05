@@ -146,8 +146,7 @@ class CollectionController extends Controller
 
     public function actionUpdateItems()
     {
-        // TODO paolo remove
-        $this->forceAll = true;
+        //$this->forceAll = true;
 
         echo 'Downloading list of object groups'.PHP_EOL;
         $this->downloadObjectGroups();
@@ -159,10 +158,12 @@ class CollectionController extends Controller
                 $objectIds[$o->id] = $o->id;
                 //check if item exists and if last mod is before last mod in mplus
 
-                // TODO paolo remove
+                // partial import
+                /*
                 if ($o->id < 39468) {
                     continue;
                 }
+                */
 
 
 
