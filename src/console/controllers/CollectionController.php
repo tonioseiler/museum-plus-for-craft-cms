@@ -158,6 +158,14 @@ class CollectionController extends Controller
             foreach ($objects as $o) {
                 $objectIds[$o->id] = $o->id;
                 //check if item exists and if last mod is before last mod in mplus
+
+                // TODO paolo remove
+                if ($o->id < 39468) {
+                    continue;
+                }
+
+
+
                 $objectLastModified = new \DateTime($o->__lastModified);
                 $item = MuseumPlusItem::find()
                     ->where(['collectionId' => $o->id])
