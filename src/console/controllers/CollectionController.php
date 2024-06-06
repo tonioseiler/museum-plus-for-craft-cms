@@ -14,6 +14,7 @@ use craft\db\Query;
 use craft\elements\Asset;
 use craft\helpers\Assets;
 use craft\helpers\ElementHelper;
+use craft\helpers\FileHelper;
 use craft\models\VolumeFolder;
 use craft\helpers\App;
 
@@ -526,6 +527,7 @@ class CollectionController extends Controller
     private function createAsset($id, $attachment, $parentFolder)
     {
         $basename = pathinfo($attachment, PATHINFO_FILENAME);
+        $basename = FileHelper::sanitizeFilename($basename,[true,'_']);
         $extension = pathinfo($attachment, PATHINFO_EXTENSION);
         $filename = $basename . '_' . $id . '.' . $extension;
         $title = Assets::filename2Title($basename . '_' . $id);
