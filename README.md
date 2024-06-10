@@ -6,7 +6,7 @@ Allows to import MuseumsPlus Collection data to Craft CMS and publish data.
 
 ## Requirements
 
-This plugin requires Craft CMS 4.7 or later.
+This plugin requires Craft CMS 4.7 or later and php 8.1 or later.
 
 ## Installation
 
@@ -38,14 +38,17 @@ You will need to provide:
 After saving the settings you will see the list of collections you have access to: choose at least one collection and save the settings.
 You should also choose the filesystem where the media will be stored: note that the two subfolders `Items` and `Multimedia` will be automatically created in the root of the filesystem.
 You can specify which kind of files to import: the plugin will download the files and store them in the chosen filesystem.
+In the settings there is a section to define the URI format and template to be used to show collection items in the frontend.
 
 The shell command `./craft museum-plus-for-craft-cms/collection/update-items` will import the data from the selected collections.
 We advise to set up a cron job to run this command regularly.
 
 ## Using MuseumPlus for CraftCMS
 
+In the backend you will see a new section called "Collection" where you can see the imported collections and their items
+
 Frontend example to display the items:
-```twig
+```
 {% set items = craft.museumPlusForCraftCms.items.all() %}
 {% for item in items %}
     <h2>{{ item.title }}</h2>
@@ -55,7 +58,7 @@ Frontend example to display the items:
 ```
 
 Frontend example to display a single item:
-```twig
+```
 {% set item = craft.museumPlusForCraftCms.items.one() %}
 <h2>{{ item.title }}</h2>
 ```
