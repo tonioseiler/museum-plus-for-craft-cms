@@ -2,27 +2,35 @@
     "name": "furbo/museum-plus-for-craft-cms",
     "description": "Allows to import MuseumsPlus Collection data to Craft CMS and publish data.",
     "type": "craft-plugin",
-    "version": "dev-master",
+    "version": "1.0.0",
     "keywords": [
         "craft",
         "cms",
         "craftcms",
         "craft-plugin",
-        "museumplus for craftcms"
+        "museumplus"
     ],
     "support": {
         "docs": "https://furbo.ch",
         "issues": "https://furbo.ch"
     },
-    "license": "MIT",
+    "license": "proprietary",
     "authors": [
         {
             "name": "Furbo GmbH",
             "homepage": "https://furbo.ch"
         }
     ],
+    "support": {
+        "email": "support@furbo.ch",
+        "issues": "https://github.com/tonioseiler/museum-plus-for-craft-cms/issues?state=open",
+        "source": "https://github.com/tonioseiler/museum-plus-for-craft-cms",
+        "docs": "https://github.com/tonioseiler/museum-plus-for-craft-cms",
+        "rss": "https://github.com/tonioseiler/museum-plus-for-craft-cms/releases.atom"
+    },
     "require": {
-        "craftcms/cms": "^4.0.0",
+        "php": ">=8.0.2",
+        "craftcms/cms": "^4.3.4",
         "gemini-api-php/client": "^1.4"
     },
     "autoload": {
@@ -35,8 +43,8 @@
         "handle": "museum-plus-for-craft-cms",
         "developer": "Furbo GmbH",
         "developerUrl": "https://furbo.ch",
-        "documentationUrl": "???",
-        "changelogUrl": "???",
+        "documentationUrl": "https://github.com/tonioseiler/museum-plus-for-craft-cms",
+        "changelogUrl": "https://github.com/tonioseiler/museum-plus-for-craft-cms/blob/master/CHANGELOG.md",
         "components": {
             "museumPlus": "furbo\\museumplusforcraftcms\\services\\MuseumPlusService",
             "collection": "furbo\\museumplusforcraftcms\\services\\CollectionService",
@@ -44,11 +52,7 @@
         },
         "class": "furbo\\museumplusforcraftcms\\MuseumPlusForCraftCms"
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "require-dev": {
-        "craftcms/rector": "dev-main"
-    },
+
     "config": {
         "allow-plugins": {
             "yiisoft/yii2-composer": true,

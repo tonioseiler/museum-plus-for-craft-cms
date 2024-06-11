@@ -22,11 +22,11 @@ To install the plugin, follow these instructions.
 
 3. In the Control Panel, go to Settings → Plugins and click the “Install” button for MuseumPlus for CraftCMS.
 
-## MuseumPlus for CraftCMS Overview
+## Overview
 
 MuseumPlus for CraftCMS automatically imports items from one or more collections and makes them available to Craft.
 
-## Configuring MuseumPlus for CraftCMS
+## Configuration
 
 Once the plugin is installed, you can configure it in the Craft Control Panel under Settings → MuseumPlus for CraftCMS.
 You will need to provide:
@@ -43,7 +43,7 @@ In the settings there is a section to define the URI format and template to be u
 The shell command `./craft museum-plus-for-craft-cms/collection/update-items` will import the data from the selected collections.
 We advise to set up a cron job to run this command regularly.
 
-## Using MuseumPlus for CraftCMS
+## Usage
 
 In the backend you will see a new section called "Collection" where you can see the imported collections and their items
 
@@ -59,15 +59,21 @@ Frontend example to display the items:
 
 Frontend example to display a single item:
 ```
-{% set item = craft.museumPlusForCraftCms.items.one() %}
+{% set attachment = entry.getAttachment() %}
+{% if attachment %}
+  {% set myAsset = attachment %}
+  {% if myAsset %}
+      {% set myAssetUrl = myAsset.getUrl() %}
+      <img 
+      src="{{ myAsset.getUrl("transformL") }}" alt="{{ myAsset.title }}" @click="$store.modal.updateModalContent('<img src=\'{{myAsset.getUrl()}}\'>', false)" class="cursor-pointer max-w-full max-h-[70vh]" />
+  {% endif %}
+{% endif %}
 <h2>{{ item.title }}</h2>
 ```
 
 
 
-## MuseumPlus for CraftCMS Roadmap
-
-Some things to do, and ideas for potential features:
+## Roadmap
 
 * Integrate Google Gemini for better titles and descriptions
 
