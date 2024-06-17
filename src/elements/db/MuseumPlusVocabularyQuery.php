@@ -27,7 +27,7 @@ class MuseumPlusVocabularyQuery extends ElementQuery
         return $this;
     }
 
-    public function language($value)
+    public function language($value): \craft\elements\db\ElementQuery
     {
         $this->language = $value;
 
