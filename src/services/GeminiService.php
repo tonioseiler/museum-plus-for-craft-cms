@@ -43,7 +43,15 @@ class GeminiService extends Component
         $prompt = "Write a title (approximately 160 characters) and a text (approximately 1000 characters) for the museum object in the image. The name of the image is " . $item->title .'. Send me the response in json.';
         // TODO prepare a complete prompt based on the available item's data
         $mainImage = $item->getAttachment();
-        $imagePath = $mainImage->getUrl();
+
+        $transform = [
+            'mode' => 'fit',
+            'width' => 300,
+            'height' => 300,
+            'quality' => 80,
+        ];
+
+        $imagePath = $mainImage->getUrl($transform, true);
         $imageEncoded = base64_encode(file_get_contents($imagePath));
         $pluginsettings = MuseumPlusForCraftCms::$plugin->getSettings();
         $client = new Client($pluginsettings['googleGeminiApiKey']);
