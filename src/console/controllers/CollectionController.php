@@ -901,6 +901,14 @@ class CollectionController extends Controller
             foreach ($vocabularyRef['items'] as $vc){
                 try {
                     $data = $this->museumPlus->getVocabularyNode($type,$vc['id']);
+
+                    //TODO:
+                    // while(voc entry with collectioId = data.parentId exists)
+                    //     $data = $this->museumPlus->getVocabularyNode($type, data.parentId);
+                    //      check if the parent exists
+                    //     create this parent object and do this until you dont have a parentId anymore
+
+
                     foreach ($data as $d) {
                         $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
                         if ($vocabularyEntry) {
