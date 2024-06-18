@@ -1,6 +1,6 @@
 <?php
 
-namespace Furbo\MuseumPlus\Events;
+namespace furbo\museumplusforcraftcms\events;
 
 use yii\base\Event;
 

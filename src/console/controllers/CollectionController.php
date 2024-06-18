@@ -27,10 +27,9 @@ use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
 use furbo\museumplusforcraftcms\records\LiteratureRecord;
-use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
+use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
 
 use Craft;
-use Furbo\MuseumPlus\Events\ItemUpdatedFromMuseumPlusEvent;
 use yii\console\Controller;
 use yii\helpers\Console;
 
@@ -986,7 +985,7 @@ class CollectionController extends Controller
             'isNewItem' => $isNewItem
         ]);
 
-        $this->trigger(MuseumPlusForCraftCms::EVENT_ITEM_UPDATED_FROM_MUSEUM_PLUS, $event);
+        MuseumPlusForCraftCms::$plugin->trigger(MuseumPlusForCraftCms::EVENT_ITEM_UPDATED_FROM_MUSEUM_PLUS, $event);
     }
 
 }
