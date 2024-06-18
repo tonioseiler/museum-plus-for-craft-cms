@@ -737,12 +737,20 @@ class MuseumPlusItem  extends Element
 
     public function getPrev($criteria = false): ?ElementInterface
     {
-        return parent::getPrev($this->getCriteria());
+        if (empty($criteria)) {
+            return parent::getPrev($this->getCriteria());
+        } else {
+            return parent::getPrev($criteria);
+        }
     }
 
     public function getNext($criteria = false): ?ElementInterface
     {
-        return parent::getNext($this->getCriteria());
+        if (empty($criteria)) {
+            return parent::getNext($this->getCriteria());
+        } else {
+            return parent::getNext($criteria);
+        }
     }
 
     private function getCriteria()
