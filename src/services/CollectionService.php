@@ -72,11 +72,12 @@ class CollectionService extends Component
     public function getItemsByIds($ids, $limit = 10, $offset = 0) {
         $items = MuseumPlusItem::find()
             ->id($ids)
-            ->limit($limit)
-            ->offset($offset)
         ;
+        Craft::$app->session->set('museumPlusCriteria', $items);
+        $items = $items->limit($limit)->offset($offset);
         return $items;
     }
+
 
     public function searchItems($params, $limit = 10, $offset = 0) {
         $criteria = [];
