@@ -16,6 +16,7 @@ use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 
 use Craft;
 use craft\web\Controller;
+use Furbo\MuseumPlus\Events\ItemUpdatedFromMuseumPlusEvent;
 
 /**
  * Collection Controller

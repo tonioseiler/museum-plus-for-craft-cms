@@ -30,6 +30,7 @@ use furbo\museumplusforcraftcms\records\LiteratureRecord;
 use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 
 use Craft;
+use Furbo\MuseumPlus\Events\ItemUpdatedFromMuseumPlusEvent;
 use yii\console\Controller;
 use yii\helpers\Console;
 
@@ -127,21 +128,24 @@ class CollectionController extends Controller
             return false;
         }
 
-
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $this->collectionItemId])
             ->one();
-
+        
+        $isNewItem = false;
         if (!$item) {
             echo 'Creating item (id: '.$this->collectionItemId.')'.PHP_EOL;
+            $isNewItem = true;
         } else {
             echo 'Updating item (id: '.$this->collectionItemId.')'.PHP_EOL;
         }
         $this->updateItemFromMuseumPlus($this->collectionItemId);
+        $this->triggerUpdateEvent($this->collectionItemId, $isNewItem);
         $this->updateItemToItemRelationShips($this->collectionItemId);
         $this->updateItemInventory($this->collectionItemId);
         $this->updateItemSort($this->collectionItemId);
         $this->updateItemSensitive($this->collectionItemId);
+
     }
 
 
@@ -159,14 +163,6 @@ class CollectionController extends Controller
                 $objectIds[$o->id] = $o->id;
                 //check if item exists and if last mod is before last mod in mplus
 
-                // partial import
-                /*
-                if ($o->id < 39468) {
-                    continue;
-                }
-                */
-
-
 
                 $objectLastModified = new \DateTime($o->__lastModified);
                 $item = MuseumPlusItem::find()
@@ -175,9 +171,11 @@ class CollectionController extends Controller
                 if (!$item) {
                     echo 'Creating item (id: '.$o->id.')'.PHP_EOL;
                     $this->updateItemFromMuseumPlus($o->id);
+                    $this->triggerUpdateEvent($o->id, true);
                 } else if ($this->forceAll || $item->dateUpdated < $objectLastModified) {
                     echo 'Updating item (id: '.$o->id.')'.PHP_EOL;
                     $this->updateItemFromMuseumPlus($o->id);
+                    $this->triggerUpdateEvent($o->id, false);
                 } else {
                     //echo '.';
                 }
@@ -976,6 +974,19 @@ class CollectionController extends Controller
 
     private function optimizeSearchIndex() {
         Craft::$app->db->createCommand("OPTIMIZE TABLE searchindex")->execute();
+    }
+
+    private function triggerUpdateEvent($collectionItemId, $isNewItem = false) {
+        $item = MuseumPlusItem::find()
+            ->where(['collectionId' => $collectionItemId])
+            ->one();
+
+        $event = new ItemUpdatedFromMuseumPlusEvent([
+            'item' => $item,
+            'isNewItem' => $isNewItem
+        ]);
+
+        $this->trigger(MuseumPlusForCraftCms::EVENT_ITEM_UPDATED_FROM_MUSEUM_PLUS, $event);
     }
 
 }

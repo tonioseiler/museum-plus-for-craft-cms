@@ -71,6 +71,28 @@ Frontend example to display a single item:
 <h2>{{ item.title }}</h2>
 ```
 
+### Events
+
+The plugin throws a custom event after an item has been updated or created by the plugin.Custom modules can then listen to the event and add some custom functionality.
+
+Add this code to the init() method of your custom module in craft cms.
+
+```
+Event::on(
+    MuseumPlusForCraftCms::class,
+    MuseumPlusForCraftCms::EVENT_ITEM_UPDATED_FROM_MUSEUM_PLUS,
+    function(ItemUpdatedFromMuseumPlusEvent $e) {
+        //Example: lets say you have an extra field, for example is_new to show alle the newly created items in a collection.
+        //The field can the be removed manually from the backend
+        $item = $e->item;
+        if ($e->isNewItem) {
+          $item->is_new = true;
+          Craft::$app->elements->saveElement($item);
+        }
+    }
+);
+
+```
 
 
 ## Roadmap

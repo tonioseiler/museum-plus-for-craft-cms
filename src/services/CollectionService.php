@@ -58,6 +58,13 @@ class CollectionService extends Component
         return $people;
     }
 
+    public function getAllPeople() {
+        $people = PersonRecord::find()
+                ->orderBy(['title' => SORT_ASC])
+                ->all();
+        return $people;
+    }
+
     public function getItemsByTag($tagId) {
         return 'Todo: implement';
     }

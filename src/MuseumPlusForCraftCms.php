@@ -96,6 +96,13 @@ class MuseumPlusForCraftCms extends Plugin
      */
     public bool $hasCpSection = true;
 
+
+    // Events
+    // =========================================================================
+    const EVENT_ITEM_UPDATED_FROM_MUSEUM_PLUS = 'itemUpdatedFromMuseumPlus';
+
+
+
     // Public Methods
     // =========================================================================
 

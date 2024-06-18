@@ -106,6 +106,10 @@ class MuseumPlusForCraftCmsVariable
         return MuseumPlusForCraftCms::$plugin->vocabulary->getElementById($id);
     }
 
+    public function getAllPeople() {
+        return MuseumPlusForCraftCms::$plugin->collection->getAllPeople();
+    }
+
     public function getPeopleById($id) {
         return MuseumPlusForCraftCms::$plugin->collection->getPeopleById($id);
     }
@@ -123,6 +127,9 @@ class MuseumPlusForCraftCmsVariable
     }
 
     public function getAllClassifications() {
+
+        //TODO: get from service
+
         return MuseumPlusVocabulary::find()
             ->type(['ObjClassificationVgr'])
             ->orderBy('title')
@@ -130,6 +137,9 @@ class MuseumPlusForCraftCmsVariable
     }
 
     public function getAllPlaces() {
+
+        //TODO: get from service
+
         return MuseumPlusVocabulary::find()
             ->type(['GenPlaceVgr'])
             ->orderBy('title')
