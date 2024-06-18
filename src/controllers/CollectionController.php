@@ -13,14 +13,6 @@ namespace furbo\museumplusforcraftcms\controllers;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 
-//use Gemini;
-
-
-use GeminiAPI\Client;
-use GeminiAPI\Enums\MimeType;
-use GeminiAPI\Resources\Parts\ImagePart;
-use GeminiAPI\Resources\Parts\TextPart;
-
 
 use Craft;
 use craft\web\Controller;
@@ -93,24 +85,7 @@ class CollectionController extends Controller
         $request = Craft::$app->getRequest();
         $params = \Craft::$app->getRequest()->getBodyParams();
         $itemId = $request->getBodyParam('itemId');
-        // 1 prepare the prompt using some fields and the main image url
-        $item = MuseumPlusItem::find()->id($itemId)->one();
-        $prompt = "Generate a title for the museum object in the image. The name of the image is " . $item->title;
-        // TODO prepare a complete prompt based on the available item's data
-        $mainImage = $item->getAttachment();
-        $imagePath = $mainImage->getUrl();
-        $imageEncoded = base64_encode(file_get_contents($imagePath));
-        $pluginsettings = MuseumPlusForCraftCms::$plugin->getSettings();
-        $client = new Client($pluginsettings['googleGeminiApiKey']);
-        $result = $client->geminiProVision()->generateContent(
-            new TextPart($prompt),
-            new ImagePart(
-                MimeType::IMAGE_JPEG,
-                $imageEncoded,
-            ),
-        );
-        $aiData['extraTitle'] = $result->text();
-        $aiData['extraDescription'] = 'not implemented yet';
+        $aiData = MuseumPlusForCraftCms::$plugin->gemini->generateContent($itemId);
         return json_encode($aiData);
     }
 

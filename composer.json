@@ -48,7 +48,8 @@
         "components": {
             "museumPlus": "furbo\\museumplusforcraftcms\\services\\MuseumPlusService",
             "collection": "furbo\\museumplusforcraftcms\\services\\CollectionService",
-            "vocabulary": "furbo\\museumplusforcraftcms\\services\\VocabularyService"
+            "vocabulary": "furbo\\museumplusforcraftcms\\services\\VocabularyService",
+            "gemini": "furbo\\museumplusforcraftcms\\services\\GeminiService"
         },
         "class": "furbo\\museumplusforcraftcms\\MuseumPlusForCraftCms"
     },
