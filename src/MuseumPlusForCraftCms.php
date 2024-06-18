@@ -385,7 +385,7 @@ class MuseumPlusForCraftCms extends Plugin
 
         $cpNavItem['subnav']['items'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Items'), 'url' => 'museum-plus-for-craft-cms/collection'];
         if (Craft::$app->getUser()->getIsAdmin()) {
-            $cpNavItem['subnav']['vocabularies'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Vocabularies'), 'url' => 'museum-plus-for-craft-cms/vocabularies'];
+            //$cpNavItem['subnav']['vocabularies'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Vocabularies'), 'url' => 'museum-plus-for-craft-cms/vocabularies'];
         }
 
         return $cpNavItem;

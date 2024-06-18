@@ -212,7 +212,8 @@
                         <ul>
                             {% for geo in geographyCulture %}
                                 <li>
-                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                                    {# <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a> #}
+                                    {{ geo.title }}
                                 </li>
                             {% endfor %}
                         </ul>
@@ -231,7 +232,7 @@
                         <ul>
                             {% for geo in geographyPolitical %}
                                 <li>
-                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                                    {{ geo.title }}
                                 </li>
                             {% endfor %}
                         </ul>
@@ -250,7 +251,7 @@
                         <ul>
                             {% for geo in geographyHistoric %}
                                 <li>
-                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                                    {{ geo.title }}
                                 </li>
                             {% endfor %}
                         </ul>
@@ -269,7 +270,7 @@
                         <ul>
                             {% for geo in geographyGeo %}
                                 <li>
-                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
+                                    {{ geo.title }}
                                 </li>
                             {% endfor %}
                         </ul>
