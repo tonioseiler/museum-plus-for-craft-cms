@@ -99,7 +99,7 @@ class MuseumPlusForCraftCmsVariable
     }
 
     public function getItemsByIds($ids) {
-        return MuseumPlusForCraftCms::$plugin->collection->getItemsById($ids);
+        return MuseumPlusForCraftCms::$plugin->collection->getItemsByIds($ids);
     }
 
     public function getVocabularyById($id) {

@@ -377,6 +377,8 @@ class CollectionController extends Controller
                 }
             }
 
+            //TODO: trigger event after create/update
+
         } catch (\Exception $e) {
             //     echo $item->id . " could not be fully updated." . PHP_EOL;
             echo $e->getMessage() . PHP_EOL;
@@ -624,10 +626,13 @@ class CollectionController extends Controller
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
             $item->sensitive = false;
+
+            //TODO: remove sensitive and trigger event before create
         } else {
             //update
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
+            //TODO: trigger event before update
         }
         $success = Craft::$app->elements->saveElement($item, false);
 

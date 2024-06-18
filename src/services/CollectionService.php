@@ -69,8 +69,13 @@ class CollectionService extends Component
         return $item;
     }
 
-    public function getItemsByIds($ids) {
-        return 'Todo: implement';
+    public function getItemsByIds($ids, $limit = 10, $offset = 0) {
+        $items = MuseumPlusItem::find()
+            ->id($ids)
+            ->limit($limit)
+            ->offset($offset)
+        ;
+        return $items;
     }
 
     public function searchItems($params, $limit = 10, $offset = 0) {
