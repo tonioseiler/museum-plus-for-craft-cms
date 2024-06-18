@@ -117,6 +117,11 @@ class CollectionService extends Component
             $criteria['person'] = $params['person'];
         }
 
+        if(isset($params['inventoryNumber'])) {
+            $items = $items->inventoryNumber($params['inventoryNumber']);
+            $criteria['inventoryNumber'] = $params['inventoryNumber'];
+        }
+
         Craft::$app->session->set('museumPlusCriteria', $items);
 
         if(isset($params['firstObjectId'])) {
