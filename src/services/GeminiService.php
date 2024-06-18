@@ -40,7 +40,7 @@ class GeminiService extends Component
     public function generateContent($itemId) {
         $aiData = [];
         $item = MuseumPlusItem::find()->id($itemId)->one();
-        $prompt = "Generate a title for the museum object in the image. The name of the image is " . $item->title;
+        $prompt = "Write a title (approximately 160 characters) and a text (approximately 1000 characters) for the museum object in the image. The name of the image is " . $item->title .'. Send me the response in json.';
         // TODO prepare a complete prompt based on the available item's data
         $mainImage = $item->getAttachment();
         $imagePath = $mainImage->getUrl();
@@ -54,8 +54,19 @@ class GeminiService extends Component
                 $imageEncoded,
             ),
         );
-        $aiData['extraTitle'] = $result->text();
-        $aiData['extraDescription'] = 'not implemented yet';
+        $prefix = "```json\n";
+        $txt = $result->text();
+        $txt = substr($txt, strlen($prefix) + 1);
+        $txt = substr($txt, 0, -3);
+
+        //dd($txt);
+        $data = json_decode($txt, true);
+
+        if (isset($data['title']))
+            $aiData['extraTitle'] = $data['title'];
+
+        if (isset($data['text']))
+            $aiData['extraDescription'] = $data['text'];
         return $aiData;
     }
 
