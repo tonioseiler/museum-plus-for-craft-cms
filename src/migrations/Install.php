@@ -22,7 +22,6 @@ class Install extends Migration
                 'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
                 'inventoryNumber' => $this->string(),
-                'sensitive' => $this->boolean(),
                 'extraTitle' => $this->text(),
                 'extraDescription' => $this->longText(),
                 'sort' => $this->string(),

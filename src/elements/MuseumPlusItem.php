@@ -60,7 +60,6 @@ class MuseumPlusItem  extends Element
 
     public $sort;
 
-    public $sensitive;
 
     public $extraTitle;
 
@@ -283,7 +282,6 @@ class MuseumPlusItem  extends Element
         $itemRecord->assetId = $this->assetId;
         $itemRecord->inventoryNumber = $this->inventoryNumber;
         $itemRecord->sort = $this->sort;
-        $itemRecord->sensitive = $this->sensitive;
         $itemRecord->extraTitle = $this->extraTitle;
         $itemRecord->extraDescription = $this->extraDescription;
 

@@ -21,7 +21,6 @@ class MuseumPlusItemQuery extends ElementQuery
     public $inventoryNumber;
     public $extraTitle;
     public $extraDescription;
-    public $sensitive;
 
 
     public function collectionId($value)
@@ -73,12 +72,6 @@ class MuseumPlusItemQuery extends ElementQuery
         return $this;
     }
 
-    public function sensitive($value)
-    {
-        $this->sensitive = $value;
-        return $this;
-    }
-
     public function extraTitle($value)
     {
         $this->extraTitle = $value;
@@ -102,7 +95,6 @@ class MuseumPlusItemQuery extends ElementQuery
             'museumplus_items.data',
             'museumplus_items.assetId',
             'museumplus_items.inventoryNumber',
-            'museumplus_items.sensitive',
             'museumplus_items.extraTitle',
             'museumplus_items.extraDescription',
         ]);
@@ -119,11 +111,6 @@ class MuseumPlusItemQuery extends ElementQuery
             $this->subQuery->andWhere(Db::parseParam('museumplus_items.inventoryNumber', $this->inventoryNumber));
         }
 
-
-        if(!is_null($this->sensitive)){
-            $this->subQuery->andWhere(Db::parseParam('museumplus_items.sensitive', false));
-        }
-
         if(!is_null($this->extraTitle)){
             $this->subQuery->andWhere(Db::parseParam('museumplus_items.extraTitle', false));
         }
@@ -131,8 +118,6 @@ class MuseumPlusItemQuery extends ElementQuery
         if(!is_null($this->extraDescription)){
             $this->subQuery->andWhere(Db::parseParam('museumplus_items.extraDescription', false));
         }
-
-
 
         if($this->geographic){
             $subQuery = (new Query())

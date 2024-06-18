@@ -143,7 +143,6 @@ class CollectionController extends Controller
         $this->updateItemToItemRelationShips($this->collectionItemId);
         $this->updateItemInventory($this->collectionItemId);
         $this->updateItemSort($this->collectionItemId);
-        $this->updateItemSensitive($this->collectionItemId);
 
     }
 
@@ -194,7 +193,6 @@ class CollectionController extends Controller
         }
 
         $this->actionUpdateItemsInventory();
-        $this->actionUpdateItemsSensitive();
         $this->actionUpdateItemToItemRelationShips();
         $this->optimizeSearchIndex();
 
@@ -622,14 +620,10 @@ class CollectionController extends Controller
             $item->collectionId = $collectionId;
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
-            $item->sensitive = false;
-
-            //TODO: remove sensitive and trigger event before create
         } else {
             //update
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
-            //TODO: trigger event before update
         }
         $success = Craft::$app->elements->saveElement($item, false);
 
@@ -855,26 +849,6 @@ class CollectionController extends Controller
             echo $e->getMessage().PHP_EOL;
         }
     }
-
-    public function actionUpdateItemsSensitive()
-    {
-        App::maxPowerCaptain();
-        //251772
-        $subQuery = (new Query())
-            ->select(['itemId'])
-            ->from(['{{%museumplus_items_vocabulary}}'])
-            ->where(['vocabularyId' => 251772]);
-        $itemIds = MuseumPlusItem::find()
-            ->where(['in', 'museumplus_items.id', $subQuery])
-            ->ids();
-        foreach($itemIds as $itemId) {
-            $item = MuseumPlusItem::find()
-                ->id($itemId)
-                ->one();
-            $this->updateItemSensitive($item->collectionId);
-        }
-    }
-
     public function actionUpdateVocabularyRefs()
     {
         App::maxPowerCaptain();
@@ -914,19 +888,6 @@ class CollectionController extends Controller
             } catch(\Exception $e) {
                 echo $e->getMessage().PHP_EOL;
             }
-        }
-    }
-
-    private function updateItemSensitive($collectionId) {
-
-        $item = MuseumPlusItem::find()
-            ->where(['collectionId' => $collectionId])
-            ->one();
-
-        $item->sensitive = true;
-        if(Craft::$app->elements->saveElement($item)) {
-            echo $item->id . " - " . $item->title;
-            echo "\n";
         }
     }
 

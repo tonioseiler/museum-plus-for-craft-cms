@@ -201,10 +201,8 @@ class CollectionController extends Controller
     public function actionGetRandomItemByTag()
     {
         $params = Craft::$app->getRequest()->getQueryParams();
-        //sensitive tag id: 251772
+        
         $item = MuseumPlusItem::find();
-
-        $item = $item->sensitive(false);
 
         if (isset($params['tagId'])) {
             $item = $item->tag($params['tagId']);
