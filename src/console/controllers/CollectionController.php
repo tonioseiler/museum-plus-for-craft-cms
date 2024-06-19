@@ -130,7 +130,7 @@ class CollectionController extends Controller
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $this->collectionItemId])
             ->one();
-        
+
         $isNewItem = false;
         if (!$item) {
             echo 'Creating item (id: '.$this->collectionItemId.')'.PHP_EOL;
@@ -946,8 +946,41 @@ class CollectionController extends Controller
                     foreach ($data as $d) {
                         $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
                         if ($vocabularyEntry) {
-                            if (!empty($vocabularyEntry->id))
+                            if (!empty($vocabularyEntry->id)) {
                                 $ids[] = $vocabularyEntry->id;
+                                // create or update parents
+                                // TODO Paolo make this recursive
+                                echo 'vocabularyEntry id: '.$vocabularyEntry->id.' pid: '.$vocabularyEntry->parentId.'<br>';
+
+
+                                /* TODO P{aolo finish recursive version
+                                $parentId = $vocabularyEntry->parentId;
+                                $parentNodeId = $vc['id'];
+                                while ($parentId > 0) {
+                                    echo 'we have a parent: '.$vocabularyEntry->parentId.'<br>';
+                                    $parentNodeId = $this->museumPlus->getVocabularyParentNodeId($type,$vc['id']);
+                                    echo 'parentNodeId: '.$parentNodeId.'<br>';
+                                    $dataParent = $this->museumPlus->getVocabularyNode($type,$parentNodeId);
+
+                                    foreach ($dataParent as $dp) {
+                                        $vocabularyEntryParent = $this->createOrUpdateVocabularyEntry($type, $dp);
+                                    }
+
+                                    $parentId = $dp->parentId;
+                                }
+                                */
+
+                                // this works but is not recursive
+                                if($vocabularyEntry->parentId > 0) {
+                                    echo 'we have a parent: '.$vocabularyEntry->parentId.'<br>';
+                                    $parentNodeId = $this->museumPlus->getVocabularyParentNodeId($type,$vc['id']);
+                                    echo 'parentNodeId: '.$parentNodeId.'<br>';
+                                    $dataParent = $this->museumPlus->getVocabularyNode($type,$parentNodeId);
+                                    foreach ($dataParent as $dp) {
+                                        $vocabularyEntryParent = $this->createOrUpdateVocabularyEntry($type, $dp);
+                                    }
+                                }
+                            }
                         }
                     }
                 } catch (\GuzzleHttp\Exception\ClientException $e) {
@@ -963,6 +996,7 @@ class CollectionController extends Controller
             }
         }
 
+        // please do not remove this comment - die('end');
         if(count($syncData)){
             $item->syncVocabularyRelations($syncData);
             //echo 'v';

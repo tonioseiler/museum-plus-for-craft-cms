@@ -74,7 +74,9 @@ class MuseumPlusService extends Component
 
             $parentId = 0;
             if(!empty($parents)) {
-                $parentId = $parents[0]['parent']['@attributes']['nodeId'];
+                $parentNodeId = $parents[0]['parent']['@attributes']['nodeId'];
+                $parentAdd = $this->getVocabularyNode($groupName, $parentNodeId);
+                $parentId = $parentAdd['id'];
             }
 
             $ret = [];
@@ -100,6 +102,32 @@ class MuseumPlusService extends Component
                 }
             }
             return $ret;
+
+        }, 1);
+        return $tmp;
+    }
+
+    public function getVocabularyParentNodeId($groupName, $nodeId) {
+        $that = $this;
+        $cacheKey = Craft::$app->cache->buildKey('museumplus.vocabulary_parent.'.$groupName.'.'.$nodeId);
+        $seconds = self::CACHE_DURATION;
+        $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupName, $nodeId) {
+            $this->init();
+            $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application//vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
+            $res = $that->client->sendAsync($request)->wait();
+            $responseXml = simplexml_load_string($res->getBody()->getContents());
+
+            //$terms = json_decode(json_encode($responseXml->terms), true);
+            $parents = json_decode(json_encode($responseXml->parents), true);
+
+            $parentId = 0;
+            if(!empty($parents)) {
+                $parentNodeId = $parents[0]['parent']['@attributes']['nodeId'];
+                //$parentAdd = $this->getVocabularyNode($groupName, $parentNodeId);
+                //die('<textarea style="width:600px;height:600px;">'.print_r($parentAdd,true).'</textarea>');
+                //$parentId = $parentAdd[0]->id;
+            }
+            return $parentNodeId;
 
         }, 1);
         return $tmp;
