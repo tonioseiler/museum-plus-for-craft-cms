@@ -117,7 +117,7 @@ class MuseumPlusService extends Component
             $res = $that->client->sendAsync($request)->wait();
             $responseXml = simplexml_load_string($res->getBody()->getContents());
             $parents = json_decode(json_encode($responseXml->parents), true);
-            $parentNodeId = 0;
+            $parentNodeId = 0; //
             if(!empty($parents)) {
                 $parentNodeId = $parents[0]['parent']['@attributes']['nodeId'];
             }
