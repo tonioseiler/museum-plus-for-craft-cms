@@ -891,90 +891,54 @@ class CollectionController extends Controller
         }
     }
 
-    private function updateVocabularyRefs(MuseumPlusItem $item) {
+    private function updateVocabularyRefs(MuseumPlusItem $item)
+    {
         //add vocabulary refs
         $vocabularyRefs = $item->getDataAttribute('vocabularyReferences');
         $syncData = [];
-        // die(' <textarea style="width:600px;height:600px;">'.print_r($vocabularyRefs,true).'</textarea>');
-        /* In the $vocabularyRefs array why have the node id of the vocabulary entry, in the example below the id is 299292
-          [22] => Array
-        (
-            [name] => PoliticalVoc
-            [instanceName] => GenGeoPoliticalVgr
-            [id] => 71624
-            [items] => Array
-                (
-                    [0] => Array
-                        (
-                            [id] => 299292
-                            [name] => Asien##Indien
-                            [value] => India
-                        )
-                )
-        )
-         */
-        foreach($vocabularyRefs as $vocabularyRef) {
+        foreach ($vocabularyRefs as $vocabularyRef) {
             $ids = [];
             $type = $vocabularyRef['instanceName'];
-            foreach ($vocabularyRef['items'] as $vc){
+            foreach ($vocabularyRef['items'] as $vc) {
                 try {
                     // Using the node id from above we get the vocabulary data for the entry: content, id, parentId (directly from the m+ server)
-                    $data = $this->museumPlus->getVocabularyNode($type,$vc['id']);
-
-                    /*
-                    if($type=='GenGeoPoliticalVgr') {
-                        die('Leaf Type:'.$type.' nodeId:'.$vc['id'].' content:'.$data[0]->content.'  <textarea style="width:600px;height:600px;">'.print_r($data,true).'</textarea>');
-                    }
-                    */
-
-                    /*
-                    Problem: we also need the parent data of the vocabulary entry, so we can create the parent entry.
-                    But we do not have the parent node id, we have only the parent id
-                    And we do not have a method to get a vocabulary entry using its id.
-
-                    Ideally we would have a method like this: getVocabularyById($collectionId) that queries the m+ server
-                     */
-
-
-                    //TODO:
-                    // while(voc entry with collectioId = data.parentId exists)
-                    //     $data = $this->museumPlus->getVocabularyNode($type, data.parentId);
-                    //      check if the parent exists
-                    //     create this parent object and do this until you dont have a parentId anymore
-
-
+                    $data = $this->museumPlus->getVocabularyNode($type, $vc['id']);
                     foreach ($data as $d) {
                         $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
                         if ($vocabularyEntry) {
                             if (!empty($vocabularyEntry->id)) {
                                 $ids[] = $vocabularyEntry->id;
-                                // create or update parents
-                                // TODO Paolo make this recursive
-                                echo 'vocabularyEntry id: '.$vocabularyEntry->id.' pid: '.$vocabularyEntry->parentId.'<br>';
-
-
-                                /* TODO P{aolo finish recursive version
-                                $parentId = $vocabularyEntry->parentId;
-                                $parentNodeId = $vc['id'];
-                                while ($parentId > 0) {
-                                    echo 'we have a parent: '.$vocabularyEntry->parentId.'<br>';
-                                    $parentNodeId = $this->museumPlus->getVocabularyParentNodeId($type,$vc['id']);
-                                    echo 'parentNodeId: '.$parentNodeId.'<br>';
-                                    $dataParent = $this->museumPlus->getVocabularyNode($type,$parentNodeId);
-
+                            }
+                            //echo 'vocabularyEntry id: ' . $vocabularyEntry->id . ' pid: ' . $vocabularyEntry->parentId . '<br>';
+                            if(($type=='GenGeoCultureVgr')||($type=='GenGeoPoliticalVgr')||($type=='GenGeoGeographyVgr')||($type=='GenGeoHistoryVgr') ){
+                                // for geo vocabularies we need the whole tree
+                                $currentParentId = $vocabularyEntry->parentId;
+                                $currentParentNodeId = $vc['id'];
+                                $counter = 0;
+                                while ($currentParentId > 0) {
+                                    $counter++;
+                                    //echo '------- counter: ' . $counter. '<br>';
+                                    if ($counter > 5) {
+                                        //die('infinite loop? '.$counter);
+                                        break;
+                                    }
+                                    //echo 'we have a parent: ' . $currentParentId . ' ['.$counter.']<br>';
+                                    $parentNodeId = $this->museumPlus->getVocabularyParentNodeId($type, $currentParentNodeId);
+                                    //echo 'parentNodeId: ' . $parentNodeId . '<br>';
+                                    $dataParent = $this->museumPlus->getVocabularyNode($type, $parentNodeId);
+                                    $currentParentId = 0;
                                     foreach ($dataParent as $dp) {
                                         $vocabularyEntryParent = $this->createOrUpdateVocabularyEntry($type, $dp);
+                                        $currentParentId = $vocabularyEntryParent->parentId;
+                                        $currentParentNodeId = $parentNodeId;
                                     }
-
-                                    $parentId = $dp->parentId;
                                 }
-                                */
-
-                                // this works but is not recursive
+                            } else {
+                                // we get only the direct parent
                                 if($vocabularyEntry->parentId > 0) {
-                                    echo 'we have a parent: '.$vocabularyEntry->parentId.'<br>';
+                                    //echo 'we have a parent: '.$vocabularyEntry->parentId.'<br>';
                                     $parentNodeId = $this->museumPlus->getVocabularyParentNodeId($type,$vc['id']);
-                                    echo 'parentNodeId: '.$parentNodeId.'<br>';
+                                    //echo 'parentNodeId: '.$parentNodeId.'<br>';
                                     $dataParent = $this->museumPlus->getVocabularyNode($type,$parentNodeId);
                                     foreach ($dataParent as $dp) {
                                         $vocabularyEntryParent = $this->createOrUpdateVocabularyEntry($type, $dp);
@@ -984,11 +948,11 @@ class CollectionController extends Controller
                         }
                     }
                 } catch (\GuzzleHttp\Exception\ClientException $e) {
-                    echo "WARNING: ".$e->getMessage().PHP_EOL;
+                    echo "WARNING: " . $e->getMessage() . PHP_EOL;
                 }
             }
             if (isset($syncData[$type])) {
-                foreach($ids as $id) {
+                foreach ($ids as $id) {
                     $syncData[$type][] = $id;
                 }
             } else {
@@ -996,8 +960,7 @@ class CollectionController extends Controller
             }
         }
 
-        // please do not remove this comment - die('end');
-        if(count($syncData)){
+        if (count($syncData)) {
             $item->syncVocabularyRelations($syncData);
             //echo 'v';
         }

@@ -116,19 +116,12 @@ class MuseumPlusService extends Component
             $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application//vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
             $res = $that->client->sendAsync($request)->wait();
             $responseXml = simplexml_load_string($res->getBody()->getContents());
-
-            //$terms = json_decode(json_encode($responseXml->terms), true);
             $parents = json_decode(json_encode($responseXml->parents), true);
-
-            $parentId = 0;
+            $parentNodeId = 0;
             if(!empty($parents)) {
                 $parentNodeId = $parents[0]['parent']['@attributes']['nodeId'];
-                //$parentAdd = $this->getVocabularyNode($groupName, $parentNodeId);
-                //die('<textarea style="width:600px;height:600px;">'.print_r($parentAdd,true).'</textarea>');
-                //$parentId = $parentAdd[0]->id;
             }
             return $parentNodeId;
-
         }, 1);
         return $tmp;
     }
