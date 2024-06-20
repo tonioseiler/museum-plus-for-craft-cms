@@ -171,7 +171,7 @@ class MuseumPlusItemRecord extends DataRecord
         }
     }
 
-    public function getRepeatableGroupValues($groupName, $attribute, $filterTypes = []) {
+    public function getRepeatableGroupValues($groupName, $attribute = null, $filterTypes = []) {
         $data = $this->getDataAttributes();
         $ret = [];
         if (isset($data['repeatableGroups'])) {
@@ -179,13 +179,22 @@ class MuseumPlusItemRecord extends DataRecord
                 if ($group['name'] == $groupName) {
                     foreach($group['items'] as $i) {
                         if (empty($filterTypes)) {
-                            if (isset($i[$attribute])) {
-                                $ret[] = $i[$attribute];
+                            if (empty($attribute)) {
+                                $ret[] = $i;
+                            } else {
+                                if (isset($i[$attribute])) {
+                                    $ret[] = $i[$attribute];
+                                }
                             }
+                            
                         } else {
                             if(isset($i['TypeVoc'])){
                                 if (in_array($i['TypeVoc'], $filterTypes)) {
-                                    $ret[] = $i[$attribute];
+                                    if (empty($attribute)) {
+                                        $ret[] = $i;
+                                    } else {
+                                        $ret[] = $i[$attribute];
+                                    }
                                 }
                             }
                         }
