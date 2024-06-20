@@ -235,7 +235,22 @@ class MuseumPlusForCraftCms extends Plugin
                 if ($attribute == 'data') {
 
                     $data = "";
+
+                    
+                    
+                    
                     try {
+
+                        //ids
+                        $data .= $element->collectionId.' ';
+                        $data .= $element->inventoryNumber.' ';
+
+                        if (!empty($element->extraTitle))
+                            $data .= $element->extraTitle.' ';
+
+                        if (!empty($element->extraDescription))
+                            $data .= $element->extraDescription.' ';
+
                         foreach ($element->getAssociationPeople()->all() as $person) {
                             if (is_array($person->getDataAttribute('PerPersonTxt'))) {
                                 foreach ($person->getDataAttribute('PerPersonTxt') as $personTxt) {
