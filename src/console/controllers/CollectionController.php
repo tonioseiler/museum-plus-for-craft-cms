@@ -895,14 +895,17 @@ class CollectionController extends Controller
     {
         //add vocabulary refs
         $vocabularyRefs = $item->getDataAttribute('vocabularyReferences');
+        // '$vocabularyRefs:<br><textarea style="width:600px;height:500px;">'.print_r($vocabularyRefs,true).'</textarea><br>';
         $syncData = [];
         foreach ($vocabularyRefs as $vocabularyRef) {
             $ids = [];
             $type = $vocabularyRef['instanceName'];
+            //echo '<br><br>$vocabularyRef[items] ['.$type.']<br><textarea style="width:600px;height:100px;">'.print_r($vocabularyRef['items'],true).'</textarea><br>';
             foreach ($vocabularyRef['items'] as $vc) {
                 try {
                     // Using the node id from above we get the vocabulary data for the entry: content, id, parentId (directly from the m+ server)
                     $data = $this->museumPlus->getVocabularyNode($type, $vc['id']);
+                    //echo '<textarea style="width:600px;height:500px;">Type: '.$type.' ['.$vc['id'].'] '.print_r($data,true).'</textarea>';
                     foreach ($data as $d) {
                         $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
                         if ($vocabularyEntry) {
@@ -959,7 +962,6 @@ class CollectionController extends Controller
                 $syncData[$type] = $ids;
             }
         }
-
         if (count($syncData)) {
             $item->syncVocabularyRelations($syncData);
             //echo 'v';

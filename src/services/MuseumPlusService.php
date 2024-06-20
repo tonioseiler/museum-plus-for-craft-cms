@@ -59,7 +59,6 @@ class MuseumPlusService extends Component
 
     public function getVocabularyNode($groupName, $nodeId)
     {
-
         $that = $this;
         $cacheKey = Craft::$app->cache->buildKey('museumplus.vocabulary.'.$groupName.'.'.$nodeId);
         $seconds = self::CACHE_DURATION;
@@ -68,23 +67,23 @@ class MuseumPlusService extends Component
             $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application//vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
             $res = $that->client->sendAsync($request)->wait();
             $responseXml = simplexml_load_string($res->getBody()->getContents());
-
             $terms = json_decode(json_encode($responseXml->terms), true);
             $parents = json_decode(json_encode($responseXml->parents), true);
-
             $parentId = 0;
-            if(!empty($parents)) {
+            //echo '<br><br>$terms<br><textarea style="width:600px;height:100px;">'.print_r($parents,true).'</textarea><br>';
+            //echo '<br><br>$parents<br><textarea style="width:600px;height:100px;">'.print_r($parents,true).'</textarea><br>';
+            if((!empty($parents)) && (isset($parents[0]['parent']['@attributes']['nodeId']))) {
                 $parentNodeId = $parents[0]['parent']['@attributes']['nodeId'];
                 $parentAdd = $this->getVocabularyNode($groupName, $parentNodeId);
-                $parentId = $parentAdd['id'];
+                //echo '<br><br>$parentAdd<br>$parentNodeId: '.$parentNodeId.'<br><textarea style="width:600px;height:100px;">'.print_r($parentAdd,true).'</textarea><br>'.$parentAdd[0]->id.'<br>';
+                if(isset($parentAdd[0]->id)) {
+                    $parentId = $parentAdd[0]->id;
+                }
             }
-
             $ret = [];
-
             if (isset($terms['term']) && !isset($terms['term']['@attributes'])) {
                 $terms = $terms['term'];
             }
-
             foreach($terms as $term) {
                 $object = new \stdClass();
                 $object->parentId = $parentId;
@@ -102,7 +101,6 @@ class MuseumPlusService extends Component
                 }
             }
             return $ret;
-
         }, 1);
         return $tmp;
     }
