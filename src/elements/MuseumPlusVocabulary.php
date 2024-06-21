@@ -203,7 +203,7 @@ class MuseumPlusVocabulary extends Element
     {
         $parent = $this->getParent();
         if ($parent) {
-            return $parent->getParents() + [$parent];
+            return [$parent] + $parent->getParents();
         } else {
             return [];
         }
