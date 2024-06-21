@@ -8,6 +8,7 @@ use craft\helpers\Cp;
 
 use Craft;
 use \craft\base\Element;
+use craft\base\ElementInterface;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
@@ -192,7 +193,7 @@ class MuseumPlusVocabulary extends Element
         return $rec->getItems();
     }
 
-    public function getParent()
+    public function getParent(): null|ElementInterface
     {
         return MuseumPlusVocabulary::find()->collectionId($this->parentId)->one();
     }
