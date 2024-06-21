@@ -159,6 +159,6 @@ Event::on(
 
 ## Roadmap
 
-* Integrate Google Gemini for better titles and descriptions
+* add geo refs via google to items
 
 Brought to you by [Furbo GmbH](https://furbo.ch)
