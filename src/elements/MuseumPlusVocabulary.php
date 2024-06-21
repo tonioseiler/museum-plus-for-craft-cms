@@ -192,4 +192,10 @@ class MuseumPlusVocabulary extends Element
         return MuseumPlusVocabulary::find()->id($this->parentId)->one();
     }
 
+    //TODO: Paolo, return an array in the corrcte way
+    public function getParentsTree()
+    {
+        
+    }
+
 }
