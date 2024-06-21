@@ -270,7 +270,9 @@ class CollectionController extends Controller
             //echo '- Multimedia files'.PHP_EOL;
             if(!$this->ignoreMultimedia && isset($moduleRefs['ObjMultimediaRef'])) {
                 $assetIds = [];
-                foreach ($moduleRefs['ObjMultimediaRef']['items'] as $mm){
+                $refs = $moduleRefs['ObjMultimediaRef']['items'];
+                $this->sortArray($refs, 'SortLnu');
+                foreach ($refs as $mm){
                     $assetId = $this->createMultimediaFromId($mm['id'],$collectionId);
                     if ($assetId) {
                         $assetIds[] = $assetId;
@@ -283,10 +285,11 @@ class CollectionController extends Controller
             }
 
             //add literature relations
-            $moduleRefs = $item->getDataAttribute('moduleReferences');
             $literatureIds = [];
             if(isset($moduleRefs['ObjLiteratureRef'])) {
-                foreach ($moduleRefs['ObjLiteratureRef']['items'] as $l){
+                $refs = $moduleRefs['ObjLiteratureRef']['items'];
+                $this->sortArray($refs, 'SortLnu');
+                foreach ($refs as $l){
                     try {
                         $data = $this->museumPlus->getLiterature($l['id']);
                         if ($data){
@@ -307,12 +310,32 @@ class CollectionController extends Controller
                 //echo 'l';
             }
 
+            //add literature assets
+            if(!$this->ignoreLiterature && isset($moduleRefs['ObjLiteratureRef'])) {
+                $assetIds = [];
+                $refs = $moduleRefs['ObjLiteratureRef']['items'];
+                $this->sortArray($refs, 'SortLnu');
+                foreach ($refs as $l){
+                    $assetId = $this->createLiteratureFromId($l['id']);
+                    $literature = $this->museumPlus->getLiterature($l['id']);
+                    if($assetId && $literature){
+                        //echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
+                        $literature->assetId = $assetId;
+                        $literature->save();
+                    }else{
+                        //echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: NULL" . PHP_EOL;
+                    }
+                }
+            }
+
             //add people refs
             $peopleTypes = ['ObjAdministrationRef', 'ObjPerOwnerRef', 'ObjPerAssociationRef'];
             foreach($peopleTypes as $peopleType) {
                 if(isset($moduleRefs[$peopleType])) {
                     $peopleIds = [];
-                    foreach ($moduleRefs[$peopleType]['items'] as $p){
+                    $refs = $moduleRefs[$peopleType]['items'];
+                    $this->sortArray($refs, 'SortLnu');
+                    foreach ($refs as $p){
                         try {
                             $data = $this->museumPlus->getPerson($p['id']);
                             $person = $this->createOrUpdatePerson($data);
@@ -334,7 +357,9 @@ class CollectionController extends Controller
             //add owenrship refs
             $ownershipIds = [];
             if(isset($moduleRefs['ObjOwnershipRef'])) {
-                foreach ($moduleRefs['ObjOwnershipRef']['items'] as $o){
+                $refs = $moduleRefs['ObjOwnershipRef']['items'];
+                $this->sortArray($refs, 'SortLnu');
+                foreach ($refs as $o){
                     try {
                         $data = $this->museumPlus->getOwnership($o['id']);
                         $ownership = $this->createOrUpdateOwnership($data);
@@ -354,25 +379,6 @@ class CollectionController extends Controller
 
             $this->updateVocabularyRefs($item);
 
-
-
-            //add literature
-            if(!$this->ignoreLiterature && isset($moduleRefs['ObjLiteratureRef'])) {
-                $assetIds = [];
-                foreach ($moduleRefs['ObjLiteratureRef']['items'] as $l){
-                    $assetId = $this->createLiteratureFromId($l['id']);
-                    $literature = $this->museumPlus->getLiterature($l['id']);
-                    if($assetId && $literature){
-                        //echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
-                        $literature->assetId = $assetId;
-                        $literature->save();
-                    }else{
-                        //echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: NULL" . PHP_EOL;
-                    }
-                }
-            }
-
-            //TODO: trigger event after create/update
 
         } catch (\Exception $e) {
             //     echo $item->id . " could not be fully updated." . PHP_EOL;
@@ -990,6 +996,23 @@ class CollectionController extends Controller
         ]);
 
         MuseumPlusForCraftCms::$plugin->trigger(MuseumPlusForCraftCms::EVENT_ITEM_UPDATED_FROM_MUSEUM_PLUS, $event);
+    }
+
+
+    private function sortArray(&$array, $key) {
+        usort($array, function($a, $b) use ($key) {
+
+            if (!isset($a[$key]) || !isset($b[$key])) {
+                return 0;
+            } else if (!isset($a[$key]) && isset($b[$key])) {
+                return -1;
+            } else if (isset($a[$key]) && !isset($b[$key])) {
+                return 1;
+            } else if ($a[$key] == $b[$key]) {
+                return 0;
+            }
+            return ($a[$key] < $b[$key]) ? -1 : 1;
+        });
     }
 
 }

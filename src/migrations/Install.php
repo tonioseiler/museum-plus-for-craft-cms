@@ -61,7 +61,8 @@ class Install extends Migration
                 'objectGroupId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid()
+                'uid' => $this->uid(),
+                'sort' => $this->integer()->defaultValue(0)
             ]);
 
             $this->addForeignKey(
@@ -90,7 +91,8 @@ class Install extends Migration
                 'relatedItemId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid()
+                'uid' => $this->uid(),
+                'sort' => $this->integer()->defaultValue(0)
             ]);
 
             $this->addForeignKey(
@@ -132,7 +134,8 @@ class Install extends Migration
                 'literatureId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid()
+                'uid' => $this->uid(),
+                'sort' => $this->integer()->defaultValue(0)
             ]);
 
             $this->addForeignKey(
@@ -175,7 +178,8 @@ class Install extends Migration
                 'type' => $this->string(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid()
+                'uid' => $this->uid(),
+                'sort' => $this->integer()->defaultValue(0)
             ]);
 
             $this->addForeignKey(
@@ -217,7 +221,8 @@ class Install extends Migration
                 'ownershipId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid()
+                'uid' => $this->uid(),
+                'sort' => $this->integer()->defaultValue(0)
             ]);
 
             $this->addForeignKey(
@@ -247,7 +252,8 @@ class Install extends Migration
                 'assetId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid()
+                'uid' => $this->uid(),
+                'sort' => $this->integer()->defaultValue(0)
             ]);
 
             $this->addForeignKey(
@@ -340,7 +346,8 @@ class Install extends Migration
                 'vocabularyId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid()
+                'uid' => $this->uid(),
+                'sort' => $this->integer()->defaultValue(0)
             ]);
 
             $this->addForeignKey(

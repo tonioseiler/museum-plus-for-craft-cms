@@ -597,6 +597,13 @@ class MuseumPlusService extends Component
                         if (isset($mrItem['formattedValue']['@attributes']['language']))
                             $mri->language = $mrItem['formattedValue']['@attributes']['language'];
                     }
+
+                    //add all data fields
+                    $this->addFieldValuesToObject($mri, $mrItem, 'dataField');
+
+
+                    //add vocabulary reference directly here
+                    $this->addVocabularyRefsToObject($mri, $mrItem);
                     $mr->items[] = $mri;
                 }
                 $obj->moduleReferences[$mr->name] = $mr;

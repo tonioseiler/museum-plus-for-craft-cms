@@ -13,7 +13,7 @@
             {% else %}
                 <li>{{ k }}</li>
             {% endif %}
-            <ul style="padding-left: 1rem;">
+            <ul style="padding-left: 1rem; margin-bottom: 0.6rem;">
                 {{ _self.printArray(v) }}
             </ul>
         {% else %}
@@ -504,6 +504,7 @@
                                 <ul>
                                     {{ _self.printArray(value) }}
                                 </ul>
+                                    <hr />
                             {% else %}
                                 {% set v = value is iterable ? value|join(',') : value.timestamp is defined ? value|date : value %}
                                 {% if v|length < 60 %}
