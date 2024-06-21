@@ -913,6 +913,7 @@ class CollectionController extends Controller
                                 $ids[] = $vocabularyEntry->id;
                             }
                             //echo 'vocabularyEntry id: ' . $vocabularyEntry->id . ' pid: ' . $vocabularyEntry->parentId . '<br>';
+                            //probaly can be remooved to get all the tree
                             if(($type=='GenGeoCultureVgr')||($type=='GenGeoPoliticalVgr')||($type=='GenGeoGeographyVgr')||($type=='GenGeoHistoryVgr') ){
                                 // for geo vocabularies we need the whole tree
                                 $currentParentId = $vocabularyEntry->parentId;
@@ -921,7 +922,7 @@ class CollectionController extends Controller
                                 while ($currentParentId > 0) {
                                     $counter++;
                                     //echo '------- counter: ' . $counter. '<br>';
-                                    if ($counter > 5) {
+                                    if ($counter > 15) {
                                         //die('infinite loop? '.$counter);
                                         break;
                                     }
@@ -930,6 +931,7 @@ class CollectionController extends Controller
                                     //echo 'parentNodeId: ' . $parentNodeId . '<br>';
                                     $dataParent = $this->museumPlus->getVocabularyNode($type, $parentNodeId);
                                     $currentParentId = 0;
+                                    // its always one, but an array
                                     foreach ($dataParent as $dp) {
                                         $vocabularyEntryParent = $this->createOrUpdateVocabularyEntry($type, $dp);
                                         $currentParentId = $vocabularyEntryParent->parentId;
