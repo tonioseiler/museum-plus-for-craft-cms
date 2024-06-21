@@ -193,9 +193,30 @@ class MuseumPlusVocabulary extends Element
     }
 
     //TODO: Paolo, return an array in the corrcte way
-    public function getParentsTree()
+    public function getVocabularyWithParentsTree()
     {
-        
+        $SortLnu = 'some_value'; // Assign appropriate value
+        $UncertaintyBoo = 'some_value'; // Assign appropriate value
+        $array = [
+            'SortLnu' => $SortLnu,
+            'UncertaintyBoo' => $UncertaintyBoo,
+            'tree' => [
+                [
+                    'id' => null, // Assign appropriate value
+                    'title' => null, // Assign appropriate value
+                    'path' => null, // Assign appropriate value
+                ],
+                [
+                    'id' => null, // Assign appropriate value
+                    'title' => null, // Assign appropriate value
+                    'path' => null, // Assign appropriate value
+                ],
+            ],
+        ];
+        $array['tree'][0]['id'] = 1;
+        $array['tree'][0]['title'] = 'First Title';
+        $array['tree'][0]['path'] = '/path/to/first';
+        return $array;
     }
 
 }
