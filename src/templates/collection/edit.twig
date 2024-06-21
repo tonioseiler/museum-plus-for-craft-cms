@@ -11,13 +11,13 @@
             {% if k matches '/^\\d+$/' %}
                 {# ?? #}
             {% else %}
-                <li>{{ k }}</li>
+                <li style="font-style: italic;">{{ k }}:</li>
             {% endif %}
             <ul style="padding-left: 1rem; margin-bottom: 0.6rem;">
                 {{ _self.printArray(v) }}
             </ul>
         {% else %}
-            {{ k }}: {{ v }}
+            <span style="font-style: italic;">{{ k }}</span>: {{ v }}
             <br/>
         {% endif %}
         </li>
