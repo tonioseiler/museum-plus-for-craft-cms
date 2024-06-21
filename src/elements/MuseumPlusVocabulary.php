@@ -187,36 +187,30 @@ class MuseumPlusVocabulary extends Element
         return $rec->getDataAttribute($name);
     }
 
-    public function getParentElement()
-    {
-        return MuseumPlusVocabulary::find()->id($this->parentId)->one();
+    public function getItems() {
+        $rec = $this->getRecord();
+        return $rec->getItems();
     }
 
-    //TODO: Paolo, return an array in the corrcte way
-    public function getVocabularyWithParentsTree()
+    public function getParent()
     {
-        $SortLnu = 'some_value'; // Assign appropriate value
-        $UncertaintyBoo = 'some_value'; // Assign appropriate value
-        $array = [
-            'SortLnu' => $SortLnu,
-            'UncertaintyBoo' => $UncertaintyBoo,
-            'tree' => [
-                [
-                    'id' => null, // Assign appropriate value
-                    'title' => null, // Assign appropriate value
-                    'path' => null, // Assign appropriate value
-                ],
-                [
-                    'id' => null, // Assign appropriate value
-                    'title' => null, // Assign appropriate value
-                    'path' => null, // Assign appropriate value
-                ],
-            ],
-        ];
-        $array['tree'][0]['id'] = 1;
-        $array['tree'][0]['title'] = 'First Title';
-        $array['tree'][0]['path'] = '/path/to/first';
-        return $array;
+        return MuseumPlusVocabulary::find()->collectionId($this->parentId)->one();
+    }
+
+    //@paolo: I found a simple way to implement this method. I hope it helps.
+    public function getParents()
+    {
+        $parent = $this->getParent();
+        if ($parent) {
+            return $parent->getParents() + [$parent];
+        } else {
+            return [];
+        }
+    }
+
+    public function getPath()
+    {
+        return array_filter([$this] + $this->getParents());
     }
 
 }

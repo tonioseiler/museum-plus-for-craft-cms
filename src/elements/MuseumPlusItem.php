@@ -581,6 +581,7 @@ class MuseumPlusItem  extends Element
 
     public function getGeographyCultureAlt() {
         // TODO Paolo work in progress
+        // @Paolo: please delete when you are done
         $result = [];
         $rec = $this->getRecord();
         $itemTitle = $rec->getDataAttribute('ObjObjectTitleVrt');

@@ -44,7 +44,7 @@ class CollectionService extends Component
         return $objectGroupRecords;
     }
 
-    public function getObjectById($id) {
+    public function getObjectGroupById($id) {
         $object = ObjectGroupRecord::find()
             ->where(['id' => $id])
             ->one();
@@ -63,10 +63,6 @@ class CollectionService extends Component
                 ->orderBy(['title' => SORT_ASC])
                 ->all();
         return $people;
-    }
-
-    public function getItemsByTag($tagId) {
-        return 'Todo: implement';
     }
 
     public function getItemById($id) {

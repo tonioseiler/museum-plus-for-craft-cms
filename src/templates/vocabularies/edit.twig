@@ -85,7 +85,7 @@
                         <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{vocabulary.title}}">
                     </div>
                 </div>
-                {% if vocabulary.getParentElement %}
+                {% if vocabulary.getParent() %}
                 <div class="field" data-attribute="parent">
                     <div class="heading">
                         <label id="fields-title-label" for="fields-title">{{'Parent'|t('app')}}</label>
@@ -93,7 +93,7 @@
                     </div>
                     <div class="input ltr">
                         <div>
-                            <a href="{{ vocabulary.getParentElement().getCpEditUrl() }}">{{vocabulary.getParentElement().title}}</a>
+                            <a href="{{ vocabulary.getParent().getCpEditUrl() }}">{{vocabulary.getParent().title}}</a>
                         </div>
                     </div>
                 </div>

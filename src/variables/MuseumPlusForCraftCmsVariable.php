@@ -63,6 +63,12 @@ class MuseumPlusForCraftCmsVariable
         }
     }
 
+    /**
+     * Get all exhibitions
+     * @return array
+     * 
+     * untested, probably does not work
+     */
     public function getExhibitions() {
         try {
             $exhibitions = MuseumPlusForCraftCms::$plugin->museumPlus->getExhibitions();
@@ -90,16 +96,16 @@ class MuseumPlusForCraftCmsVariable
         return $ret;
     }
 
-    public function getItemsByTag($tagId) {
-        return MuseumPlusForCraftCms::$plugin->collection->getItemsByTag($tagId);
-    }
-
     public function getItemById($id) {
         return MuseumPlusForCraftCms::$plugin->collection->getItemById($id);
     }
 
     public function getItemsByIds($ids,$limit = 10, $offset = 0) {
         return MuseumPlusForCraftCms::$plugin->collection->getItemsByIds($ids,$limit, $offset);
+    }
+
+    public function getVocabularies($type = null) { 
+        return MuseumPlusForCraftCms::$plugin->vocabulary->getVocabularies($type);
     }
 
     public function getVocabularyById($id) {
@@ -114,8 +120,8 @@ class MuseumPlusForCraftCmsVariable
         return MuseumPlusForCraftCms::$plugin->collection->getPeopleById($id);
     }
 
-    public function getObjectById($id) {
-        return MuseumPlusForCraftCms::$plugin->collection->getObjectById($id);
+    public function getObjectGroupById($id) {
+        return MuseumPlusForCraftCms::$plugin->collection->getObjectGroupById($id);
     }
 
     public function getAllObjectGroups() {
@@ -127,30 +133,15 @@ class MuseumPlusForCraftCmsVariable
     }
 
     public function getAllClassifications() {
-
-        //TODO: get from service
-
-        return MuseumPlusVocabulary::find()
-            ->type(['ObjClassificationVgr'])
-            ->orderBy('title')
-            ->all();
+        return $this->getVocabularies('ObjClassificationVgr');
     }
 
     public function getAllPlaces() {
-
-        //TODO: get from service
-
-        return MuseumPlusVocabulary::find()
-            ->type(['GenPlaceVgr'])
-            ->orderBy('title')
-            ->all();
+        return $this->getVocabularies('GenPlaceVgr');
     }
 
     public function getAllKeywords() {
-        return MuseumPlusVocabulary::find()
-            ->type(['ObjKeyWordVgr'])
-            ->orderBy('title')
-            ->all();
+        return $this->getVocabularies('ObjKeyWordVgr');
     }
 
     public function getBookmarks($limit = 10, $offset = 0) {

@@ -62,6 +62,16 @@ class VocabularyService extends Component
             ->all();
     }
 
+    public function getVocabularies($type = null) {
+        $tmp = MuseumPlusVocabulary::find();
+        if ($type)
+            $tmp->type(['ObjClassificationVgr']);
+
+        return $tmp->orderBy('title')
+            ->all();
+    }
+    
+
     public function getAllClassifications() {
         $records = VocabularyEntryRecord::find()->where(['type' => 'ObjClassificationVgr'])->all();
         return $records;
