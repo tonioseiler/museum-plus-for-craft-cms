@@ -119,20 +119,24 @@ Methods available in on a item:
 
 Methods available in on a vocabulary entry:
 ```
-getItems() // gets all ietms associted by this type
-getParent() // get the parent vocabulary node
-getParents() // get all parents up the tree
-getPath() // get all parents up the tree plu sthe node itself
+ - getItems() // gets all ietms associted by this type
+ - getParent() // get the parent vocabulary node
+ - getParents() // get all parents up the tree
+ - getPath() // get all parents up the tree plu sthe node itself
 ```
 
 The getRecords methods gives acces to the underlying record element.
 Here the methods that can be called on the records (items, people, objectgroups, vocabulary entries, literature, ownerships)
 ```
-getRepeatableGroupValues(groupName, attribute = null, filterTypes = [])
-getDataAttributes() (for all)
-getDataAttribute(name)
+ - getRepeatableGroupValues(groupName, attribute = null, filterTypes = [])
+ - getDataAttributes() (for all)
+ - getDataAttribute(name)
 ```
 
+Get the items from objects like people, objectgroups, vocabulary entries, literature, ownerships
+ ```
+  - rec.getItems()
+ ```
 
 ### Events
 
