@@ -234,11 +234,11 @@
                         <ul>
                             {% for geo in geographyPolitical %}
                                 <li>
-                                    {{ geo.title }} {{ geo.id }}
-                                    {% set parents = item.getGeographyPoliticalParents(geo.id) %}
+                                    <span>{{ geo.title }} {{ geo.id }}</span>
+                                    {% set parents = geo.getParents() %}
                                     {% for parent in parents %}
                                         {% if loop.index < 10 %}
-                                            ,  {{ parent.title }} {{ parent.id }}
+                                            , <span>{{ parent.title }} {{ parent.id }}</span>
                                         {% endif %}
                                     {% endfor %}
                                 </li>
