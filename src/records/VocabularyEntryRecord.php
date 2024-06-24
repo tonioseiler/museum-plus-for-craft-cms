@@ -41,7 +41,7 @@ class VocabularyEntryRecord extends DataRecord
         foreach ($this->getChildren() as $child) {
             $descendants = array_merge($descendants, $child->getDescendants());
         }
-        return $descendants
+        return $descendants;
     }
 
     public function getTitle()
