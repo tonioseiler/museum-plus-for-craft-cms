@@ -32,6 +32,18 @@ class VocabularyEntryRecord extends DataRecord
             ->viaTable('museumplus_items_vocabulary', ['vocabularyId' => 'id']);
     }
 
+    public function getChildren() {
+        return $this->hasMany(VocabularyEntryRecord::className(), ['parentId' => 'collectionId']);
+    }
+
+    public function getDescendants() {
+        $descendants = $this->getChildren();
+        foreach ($this->getChildren() as $child) {
+            $descendants = array_merge($descendants, $child->getDescendants());
+        }
+        return $descendants
+    }
+
     public function getTitle()
     {
         $element = MuseumPlusVocabulary::find()->id($this->id)->one();
@@ -46,7 +58,6 @@ class VocabularyEntryRecord extends DataRecord
         return VocabularyEntryRecord::find()->where(['collectionId' => $this->parentId])->one();
     }
 
-    //@paolo: I found a simple way to implement this method. I hope it helps.
     public function getParents()
     {
         $parent = $this->getParent();

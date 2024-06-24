@@ -194,6 +194,8 @@
                     </div>
                     <div class="input ltr">
                         {{ item.getDimensions()|join }}
+
+                        {{ dump(item.getDataAttributes('moduleReferences'))}}
                         {#
                         <input type="text" id="fields-dimension" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[dimension]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{ item.getDimensions()|join }}">
                         #}
