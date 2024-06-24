@@ -2,11 +2,8 @@
 namespace furbo\museumplusforcraftcms\elements\db;
 
 use craft\db\Query;
-use craft\db\Table;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
-use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
-use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 
 class MuseumPlusItemQuery extends ElementQuery
 {

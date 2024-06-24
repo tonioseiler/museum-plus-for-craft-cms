@@ -34,9 +34,32 @@ class VocabularyEntryRecord extends DataRecord
 
     public function getTitle()
     {
-        //$element = MuseumPlusForCraftCms::$plugin->vocabulary->getElementById($this->id);
         $element = MuseumPlusVocabulary::find()->id($this->id)->one();
         return $element->title;
+    }
+
+    public function getParent():VocabularyEntryRecord|null
+    {
+        if (empty($this->parentId)) {
+            return null;
+        }
+        return VocabularyEntryRecord::find()->where(['collectionId' => $this->parentId])->one();
+    }
+
+    //@paolo: I found a simple way to implement this method. I hope it helps.
+    public function getParents()
+    {
+        $parent = $this->getParent();
+        if ($parent) {
+            return [$parent] + $parent->getParents();
+        } else {
+            return [];
+        }
+    }
+
+    public function getPath()
+    {
+        return array_filter([$this] + $this->getParents());
     }
 
 
