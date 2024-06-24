@@ -62,8 +62,4 @@ class VocabularyEntryRecord extends DataRecord
         return array_filter([$this] + $this->getParents());
     }
 
-
-    //@tonio maybe here we should have getParents() ...
-
-
 }
