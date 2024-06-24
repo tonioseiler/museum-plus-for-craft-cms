@@ -248,6 +248,58 @@
                     {% endif %}
                 </div>
 
+
+                <div class="field" data-attribute="geographical-references">
+                    <div class="heading">
+                        <label id="fields-geographical-references" for="fields-geographical-references">Geogr. Bezug, 4 different kinds (progress)</label>
+                        <div class="flex-grow"></div>
+                    </div>
+
+
+                    {% set itemRecord = item.getRecord() %}
+                    {# set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp', 'TypeVoc')  #}
+                    {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp')  %}
+
+                    {% for singleRelation in ObjGeographyRelations %}
+                        {% if singleRelation['TypeVoc']=='Herstellungsort' %}
+                            <div>
+                                {#
+                                Relation: Herstellungsort, PoliticalVoc: {{ singleRelation['PoliticalVoc'] }}, UncertaintyBoo: {{ singleRelation['UncertaintyBoo'] }}<br>
+                                Now search for  <b>PoliticalVoc</b> with value or title {{ singleRelation['PoliticalVoc'] }}<b></b>
+                                #}
+
+                                {% set geoPoliticalRefs = item.getGeographicReferences().all() %}
+                                {% for geoPoliticalRef in geoPoliticalRefs %}
+                                    {% if geoPoliticalRef['title'] == singleRelation['PoliticalVoc'] %}
+                                        {#
+                                        <br>Found the vocabulary item, the {{ singleRelation['TypeVoc'] }} vocabulary is {{ geoPoliticalRef['title'] }} with id {{ geoPoliticalRef['id'] }} and UncertaintyBoo {{ singleRelation['UncertaintyBoo'] }}<br>
+
+                                        #}
+                                        {{ singleRelation['TypeVoc'] }}: {{ geoPoliticalRef['title'] }} (id: {{ geoPoliticalRef['id'] }}) {{ singleRelation['UncertaintyBoo'] == 'true' ? '?' : '' }}<br>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% elseif singleRelation['TypeVoc']=='Abgebildet' %}
+                            <div>
+                                {#
+                                Relation: Abgebildet, PoliticalVoc: {{ singleRelation['PoliticalVoc'] }}, UncertaintyBoo: {{ singleRelation['UncertaintyBoo'] }}<br>
+                               Now search for  <b>PoliticalVoc</b> with value or title {{ singleRelation['PoliticalVoc'] }}<b></b>
+                                #}
+                                {% set geoPoliticalRefs = item.getGeographicReferences().all() %}
+                                {% for geoPoliticalRef in geoPoliticalRefs %}
+                                    {% if geoPoliticalRef['title'] == singleRelation['PoliticalVoc'] %}
+                                        {#
+                                        <br>Found the vocabulary item, the {{ singleRelation['TypeVoc'] }} vocabulary is {{ geoPoliticalRef['title'] }} with id {{ geoPoliticalRef['id'] }} and UncertaintyBoo {{ singleRelation['UncertaintyBoo'] }}<br>
+                                        #}
+                                        {{ singleRelation['TypeVoc'] }}: {{ geoPoliticalRef['title'] }} (id: {{ geoPoliticalRef['id'] }}) {{ singleRelation['UncertaintyBoo'] == 'true' ? '?' : '' }}<br>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                </div>
+
                 <div class="field" data-attribute="geographical-references">
                     <div class="heading">
                         <label id="fields-geographical-references" for="fields-geographical-references">{{ 'Geographical References: Historic'|t('museum-plus-for-craft-cms') }}</label>
@@ -511,7 +563,7 @@
                                 <ul>
                                     {{ _self.printArray(value) }}
                                 </ul>
-                                    <hr />
+                                <hr />
                             {% else %}
                                 {% set v = value is iterable ? value|join(',') : value.timestamp is defined ? value|date : value %}
                                 {% if v|length < 60 %}
