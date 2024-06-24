@@ -199,11 +199,13 @@ class MuseumPlusVocabulary extends Element
     }
 
     //@paolo: I found a simple way to implement this method. I hope it helps.
+    //@tonio this returns one extra parent...
     public function getParents()
     {
         $parent = $this->getParent();
         if ($parent) {
-            return [$parent] + $parent->getParents();
+            //return [$parent] + $parent->getParents();
+            return array_merge([$parent], $parent->getParents());
         } else {
             return [];
         }
