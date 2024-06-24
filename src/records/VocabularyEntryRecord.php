@@ -63,4 +63,7 @@ class VocabularyEntryRecord extends DataRecord
     }
 
 
+    //@tonio maybe here we should have getParents() ...
+
+
 }

@@ -579,6 +579,15 @@ class MuseumPlusItem  extends Element
         return $this->getVocabularyEntries()->where(['type' => 'GenGeoCultureVgr']);
     }
 
+    // TODO Tonio
+    public function getGeographyPoliticalParents($id) {
+        //return 'eded';
+        $myVoc = MuseumPlusVocabulary::find()->id($id)->one();
+        //$myVoc = MuseumPlusVocabulary::find()->collectionId($id)->one();
+        $parents = $myVoc->getParents();
+        return $parents;
+    }
+
     public function getGeographyCultureAlt() {
         // TODO Paolo work in progress
         // @Paolo: please delete when you are done
