@@ -193,24 +193,6 @@ class MuseumPlusVocabulary extends Element
         return $rec->getItems();
     }
 
-    public function getParent(): null|ElementInterface
-    {
-        return MuseumPlusVocabulary::find()->collectionId($this->parentId)->one();
-    }
-
-    //@paolo: I found a simple way to implement this method. I hope it helps.
-    //@tonio this returns one extra parent...
-    public function getParents()
-    {
-        $parent = $this->getParent();
-        if ($parent) {
-            //return [$parent] + $parent->getParents();
-            return array_merge([$parent], $parent->getParents());
-        } else {
-            return [];
-        }
-    }
-
     public function getPath()
     {
         return array_filter([$this] + $this->getParents());

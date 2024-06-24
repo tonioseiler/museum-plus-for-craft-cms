@@ -51,7 +51,8 @@ class VocabularyEntryRecord extends DataRecord
     {
         $parent = $this->getParent();
         if ($parent) {
-            return [$parent] + $parent->getParents();
+            //return [$parent] + $parent->getParents();
+            return array_merge([$parent], $parent->getParents());
         } else {
             return [];
         }
