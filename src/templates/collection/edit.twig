@@ -507,10 +507,7 @@
                         <ul>
                             {% for relatedItem in relatedItems %}
                                 <li>
-                                    {#
-                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
-                                    #}
-                                    {{ relatedItem.getDataAttribute('ObjObjectTitleVrt') }}
+                                    <a href="/admin/museum-plus-for-craft-cms/collection/{{ relatedItem.id }}">&raquo; {{ relatedItem.getDataAttribute('ObjObjectTitleVrt') }}</a>
                                 </li>
                             {% endfor %}
                         </ul>
