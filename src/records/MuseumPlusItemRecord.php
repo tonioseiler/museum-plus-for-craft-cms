@@ -236,5 +236,16 @@ class MuseumPlusItemRecord extends DataRecord
         return $ret;
     }
 
+    public function isComposite() {
+        $tmp = $this->getDataAttribute('ObjNumberObjectsTxt');
+        if (empty($tmp)) {
+            return false;
+        }
+        if (intval($tmp)) {
+            return true;
+        }
+        return false;
+    }
+
 
 }

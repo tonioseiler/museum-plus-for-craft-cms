@@ -565,10 +565,12 @@ class MuseumPlusItem  extends Element
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'GenGeoPoliticalVgr']);
     }
+
     public function getGeographicReferencesHistory() {
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'GenGeoHistoryVgr']);
     }
+
     public function getGeographicReferencesGeography() {
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'GenGeoGeographyVgr']);
@@ -677,9 +679,8 @@ class MuseumPlusItem  extends Element
         return implode(", ", $metaKeywords);
     }
 
-    public function getExtracontentText()
-    {
-        $extraContentText = "[demo text]";
-        return $extraContentText;
+    public function isComposite() {
+        $rec = $this->getRecord();
+        return $rec->isComposite();
     }
 }
