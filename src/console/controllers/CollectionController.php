@@ -910,6 +910,7 @@ class CollectionController extends Controller
             foreach ($vocabularyRef['items'] as $vc) {
                 try {
                     // Using the node id from above we get the vocabulary data for the entry: content, id, parentId (directly from the m+ server)
+                    // this node id is not the collection id, but the id of the vocabulary node connection
                     $data = $this->museumPlus->getVocabularyNode($type, $vc['id']);
                     //echo '<textarea style="width:600px;height:500px;">Type: '.$type.' ['.$vc['id'].'] '.print_r($data,true).'</textarea>';
                     foreach ($data as $d) {
