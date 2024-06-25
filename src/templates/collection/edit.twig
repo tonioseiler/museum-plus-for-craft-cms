@@ -204,7 +204,7 @@
 
                 <div class="field" data-attribute="geographical-references-style-culture">
                     <div class="heading">
-                        <label id="fields-geographical-references-style-culture-label" for="fields-geographical-references-style-culture">{{ 'Geographical References: Style/Culture'|t('museum-plus-for-craft-cms') }}</label>
+                        <label id="fields-geographical-references-style-culture-label" for="fields-geographical-references-style-culture">{{ 'Style/Culture'|t('museum-plus-for-craft-cms') }}</label>
                         <div class="flex-grow"></div>
                     </div>
                     {% set geographyCulture = item.getGeographyCulture().all() %}
@@ -222,143 +222,162 @@
                     {% endif %}
                 </div>
 
-                <div class="field" data-attribute="geographical-references">
-                    <div class="heading">
-                        <label id="fields-geographical-references" for="fields-geographical-references">{{ 'Geographical References: Political'|t('museum-plus-for-craft-cms') }}</label>
-                        <div class="flex-grow"></div>
-                    </div>
-                    {% set geographyPolitical = item.getGeographicReferences().all() %}
-                    {% if geographyPolitical|length %}
-                        <ul>
-                            {% for geo in geographyPolitical %}
-                                <li>
-                                    <span>{{ geo.title }} {{ geo.id }}</span>
+
+                {# Herstellungsort  #}
+                {% set atLeastOneReference = false %}
+                {% set references = '' %}
+                {% set geographyPolitical = item.getGeographicReferences().all() %}
+                {% if geographyPolitical|length %}
+                    {% for geo in geographyPolitical %}
+                        {% set itemRecord = item.getRecord() %}
+                        {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
+                        {% for singleRelation in ObjGeographyRelations %}
+                            {% if singleRelation['TypeVoc']=='Herstellungsort' %}
+                                {% if singleRelation['PoliticalVoc'] == geo.title %}
+                                    {% set atLeastOneReference = true %}
+                                    {% set references = references ~ '<dd>' %}
+                                    {% set references = references ~ '<span data-id="'~geo.id~'">'~geo.title~'</span>' %}
                                     {% set parents = geo.getParents() %}
                                     {% for parent in parents %}
                                         {% if loop.index < 10 %}
-                                            , <span>{{ parent.title }} {{ parent.id }}</span>
+                                            {% set references = references ~ ', <span data-id="'~parent.id~'">'~parent.title~'</span>' %}
                                         {% endif %}
                                     {% endfor %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        n.a.
-                    {% endif %}
-                </div>
-
-
-                <div class="field" data-attribute="geographical-references">
-                    <div class="heading">
-                        <label id="fields-geographical-references" for="fields-geographical-references">Geogr. Bezug, 4 different kinds (progress)</label>
-                        <div class="flex-grow"></div>
-                    </div>
-
-
-                    {% set itemRecord = item.getRecord() %}
-                    {# set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp', 'TypeVoc')  #}
-                    {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp')  %}
-
-                    {% for singleRelation in ObjGeographyRelations %}
-                        {% if singleRelation['TypeVoc']=='Herstellungsort' %}
-                            <div>
-                                {#
-                                Relation: Herstellungsort, PoliticalVoc: {{ singleRelation['PoliticalVoc'] }}, UncertaintyBoo: {{ singleRelation['UncertaintyBoo'] }}<br>
-                                Now search for  <b>PoliticalVoc</b> with value or title {{ singleRelation['PoliticalVoc'] }}<b></b>
-                                #}
-
-                                {% set geoPoliticalRefs = item.getGeographicReferences().all() %}
-                                {% for geoPoliticalRef in geoPoliticalRefs %}
-                                    {% if geoPoliticalRef['title'] == singleRelation['PoliticalVoc'] %}
-                                        {#
-                                        <br>Found the vocabulary item, the {{ singleRelation['TypeVoc'] }} vocabulary is {{ geoPoliticalRef['title'] }} with id {{ geoPoliticalRef['id'] }} and UncertaintyBoo {{ singleRelation['UncertaintyBoo'] }}<br>
-
-                                        #}
-                                        {{ singleRelation['TypeVoc'] }}: {{ geoPoliticalRef['title'] }} (id: {{ geoPoliticalRef['id'] }}) {{ singleRelation['UncertaintyBoo'] == 'true' ? '?' : '' }}<br>
+                                    {% if singleRelation['UncertaintyBoo'] == 'true' %}
+                                        {% set references = references ~ ' ?' %}
                                     {% endif %}
-                                {% endfor %}
-                            </div>
-                        {% elseif singleRelation['TypeVoc']=='Abgebildet' %}
-                            <div>
-                                {#
-                                Relation: Abgebildet, PoliticalVoc: {{ singleRelation['PoliticalVoc'] }}, UncertaintyBoo: {{ singleRelation['UncertaintyBoo'] }}<br>
-                               Now search for  <b>PoliticalVoc</b> with value or title {{ singleRelation['PoliticalVoc'] }}<b></b>
-                                #}
-                                {% set geoPoliticalRefs = item.getGeographicReferences().all() %}
-                                {% for geoPoliticalRef in geoPoliticalRefs %}
-                                    {% if geoPoliticalRef['title'] == singleRelation['PoliticalVoc'] %}
-                                        {#
-                                        <br>Found the vocabulary item, the {{ singleRelation['TypeVoc'] }} vocabulary is {{ geoPoliticalRef['title'] }} with id {{ geoPoliticalRef['id'] }} and UncertaintyBoo {{ singleRelation['UncertaintyBoo'] }}<br>
-                                        #}
-                                        {{ singleRelation['TypeVoc'] }}: {{ geoPoliticalRef['title'] }} (id: {{ geoPoliticalRef['id'] }}) {{ singleRelation['UncertaintyBoo'] == 'true' ? '?' : '' }}<br>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+                                    {% set references = references ~ '</dd>' %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
                     {% endfor %}
-
-                </div>
-
-                <div class="field" data-attribute="geographical-references">
-                    <div class="heading">
-                        <label id="fields-geographical-references" for="fields-geographical-references">{{ 'Geographical References: Historic'|t('museum-plus-for-craft-cms') }}</label>
-                        <div class="flex-grow"></div>
-                    </div>
-                    {% set geographyHistoric = item.getGeographicReferencesHistory().all() %}
-                    {% if geographyHistoric|length %}
-                        <ul>
-                            {% for geo in geographyHistoric %}
-                                <li>
-                                    {{ geo.title }}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        n.a.
+                    {% if atLeastOneReference %}
+                        <div class="field" data-attribute="geographical-references">
+                            <div class="heading">
+                                <label id="fields-geographical-references" for="fields-geographical-references">Herstellungsort</label><br>
+                                <div class="flex-grow"></div>
+                            </div>
+                            <div>{{ references|raw }}</div>
+                        </div>
                     {% endif %}
-                </div>
+                {% endif %}
 
-                <div class="field" data-attribute="geographical-references">
-                    <div class="heading">
-                        <label id="fields-geographical-references" for="fields-geographical-references">{{ 'Geographical References: Geographic'|t('museum-plus-for-craft-cms') }}</label>
-                        <div class="flex-grow"></div>
-                    </div>
-                    {% set geographyGeo = item.getGeographicReferencesGeography().all() %}
-                    {% if geographyGeo|length %}
-                        <ul>
-                            {% for geo in geographyGeo %}
-                                <li>
-                                    {{ geo.title }}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        n.a.
+                {# Abgebildet  #}
+                {% set atLeastOneReference = false %}
+                {% set references = '' %}
+                {% set geographyPolitical = item.getGeographicReferences().all() %}
+                {% if geographyPolitical|length %}
+                    {% for geo in geographyPolitical %}
+                        {% set itemRecord = item.getRecord() %}
+                        {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
+                        {% for singleRelation in ObjGeographyRelations %}
+                            {% if singleRelation['TypeVoc']=='Abgebildet' %}
+                                {% if singleRelation['PoliticalVoc'] == geo.title %}
+                                    {% set atLeastOneReference = true %}
+                                    {% set references = references ~ '<dd>' %}
+                                    {% set references = references ~ '<span data-id="'~geo.id~'">'~geo.title~'</span>' %}
+                                    {% set parents = geo.getParents() %}
+                                    {% for parent in parents %}
+                                        {% if loop.index < 10 %}
+                                            {% set references = references ~ ', <span data-id="'~parent.id~'">'~parent.title~'</span>' %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if singleRelation['UncertaintyBoo'] == 'true' %}
+                                        {% set references = references ~ ' ?' %}
+                                    {% endif %}
+                                    {% set references = references ~ '</dd>' %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    {% if atLeastOneReference %}
+                        <div class="field" data-attribute="geographical-references">
+                            <div class="heading">
+                                <label id="fields-geographical-references" for="fields-geographical-references">Abgebildet</label>
+                                <div class="flex-grow"></div>
+                            </div>
+                            <div>{{ references|raw }}</div>
+                        </div>
                     {% endif %}
-                </div>
+                {% endif %}
 
-                <div class="field" data-attribute="geographical-references">
-                    <div class="heading">
-                        <label id="fields-geographical-references-label" for="fields-geographical-references">{{ 'Geographical References (old)'|t('museum-plus-for-craft-cms') }}</label>
-                        <div class="flex-grow"></div>
-                    </div>
-                    {% set geographyOld = item.getGeographicReferencesOld().all() %}
-                    {% if geographyOld|length %}
-                        <ul>
-                            {% for geo in geographyOld %}
-                                <li>
-                                    {#
-                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
-                                    #}
-                                    {{ geo.title }}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        n.a.
+                {# Fundort  #}
+                {% set atLeastOneReference = false %}
+                {% set references = '' %}
+                {% set geographyPolitical = item.getGeographicReferences().all() %}
+                {% if geographyPolitical|length %}
+                    {% for geo in geographyPolitical %}
+                        {% set itemRecord = item.getRecord() %}
+                        {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
+                        {% for singleRelation in ObjGeographyRelations %}
+                            {% if singleRelation['TypeVoc']=='Fundort' %}
+                                {% if singleRelation['PoliticalVoc'] == geo.title %}
+                                    {% set atLeastOneReference = true %}
+                                    {% set references = references ~ '<dd>' %}
+                                    {% set references = references ~ '<span data-id="'~geo.id~'">'~geo.title~'</span>' %}
+                                    {% set parents = geo.getParents() %}
+                                    {% for parent in parents %}
+                                        {% if loop.index < 10 %}
+                                            {% set references = references ~ ', <span data-id="'~parent.id~'">'~parent.title~'</span>' %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if singleRelation['UncertaintyBoo'] == 'true' %}
+                                        {% set references = references ~ ' ?' %}
+                                    {% endif %}
+                                    {% set references = references ~ '</dd>' %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    {% if atLeastOneReference %}
+                        <div class="field" data-attribute="geographical-references">
+                            <div class="heading">
+                                <label id="fields-geographical-references" for="fields-geographical-references">Fundort</label>
+                                <div class="flex-grow"></div>
+                            </div>
+                            <div>{{ references|raw }}</div>
+                        </div>
                     {% endif %}
-                </div>
-                <hr>
+                {% endif %}
+
+                {# Aufnahmeort  #}
+                {% set atLeastOneReference = false %}
+                {% set references = '' %}
+                {% set geographyPolitical = item.getGeographicReferences().all() %}
+                {% if geographyPolitical|length %}
+                    {% for geo in geographyPolitical %}
+                        {% set itemRecord = item.getRecord() %}
+                        {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
+                        {% for singleRelation in ObjGeographyRelations %}
+                            {% if singleRelation['TypeVoc']=='Aufnahmeort' %}
+                                {% if singleRelation['PoliticalVoc'] == geo.title %}
+                                    {% set atLeastOneReference = true %}
+                                    {% set references = references ~ '<dd>' %}
+                                    {% set references = references ~ '<span data-id="'~geo.id~'">'~geo.title~'</span>' %}
+                                    {% set parents = geo.getParents() %}
+                                    {% for parent in parents %}
+                                        {% if loop.index < 10 %}
+                                            {% set references = references ~ ', <span data-id="'~parent.id~'">'~parent.title~'</span>' %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if singleRelation['UncertaintyBoo'] == 'true' %}
+                                        {% set references = references ~ ' ?' %}
+                                    {% endif %}
+                                    {% set references = references ~ '</dd>' %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    {% if atLeastOneReference %}
+                        <div class="field" data-attribute="geographical-references">
+                            <div class="heading">
+                                <label id="fields-geographical-references" for="fields-geographical-references">Aufnahmeort</label>
+                                <div class="flex-grow"></div>
+                            </div>
+                            <div>{{ references|raw }}</div>
+                        </div>
+                    {% endif %}
+                {% endif %}
 
                 <div class="field" data-attribute="tags">
                     <div class="heading">
@@ -370,9 +389,6 @@
                         <ul>
                             {% for tag in tags %}
                                 <li>
-                                    {#
-                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
-                                    #}
                                     {{ tag.title }}
                                 </li>
                             {% endfor %}
@@ -491,10 +507,7 @@
                         <ul>
                             {% for relatedItem in relatedItems %}
                                 <li>
-                                    {#
-                                    <a href="/admin/museum-plus-for-craft-cms/vocabularies/{{ geo.id }}">&raquo; {{ geo.title }}</a>
-                                    #}
-                                    {{ relatedItem.getDataAttribute('ObjObjectTitleVrt') }}
+                                    <a href="/admin/museum-plus-for-craft-cms/collection/{{ relatedItem.id }}">&raquo; {{ relatedItem.getDataAttribute('ObjObjectTitleVrt') }}</a>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -562,7 +575,7 @@
                                 <ul>
                                     {{ _self.printArray(value) }}
                                 </ul>
-                                <hr />
+                                <hr/>
                             {% else %}
                                 {% set v = value is iterable ? value|join(',') : value.timestamp is defined ? value|date : value %}
                                 {% if v|length < 60 %}
@@ -618,7 +631,8 @@
                 </div>
             </div>
             <div class="btngroup">
-                <br><br><br><button id="get-ai-data-btn" class="btn">Generate content (AI)</button>
+                <br><br><br>
+                <button id="get-ai-data-btn" class="btn">Generate content (AI)</button>
                 <script>
                     window.csrfTokenName = "{{ craft.app.config.general.csrfTokenName }}";
                     window.csrfTokenValue = "{{ craft.app.request.csrfToken }}";
@@ -626,20 +640,20 @@
                         const btn = this;
                         btn.disabled = true; // disable button to prevent multiple clicks
                         const itemId = {{ item.id }};
-                        var data = {itemId: itemId };
+                        var data = {itemId: itemId};
                         data[window.csrfTokenName] = window.csrfTokenValue;
                         $.ajax({
                             url: '/actions/museum-plus-for-craft-cms/collection/get-extra-content-ai',
                             type: 'POST',
                             dataType: 'json',
-                            data:data,
-                            success: function(response) {
+                            data: data,
+                            success: function (response) {
                                 console.log(response);
                                 btn.disabled = false;
                                 $('#fields-extracontentExtraTitle').val(response.extraTitle);
                                 $('#fields-extracontentText').val(response.extraDescription);
                             },
-                            error: function(xhr, textStatus, errorThrown) {
+                            error: function (xhr, textStatus, errorThrown) {
                                 console.error('AJAX Error:', errorThrown);
                                 btn.disabled = false;
                             }
