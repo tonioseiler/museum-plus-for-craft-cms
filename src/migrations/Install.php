@@ -21,6 +21,7 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'data' => $this->longText()->null(),
                 'collectionId' => $this->integer()->notNull(),
+                'parentId' => $this->integer()->notNull()->defaultValue(0),
                 'inventoryNumber' => $this->string(),
                 'extraTitle' => $this->text(),
                 'extraDescription' => $this->longText(),

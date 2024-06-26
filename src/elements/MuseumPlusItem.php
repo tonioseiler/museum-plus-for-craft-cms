@@ -679,8 +679,4 @@ class MuseumPlusItem  extends Element
         return implode(", ", $metaKeywords);
     }
 
-    public function isComposite() {
-        $rec = $this->getRecord();
-        return $rec->isComposite();
-    }
 }

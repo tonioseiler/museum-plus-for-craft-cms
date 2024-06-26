@@ -193,9 +193,4 @@ class MuseumPlusVocabulary extends Element
         return $rec->getItems();
     }
 
-    public function getPath()
-    {
-        return array_filter([$this] + $this->getParents());
-    }
-
 }

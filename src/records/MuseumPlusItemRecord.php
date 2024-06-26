@@ -244,15 +244,20 @@ class MuseumPlusItemRecord extends DataRecord
         return $ret;
     }
 
-    public function isComposite() {
-        $tmp = $this->getDataAttribute('ObjNumberObjectsTxt');
-        if (empty($tmp)) {
-            return false;
+    public function hasChildren() {
+        return !empty($this->getChildren()) && $this->getChildren()->count() > 0;
+    }
+
+    public function getChildren() {
+        return $this->hasMany(MuseumPlusItemRecord::className(), ['parentId' => 'collectionId']);
+    }
+
+    public function getParent():MuseumPlusItemRecord|null
+    {
+        if (empty($this->parentId)) {
+            return null;
         }
-        if (intval($tmp)) {
-            return true;
-        }
-        return false;
+        return MuseumPlusItemRecord::find()->where(['collectionId' => $this->parentId])->one();
     }
 
 

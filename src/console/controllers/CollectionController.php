@@ -10,10 +10,8 @@
 
 namespace furbo\museumplusforcraftcms\console\controllers;
 
-use craft\db\Query;
 use craft\elements\Asset;
 use craft\helpers\Assets;
-use craft\helpers\ElementHelper;
 use craft\helpers\FileHelper;
 use craft\models\VolumeFolder;
 use craft\helpers\App;
@@ -30,6 +28,7 @@ use furbo\museumplusforcraftcms\records\LiteratureRecord;
 use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
 
 use Craft;
+use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 use yii\console\Controller;
 use yii\helpers\Console;
 
@@ -194,6 +193,7 @@ class CollectionController extends Controller
 
         $this->actionUpdateItemsInventory();
         $this->actionUpdateItemToItemRelationShips();
+        $this->actionUpdateItemParentChildRelations();
         $this->optimizeSearchIndex();
 
         return true;
@@ -1015,5 +1015,44 @@ class CollectionController extends Controller
             return ($a[$key] < $b[$key]) ? -1 : 1;
         });
     }
+
+    public function actionUpdateItemParentChildRelations()
+    {
+
+        App::maxPowerCaptain();
+
+        //reset parent ids
+        $itemRecords = MuseumPlusItemRecord::find()
+            ->where(['>', 'parentId', '0'])
+            ->all();
+        foreach ($itemRecords as $item) {
+            $item->parentId = 0;
+            $item->save();
+            echo '.';
+        }
+
+        //set the realtions again
+        $itemRecords = MuseumPlusItemRecord::find()->all();
+        foreach ($itemRecords as $item) {
+            $moduleRefs = $item->getDataAttribute('moduleReferences');
+            if (isset($moduleRefs['ObjObjectPartRef'])) {
+                $parts = $moduleRefs['ObjObjectPartRef']['items'];
+                foreach ($parts as $part) {
+                    $child = MuseumPlusItemRecord::find()
+                        ->where(['collectionId' => $part['id']])
+                        ->one();
+                    if ($child) {
+                        $child->parentId = $item->collectionId;
+                        $child->save();
+                        echo 'x';
+                    }
+                }
+                echo '-';
+            } else {
+                echo '_';
+            }
+        }
+    }
+
 
 }

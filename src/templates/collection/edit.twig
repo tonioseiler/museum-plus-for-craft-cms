@@ -28,6 +28,8 @@
 {% set title = item.title %}
 {% set selectedSubnavItem = 'items' %}
 
+{% set itemRecord = item.getRecord() %}
+
 {# The URL to this plugin's base CP section #}
 {% set pluginCpUrl = url('collection') %}
 
@@ -229,7 +231,6 @@
                 {% set geographyPolitical = item.getGeographicReferences().all() %}
                 {% if geographyPolitical|length %}
                     {% for geo in geographyPolitical %}
-                        {% set itemRecord = item.getRecord() %}
                         {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
                         {% for singleRelation in ObjGeographyRelations %}
                             {% if singleRelation['TypeVoc']=='Herstellungsort' %}
@@ -268,7 +269,6 @@
                 {% set geographyPolitical = item.getGeographicReferences().all() %}
                 {% if geographyPolitical|length %}
                     {% for geo in geographyPolitical %}
-                        {% set itemRecord = item.getRecord() %}
                         {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
                         {% for singleRelation in ObjGeographyRelations %}
                             {% if singleRelation['TypeVoc']=='Abgebildet' %}
@@ -307,7 +307,6 @@
                 {% set geographyPolitical = item.getGeographicReferences().all() %}
                 {% if geographyPolitical|length %}
                     {% for geo in geographyPolitical %}
-                        {% set itemRecord = item.getRecord() %}
                         {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
                         {% for singleRelation in ObjGeographyRelations %}
                             {% if singleRelation['TypeVoc']=='Fundort' %}
@@ -346,7 +345,6 @@
                 {% set geographyPolitical = item.getGeographicReferences().all() %}
                 {% if geographyPolitical|length %}
                     {% for geo in geographyPolitical %}
-                        {% set itemRecord = item.getRecord() %}
                         {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
                         {% for singleRelation in ObjGeographyRelations %}
                             {% if singleRelation['TypeVoc']=='Aufnahmeort' %}
@@ -514,16 +512,49 @@
                     {% else %}
                         n.a.
                     {% endif %}
-                    {#
-                    {% set rItemValues = [] %}
-                    {% for relatedItem in item.getRelatedItems().all() %}
-                        {% set rItemValues = rItemValues|merge([relatedItem.getDataAttribute('ObjObjectTitleVrt')]) %}
-                    {% endfor %}
-                    <div class="input ltr">
-                        <textarea id="fields-related-items" disabled="disabled" class="nicetext text fullwidth disabled" name="fields[related-items]" rows="4" cols="50" placeholder="" data-show-chars-left="" style="min-height: 94px;"> – {{ rItemValues|join('\n – ') }}</textarea>
-                    </div>
-                    #}
                 </div>
+                
+                {% if itemRecord.getChildren()|length %}
+                    <div class="field" data-attribute="children">
+                        <div class="heading">
+                            <label>Partials</label>
+                            <div class="flex-grow"></div>
+                        </div>
+
+                        {% set children = itemRecord.getChildren().all() %}
+                        {% if children|length %}
+                            <ul>
+                                {% for child in children %}
+                                    <li>
+                                        <a href="/admin/museum-plus-for-craft-cms/collection/{{ child.id }}">&raquo; {{ child.getDataAttribute('ObjObjectTitleVrt') }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            n.a.
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                {% if itemRecord.getParent() %}
+                    <div class="field" data-attribute="parent">
+                        <div class="heading">
+                            <label>Parent</label>
+                            <div class="flex-grow"></div>
+                        </div>
+
+                        {% set parent = itemRecord.getParent() %}
+                        {% if parent %}
+                            <ul>
+                                <li>
+                                    <a href="/admin/museum-plus-for-craft-cms/collection/{{ parent.id }}">&raquo; {{ parent.getDataAttribute('ObjObjectTitleVrt') }}</a>
+                                </li>
+                            </ul>
+                        {% else %}
+                            n.a.
+                        {% endif %}
+                    </div>
+                {% endif %}
 
                 <div class="field" data-attribute="literature">
                     <div class="heading">
