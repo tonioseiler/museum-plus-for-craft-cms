@@ -24,6 +24,48 @@
     {% endfor %}
 {% endmacro %}
 
+
+{% macro geoReferencesRenderHtml(typeVoc, item, itemRecord) %}
+    {% set atLeastOneReference = false %}
+    {% set references = '' %}
+    {% set geographyPolitical = item.getGeographicReferences().all() %}
+    {% if geographyPolitical|length %}
+        {% for geo in geographyPolitical %}
+            {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
+            {% for singleRelation in ObjGeographyRelations %}
+                {% if singleRelation['TypeVoc']==typeVoc %}
+                    {% if singleRelation['PoliticalVoc'] == geo.title %}
+                        {% set atLeastOneReference = true %}
+                        {% set references = references ~ '<dd>' %}
+                        {% set references = references ~ '<span data-id="'~geo.id~'">'~geo.title~'</span>' %}
+                        {% set parents = geo.getParents() %}
+                        {% for parent in parents %}
+                            {% if loop.index < 10 %}
+                                {% set references = references ~ ', <span data-id="'~parent.id~'">'~parent.title~'</span>' %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if singleRelation['UncertaintyBoo'] == 'true' %}
+                            {% set references = references ~ ' ?' %}
+                        {% endif %}
+                        {% set references = references ~ '</dd>' %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        {% if atLeastOneReference %}
+            <div class="field" data-attribute="geographical-references">
+                <div class="heading">
+                    <label id="fields-geographical-references" for="fields-geographical-references">{{ typeVoc }}</label><br>
+                    <div class="flex-grow"></div>
+                </div>
+                <div>{{ references|raw }}</div>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+
+
 {# The title of this CP section #}
 {% set title = item.title %}
 {% set selectedSubnavItem = 'items' %}
@@ -224,158 +266,10 @@
                     {% endif %}
                 </div>
 
-
-                {# Herstellungsort  #}
-                {% set atLeastOneReference = false %}
-                {% set references = '' %}
-                {% set geographyPolitical = item.getGeographicReferences().all() %}
-                {% if geographyPolitical|length %}
-                    {% for geo in geographyPolitical %}
-                        {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
-                        {% for singleRelation in ObjGeographyRelations %}
-                            {% if singleRelation['TypeVoc']=='Herstellungsort' %}
-                                {% if singleRelation['PoliticalVoc'] == geo.title %}
-                                    {% set atLeastOneReference = true %}
-                                    {% set references = references ~ '<dd>' %}
-                                    {% set references = references ~ '<span data-id="'~geo.id~'">'~geo.title~'</span>' %}
-                                    {% set parents = geo.getParents() %}
-                                    {% for parent in parents %}
-                                        {% if loop.index < 10 %}
-                                            {% set references = references ~ ', <span data-id="'~parent.id~'">'~parent.title~'</span>' %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    {% if singleRelation['UncertaintyBoo'] == 'true' %}
-                                        {% set references = references ~ ' ?' %}
-                                    {% endif %}
-                                    {% set references = references ~ '</dd>' %}
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    {% endfor %}
-                    {% if atLeastOneReference %}
-                        <div class="field" data-attribute="geographical-references">
-                            <div class="heading">
-                                <label id="fields-geographical-references" for="fields-geographical-references">Herstellungsort</label><br>
-                                <div class="flex-grow"></div>
-                            </div>
-                            <div>{{ references|raw }}</div>
-                        </div>
-                    {% endif %}
-                {% endif %}
-
-                {# Abgebildet  #}
-                {% set atLeastOneReference = false %}
-                {% set references = '' %}
-                {% set geographyPolitical = item.getGeographicReferences().all() %}
-                {% if geographyPolitical|length %}
-                    {% for geo in geographyPolitical %}
-                        {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
-                        {% for singleRelation in ObjGeographyRelations %}
-                            {% if singleRelation['TypeVoc']=='Abgebildet' %}
-                                {% if singleRelation['PoliticalVoc'] == geo.title %}
-                                    {% set atLeastOneReference = true %}
-                                    {% set references = references ~ '<dd>' %}
-                                    {% set references = references ~ '<span data-id="'~geo.id~'">'~geo.title~'</span>' %}
-                                    {% set parents = geo.getParents() %}
-                                    {% for parent in parents %}
-                                        {% if loop.index < 10 %}
-                                            {% set references = references ~ ', <span data-id="'~parent.id~'">'~parent.title~'</span>' %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    {% if singleRelation['UncertaintyBoo'] == 'true' %}
-                                        {% set references = references ~ ' ?' %}
-                                    {% endif %}
-                                    {% set references = references ~ '</dd>' %}
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    {% endfor %}
-                    {% if atLeastOneReference %}
-                        <div class="field" data-attribute="geographical-references">
-                            <div class="heading">
-                                <label id="fields-geographical-references" for="fields-geographical-references">Abgebildet</label>
-                                <div class="flex-grow"></div>
-                            </div>
-                            <div>{{ references|raw }}</div>
-                        </div>
-                    {% endif %}
-                {% endif %}
-
-                {# Fundort  #}
-                {% set atLeastOneReference = false %}
-                {% set references = '' %}
-                {% set geographyPolitical = item.getGeographicReferences().all() %}
-                {% if geographyPolitical|length %}
-                    {% for geo in geographyPolitical %}
-                        {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
-                        {% for singleRelation in ObjGeographyRelations %}
-                            {% if singleRelation['TypeVoc']=='Fundort' %}
-                                {% if singleRelation['PoliticalVoc'] == geo.title %}
-                                    {% set atLeastOneReference = true %}
-                                    {% set references = references ~ '<dd>' %}
-                                    {% set references = references ~ '<span data-id="'~geo.id~'">'~geo.title~'</span>' %}
-                                    {% set parents = geo.getParents() %}
-                                    {% for parent in parents %}
-                                        {% if loop.index < 10 %}
-                                            {% set references = references ~ ', <span data-id="'~parent.id~'">'~parent.title~'</span>' %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    {% if singleRelation['UncertaintyBoo'] == 'true' %}
-                                        {% set references = references ~ ' ?' %}
-                                    {% endif %}
-                                    {% set references = references ~ '</dd>' %}
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    {% endfor %}
-                    {% if atLeastOneReference %}
-                        <div class="field" data-attribute="geographical-references">
-                            <div class="heading">
-                                <label id="fields-geographical-references" for="fields-geographical-references">Fundort</label>
-                                <div class="flex-grow"></div>
-                            </div>
-                            <div>{{ references|raw }}</div>
-                        </div>
-                    {% endif %}
-                {% endif %}
-
-                {# Aufnahmeort  #}
-                {% set atLeastOneReference = false %}
-                {% set references = '' %}
-                {% set geographyPolitical = item.getGeographicReferences().all() %}
-                {% if geographyPolitical|length %}
-                    {% for geo in geographyPolitical %}
-                        {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
-                        {% for singleRelation in ObjGeographyRelations %}
-                            {% if singleRelation['TypeVoc']=='Aufnahmeort' %}
-                                {% if singleRelation['PoliticalVoc'] == geo.title %}
-                                    {% set atLeastOneReference = true %}
-                                    {% set references = references ~ '<dd>' %}
-                                    {% set references = references ~ '<span data-id="'~geo.id~'">'~geo.title~'</span>' %}
-                                    {% set parents = geo.getParents() %}
-                                    {% for parent in parents %}
-                                        {% if loop.index < 10 %}
-                                            {% set references = references ~ ', <span data-id="'~parent.id~'">'~parent.title~'</span>' %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    {% if singleRelation['UncertaintyBoo'] == 'true' %}
-                                        {% set references = references ~ ' ?' %}
-                                    {% endif %}
-                                    {% set references = references ~ '</dd>' %}
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    {% endfor %}
-                    {% if atLeastOneReference %}
-                        <div class="field" data-attribute="geographical-references">
-                            <div class="heading">
-                                <label id="fields-geographical-references" for="fields-geographical-references">Aufnahmeort</label>
-                                <div class="flex-grow"></div>
-                            </div>
-                            <div>{{ references|raw }}</div>
-                        </div>
-                    {% endif %}
-                {% endif %}
+                {{ _self.geoReferencesRenderHtml('Herstellungsort', item, itemRecord) }}
+                {{ _self.geoReferencesRenderHtml('Abgebildet', item, itemRecord) }}
+                {{ _self.geoReferencesRenderHtml('Fundort', item, itemRecord) }}
+                {{ _self.geoReferencesRenderHtml('Aufnahmeort', item, itemRecord) }}
 
                 <div class="field" data-attribute="tags">
                     <div class="heading">
@@ -395,7 +289,6 @@
                         n.a.
                     {% endif %}
                 </div>
-
 
             </fieldset>
 
@@ -513,7 +406,7 @@
                         n.a.
                     {% endif %}
                 </div>
-                
+
                 {% if itemRecord.getChildren()|length %}
                     <div class="field" data-attribute="children">
                         <div class="heading">
