@@ -4,6 +4,7 @@ namespace furbo\museumplusforcraftcms\elements\db;
 use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
+use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 
 class MuseumPlusItemQuery extends ElementQuery
 {
@@ -134,7 +135,14 @@ class MuseumPlusItemQuery extends ElementQuery
 
             $allDescendantVocabularyIds = $this->vocabularyIds;
             //TODO Paolo: add all descendant ids to this query
-
+            // more or less like this
+            /*foreach ($this->vocabularyIds as $vocabularyId) {
+                $record = VocabularyEntryRecord::findOne($vocabularyId);
+                $descendants = $record->getDescendants();
+                //TODO: Extract the ids
+                $allDescendantVocabularyIds = array_merge($allDescendantVocabularyIds, );
+            }*/
+            
             $subQuery = (new Query())
                 ->select(['itemId'])
                 ->from(['{{%museumplus_items_vocabulary}}'])
