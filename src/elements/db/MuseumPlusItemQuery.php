@@ -19,6 +19,8 @@ class MuseumPlusItemQuery extends ElementQuery
     public $extraTitle;
     public $extraDescription;
 
+    public $vocabularyIds = [];
+
 
     public function collectionId($value)
     {
@@ -78,6 +80,12 @@ class MuseumPlusItemQuery extends ElementQuery
     public function extraDescription($value)
     {
         $this->extraDescription = $value;
+        return $this;
+    }
+
+    public function vocabularyIds($value)
+    {
+        $this->vocabularyIds = $value;
         return $this;
     }
 
@@ -165,6 +173,18 @@ class MuseumPlusItemQuery extends ElementQuery
                 ->select(['itemId'])
                 ->from(['{{%museumplus_items_people}}'])
                 ->where(['personId' => $this->person]);
+            $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
+        }
+
+        if(!empty($this->vocabularyIds)){
+
+            //TODO Paolo: add all descendant ids to this query
+            $allDescendantVocabularyIds = $this->vocabularyIds;
+
+            $subQuery = (new Query())
+                ->select(['itemId'])
+                ->from(['{{%museumplus_items_vocabulary}}'])
+                ->where(['in', 'vocabularyId', $allDescendantVocabularyIds]);
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
         }
 

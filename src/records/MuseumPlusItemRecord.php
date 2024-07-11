@@ -8,7 +8,7 @@ namespace furbo\museumplusforcraftcms\records;
 use Craft;
 use craft\db\ActiveRecord;
 use craft\helpers\Db;
-
+use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 use furbo\museumplusforcraftcms\records\DataRecord;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
@@ -258,6 +258,18 @@ class MuseumPlusItemRecord extends DataRecord
             return null;
         }
         return MuseumPlusItemRecord::find()->where(['collectionId' => $this->parentId])->one();
+    }
+
+    public function getTitle()
+    {
+        $element = MuseumPlusItem::find()->id($this->id)->one();
+        return $element->title;
+    }
+
+    public function getUrl()
+    {
+        $element = MuseumPlusItem::find()->id($this->id)->one();
+        return $element->getUrl();
     }
 
 

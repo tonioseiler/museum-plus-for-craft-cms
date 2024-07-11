@@ -679,4 +679,5 @@ class MuseumPlusItem  extends Element
         return implode(", ", $metaKeywords);
     }
 
+
 }
