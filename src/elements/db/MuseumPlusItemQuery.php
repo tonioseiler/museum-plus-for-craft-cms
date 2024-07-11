@@ -29,24 +29,6 @@ class MuseumPlusItemQuery extends ElementQuery
         return $this;
     }
 
-    public function geographic($value)
-    {
-        $this->geographic = $value;
-        return $this;
-    }
-
-    public function classification($value)
-    {
-        $this->classification = $value;
-        return $this;
-    }
-
-    public function tag($value)
-    {
-        $this->tag = $value;
-        return $this;
-    }
-
     public function objectGroup($value)
     {
         $this->objectGroup = $value;
@@ -124,34 +106,6 @@ class MuseumPlusItemQuery extends ElementQuery
             $this->subQuery->andWhere(Db::parseParam('museumplus_items.extraDescription', false));
         }
 
-        if($this->geographic){
-            $subQuery = (new Query())
-                ->select(['itemId'])
-                ->from(['{{%museumplus_items_vocabulary}}'])
-                ->where(['vocabularyId' => $this->geographic]);
-            $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
-        }
-
-        if($this->classification){
-            $subQuery = (new Query())
-                ->select(['itemId'])
-                ->from(['{{%museumplus_items_vocabulary}}'])
-                ->where(['vocabularyId' => $this->classification]);
-            $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
-        }
-
-        if($this->tag){
-            $tagId = $this->tag;
-            $subQuery = (new Query())
-                ->select(['itemId'])
-                ->from(['{{%museumplus_items_vocabulary}}']);
-
-            $subQuery = $subQuery->where(['vocabularyId' => $tagId]);
-
-
-            $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
-        }
-
         if($this->objectGroup){
             $subQuery = (new Query())
                 ->select(['itemId'])
@@ -178,8 +132,8 @@ class MuseumPlusItemQuery extends ElementQuery
 
         if(!empty($this->vocabularyIds)){
 
-            //TODO Paolo: add all descendant ids to this query
             $allDescendantVocabularyIds = $this->vocabularyIds;
+            //TODO Paolo: add all descendant ids to this query
 
             $subQuery = (new Query())
                 ->select(['itemId'])
