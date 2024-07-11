@@ -33,7 +33,7 @@
         {% for geo in geographyPolitical %}
             {% set ObjGeographyRelations = itemRecord.getRepeatableGroupValues('ObjGeographyRelationGrp') %}
             {% for singleRelation in ObjGeographyRelations %}
-                {% if singleRelation['TypeVoc']==typeVoc %}
+                {% if singleRelation['TypeVoc'] == typeVoc %}
                     {% if singleRelation['PoliticalVoc'] == geo.title %}
                         {% set atLeastOneReference = true %}
                         {% set references = references ~ '<dd>' %}

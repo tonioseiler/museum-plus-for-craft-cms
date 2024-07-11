@@ -1054,5 +1054,17 @@ class CollectionController extends Controller
         }
     }
 
+    public function actionTriggerUpdateEvents() {
+        $itemIds = MuseumPlusItem::find()->ids();
+        foreach($itemIds as $itemId) {
+            $item = MuseumPlusItem::find()
+                ->id($itemId)
+                ->one();
+            $this->triggerUpdateEvent($item->collectionId, false);
+            echo '.';
+        }
+        echo "done\n";
+    }
+
 
 }
