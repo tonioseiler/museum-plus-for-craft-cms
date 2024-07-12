@@ -101,7 +101,7 @@ class MuseumPlusService extends Component
                 }
             }
             return $ret;
-        }, 1);
+        }, $seconds);
         return $tmp;
     }
 
