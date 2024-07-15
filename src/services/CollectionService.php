@@ -93,9 +93,16 @@ class CollectionService extends Component
             $criteria['search'] = $params['search'];
         }
 
+
+        if(isset($params['geographic'])) {
+            $items = $items->vocabularyIds($params['geographic']);
+            $criteria['geographic'] = $params['geographic'];
+        }
+
         //Paolo: THESE need to be replaced by vocabularyIds
         //$items = $items->vocabularyIds($params['vocabularyIds']);
 
+        /*
         if(isset($params['geographic'])) {
             $items = $items->geographic($params['geographic']);
             $criteria['geographic'] = $params['geographic'];
@@ -108,7 +115,7 @@ class CollectionService extends Component
             $items = $items->tag($params['tag']);
             $criteria['tag'] = $params['tag'];
         }
-        //until here
+        */
 
 
         if(isset($params['objectGroup'])) {
