@@ -133,6 +133,11 @@ class MuseumPlusItemQuery extends ElementQuery
 
 
         if(!empty($this->vocabularyIds)){
+
+            //check the type of all the ids
+            //group the ids by type
+            // if the same type its an "or", if different its and "and"
+
             $allDescendantVocabularyIds = $this->vocabularyIds;
             foreach ($this->vocabularyIds as $vocabularyId) {
                 $descendantsIds = [];
@@ -159,7 +164,9 @@ class MuseumPlusItemQuery extends ElementQuery
                 ->select(['itemId'])
                 ->from(['{{%museumplus_items_vocabulary}}'])
                 ->where(['in', 'vocabularyId', $allDescendantVocabularyIds]);
+            //if its only one type of vocabulary
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
+            //else for eacht type an or, but in general its an and
         }
         $this->subQuery->groupBy('museumplus_items.id');
         return parent::beforePrepare();
