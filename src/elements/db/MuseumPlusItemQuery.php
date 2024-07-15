@@ -131,29 +131,31 @@ class MuseumPlusItemQuery extends ElementQuery
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
         }
 
-        if(!empty($this->vocabularyIds)){
 
+        if(!empty($this->vocabularyIds)){
             $allDescendantVocabularyIds = $this->vocabularyIds;
-            //TODO Paolo: add all descendant ids to this query
-            // more or less like this
-            /*foreach ($this->vocabularyIds as $vocabularyId) {
+            foreach ($this->vocabularyIds as $vocabularyId) {
+                $descendantsIds = [];
                 $record = VocabularyEntryRecord::findOne($vocabularyId);
-                $descendants = $record->getDescendants();
-                //TODO: Extract the ids
-                $allDescendantVocabularyIds = array_merge($allDescendantVocabularyIds, );
-            }*/
-            
+
+                $descendants = $record->getChildren();
+                // @tonio his is broken: $descendants = $record->getDescendants();
+
+                foreach ($descendants->all() as $descendant) {
+                    $descendantsIds[] = $descendant->id;
+                }
+                if (!empty($descendantsIds)) {
+                    $allDescendantVocabularyIds = array_merge($allDescendantVocabularyIds,$descendantsIds);
+                }
+                $allDescendantVocabularyIds = array_map('intval', $allDescendantVocabularyIds);
+            }
             $subQuery = (new Query())
                 ->select(['itemId'])
                 ->from(['{{%museumplus_items_vocabulary}}'])
                 ->where(['in', 'vocabularyId', $allDescendantVocabularyIds]);
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
         }
-
-
         $this->subQuery->groupBy('museumplus_items.id');
-
-
         return parent::beforePrepare();
     }
 }
