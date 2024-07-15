@@ -44,11 +44,23 @@ abstract class DataRecord extends ActiveRecord
         return null;
     }
 
+    /*
     public function getDescendants() {
         $descendants = $this->getChildren();
         if (!empty($this->getChildren())) {
             foreach ($this->getChildren()->all() as $child) {
                 $descendants = array_merge($descendants, $child->getDescendants());
+            }
+        }
+        return $descendants;
+    }
+    */
+
+    public function getDescendants() {
+        $descendants = $this->getChildren()->all();  // Convert the ActiveQuery result to an array immediately.
+        if (!empty($descendants)) {  // Check if descendants is not empty.
+            foreach ($descendants as $child) {
+                $descendants = array_merge($descendants, $child->getDescendants());  // Merge with returned descendants.
             }
         }
         return $descendants;

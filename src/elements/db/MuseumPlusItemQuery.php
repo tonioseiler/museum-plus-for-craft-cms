@@ -138,10 +138,16 @@ class MuseumPlusItemQuery extends ElementQuery
                 $descendantsIds = [];
                 $record = VocabularyEntryRecord::findOne($vocabularyId);
 
-                $descendants = $record->getChildren();
-                // @tonio his is broken: $descendants = $record->getDescendants();
+                //$descendants = $record->getChildren();
+                $descendants = $record->getDescendants();
 
+                /*
                 foreach ($descendants->all() as $descendant) {
+                    $descendantsIds[] = $descendant->id;
+                }
+                */
+
+                foreach ($descendants as $descendant) {
                     $descendantsIds[] = $descendant->id;
                 }
                 if (!empty($descendantsIds)) {
