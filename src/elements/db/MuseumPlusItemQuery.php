@@ -68,7 +68,7 @@ class MuseumPlusItemQuery extends ElementQuery
 
     public function vocabularyIds($value)
     {
-        $this->vocabularyIds = $value;
+        $this->vocabularyIds[] = $value;
         return $this;
     }
 
