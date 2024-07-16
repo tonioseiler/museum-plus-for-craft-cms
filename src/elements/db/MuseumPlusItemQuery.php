@@ -155,11 +155,17 @@ class MuseumPlusItemQuery extends ElementQuery
                 $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
             */
 
-            $counter = 0;  // Counter to create unique aliases for each join
+            //$counter = 0;  // Counter to create unique aliases for each join
             foreach ($allDescendantVocabularyIds as $type => $ids) {
                 if (!empty($ids)) {
-                    $alias1 = "t1_{$counter}";
-                    $alias2 = "t2_{$counter}";
+                    $this->subQuery->andWhere([
+                        'exists', (new \craft\db\Query())
+                            ->select(['itemId'])
+                            ->from(['museumplus_items_vocabulary'])
+                            ->where(['in', "vocabularyId", $ids])
+                            ->andWhere("itemId = elements.id")  // Linking subquery to the main query's element ID
+                    ]);
+                    /*
                     $this->subQuery->andWhere([
                         'exists', (new \craft\db\Query())
                             ->select(["{$alias1}". '.itemId'])
@@ -168,7 +174,9 @@ class MuseumPlusItemQuery extends ElementQuery
                             ->where(['in', "{$alias1}.vocabularyId", $ids])
                             ->andWhere("{$alias1}.itemId = elements.id")  // Linking subquery to the main query's element ID
                     ]);
-                    $counter++;
+                    */
+
+                    //$counter++;
                 }
             }
         }
