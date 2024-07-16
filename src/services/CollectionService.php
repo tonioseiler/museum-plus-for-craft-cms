@@ -106,6 +106,13 @@ class CollectionService extends Component
                 $criteria['classification'] = $params['classification'];
             }
         }
+        if(isset($params['vocabulary'])) {
+            if(!empty($params['vocabulary'])) {
+                $items = $items->vocabularyIds($params['vocabulary']);
+                //$criteria['geographic'] = $params['geographic'];
+            }
+        }
+
 
         if(isset($params['objectGroup'])) {
             $items = $items->objectGroup($params['objectGroup']);
