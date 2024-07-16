@@ -131,44 +131,57 @@ class MuseumPlusItemQuery extends ElementQuery
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
         }
 
-
         if(!empty($this->vocabularyIds)){
-
-            //check the type of all the ids
-            //group the ids by type
-            // if the same type its an "or", if different its and "and"
-
-            $allDescendantVocabularyIds = $this->vocabularyIds;
             foreach ($this->vocabularyIds as $vocabularyId) {
                 $descendantsIds = [];
                 $record = VocabularyEntryRecord::findOne($vocabularyId);
-
-                //$descendants = $record->getChildren();
+                $allDescendantVocabularyIds[$record->type][] = $vocabularyId;
+                // $record->type
                 $descendants = $record->getDescendants();
-
-                /*
-                foreach ($descendants->all() as $descendant) {
-                    $descendantsIds[] = $descendant->id;
-                }
-                */
-
                 foreach ($descendants as $descendant) {
                     $descendantsIds[] = $descendant->id;
                 }
                 if (!empty($descendantsIds)) {
-                    $allDescendantVocabularyIds = array_merge($allDescendantVocabularyIds,$descendantsIds);
+                    $allDescendantVocabularyIds[$record->type] = array_merge($allDescendantVocabularyIds[$record->type],$descendantsIds);
                 }
-                $allDescendantVocabularyIds = array_map('intval', $allDescendantVocabularyIds);
+                $allDescendantVocabularyIds[$record->type] = array_map('intval', $allDescendantVocabularyIds[$record->type]);
             }
-            $subQuery = (new Query())
-                ->select(['itemId'])
-                ->from(['{{%museumplus_items_vocabulary}}'])
-                ->where(['in', 'vocabularyId', $allDescendantVocabularyIds]);
-            //if its only one type of vocabulary
-            $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
-            //else for eacht type an or, but in general its an and
+            //dd($allDescendantVocabularyIds);
+            /*
+               $subQuery = (new Query())
+                    ->select(['itemId'])
+                    ->from(['{{%museumplus_items_vocabulary}}'])
+                    ->where(['in', 'vocabularyId', $allDescendantVocabularyIds]);
+                $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
+            */
+
+            //$counter = 0;  // Counter to create unique aliases for each join
+            foreach ($allDescendantVocabularyIds as $type => $ids) {
+                if (!empty($ids)) {
+                    $this->subQuery->andWhere([
+                        'exists', (new \craft\db\Query())
+                            ->select(['itemId'])
+                            ->from(['museumplus_items_vocabulary'])
+                            ->where(['in', "vocabularyId", $ids])
+                            ->andWhere("itemId = elements.id")  // Linking subquery to the main query's element ID
+                    ]);
+                    /*
+                    $this->subQuery->andWhere([
+                        'exists', (new \craft\db\Query())
+                            ->select(["{$alias1}". '.itemId'])
+                            ->from(["{$alias1}" => 'museumplus_items_vocabulary'])
+                            ->innerJoin(["{$alias2}" => 'museumplus_items_vocabulary'], "[[{$alias1}.itemId]] = [[{$alias2}.itemId]]")
+                            ->where(['in', "{$alias1}.vocabularyId", $ids])
+                            ->andWhere("{$alias1}.itemId = elements.id")  // Linking subquery to the main query's element ID
+                    ]);
+                    */
+
+                    //$counter++;
+                }
+            }
         }
         $this->subQuery->groupBy('museumplus_items.id');
+        //die($subQuery->createCommand()->getRawSql());
         return parent::beforePrepare();
     }
 }

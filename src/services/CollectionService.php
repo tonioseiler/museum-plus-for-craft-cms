@@ -107,30 +107,6 @@ class CollectionService extends Component
             }
         }
 
-        // no, because if I search for FIGUR and PAKISTAN, I should get all the items that have FIGUR _AND_ PAKISTAN
-
-        // possibile solution: vocabularyIds[geographic][] vocabularyIds[classification] and then in the $subQuery  ->where(['in', 'vocabularyId', $allDescendantVocabularyIds[geographic]]); AND $allDescendantVocabularyIds[classification]
-
-
-        //Paolo: THESE need to be replaced by vocabularyIds
-        //$items = $items->vocabularyIds($params['vocabularyIds']);
-
-        /*
-        if(isset($params['geographic'])) {
-            $items = $items->geographic($params['geographic']);
-            $criteria['geographic'] = $params['geographic'];
-        }
-        if(isset($params['classification'])) {
-            $items = $items->classification($params['classification']);
-            $criteria['classification'] = $params['classification'];
-        }
-        if(isset($params['tag'])) {
-            $items = $items->tag($params['tag']);
-            $criteria['tag'] = $params['tag'];
-        }
-        */
-
-
         if(isset($params['objectGroup'])) {
             $items = $items->objectGroup($params['objectGroup']);
             $criteria['objectGroup'] = $params['objectGroup'];
