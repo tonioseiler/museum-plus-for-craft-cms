@@ -131,36 +131,48 @@ class MuseumPlusItemQuery extends ElementQuery
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
         }
 
-
         if(!empty($this->vocabularyIds)){
-            $allDescendantVocabularyIds = $this->vocabularyIds;
+            //$allDescendantVocabularyIds = $this->vocabularyIds;
             foreach ($this->vocabularyIds as $vocabularyId) {
                 $descendantsIds = [];
                 $record = VocabularyEntryRecord::findOne($vocabularyId);
-
-                //$descendants = $record->getChildren();
+                $allDescendantVocabularyIds[$record->type][] = $vocabularyId;
+                // $record->type
                 $descendants = $record->getDescendants();
-
-                /*
-                foreach ($descendants->all() as $descendant) {
-                    $descendantsIds[] = $descendant->id;
-                }
-                */
-
                 foreach ($descendants as $descendant) {
                     $descendantsIds[] = $descendant->id;
                 }
                 if (!empty($descendantsIds)) {
-                    $allDescendantVocabularyIds = array_merge($allDescendantVocabularyIds,$descendantsIds);
+                    $allDescendantVocabularyIds[$record->type] = array_merge($allDescendantVocabularyIds[$record->type],$descendantsIds);
                 }
-                $allDescendantVocabularyIds = array_map('intval', $allDescendantVocabularyIds);
+                $allDescendantVocabularyIds[$record->type] = array_map('intval', $allDescendantVocabularyIds[$record->type]);
             }
-            $subQuery = (new Query())
+            //dd($allDescendantVocabularyIds);
+
+            /*
+           $subQuery = (new Query())
                 ->select(['itemId'])
                 ->from(['{{%museumplus_items_vocabulary}}'])
                 ->where(['in', 'vocabularyId', $allDescendantVocabularyIds]);
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
+            */
+
+            $subQuery = (new Query())
+                ->select(['itemId'])
+                ->from(['{{%museumplus_items_vocabulary}}']);
+            $firstWhere=true;
+            foreach ($allDescendantVocabularyIds as $type => $vocabularyIds) {
+                if($firstWhere) {
+                    $firstWhere=false;
+                    $subQuery->where(['in', 'vocabularyId', $vocabularyIds]);
+                } else {
+                    $subQuery->andWhere(['in', 'vocabularyId', $vocabularyIds]);
+                }
+            }
+            $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
+
         }
+
         $this->subQuery->groupBy('museumplus_items.id');
         return parent::beforePrepare();
     }
