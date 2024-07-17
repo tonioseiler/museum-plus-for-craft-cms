@@ -76,7 +76,7 @@ class CollectionService extends Component
         $items = MuseumPlusItem::find()
             ->id($ids)
         ;
-        Craft::$app->session->set('museumPlusCriteria', $items);
+        //Craft::$app->session->set('museumPlusCriteria', $items);
         $items = $items->limit($limit)->offset($offset);
         return $items;
     }
@@ -128,7 +128,7 @@ class CollectionService extends Component
             $criteria['inventoryNumber'] = $params['inventoryNumber'];
         }
 
-        Craft::$app->session->set('museumPlusCriteria', $items);
+        //Craft::$app->session->set('museumPlusCriteria', $items);
 
         if(isset($params['firstObjectId'])) {
             $params['firstObjectId'] = intval($params['firstObjectId']);
