@@ -93,7 +93,7 @@ class CollectionService extends Component
             $criteria['search'] = $params['search'];
         }
 
-
+        /* removed as too specific
         if(isset($params['geographic'])) {
             if(!empty($params['geographic'])) {
                 $items = $items->vocabularyIds($params['geographic']);
@@ -106,13 +106,21 @@ class CollectionService extends Component
                 $criteria['classification'] = $params['classification'];
             }
         }
+        */
+
         if(isset($params['vocabulary'])) {
             if(!empty($params['vocabulary'])) {
-                $items = $items->vocabularyIds($params['vocabulary']);
-                //$criteria['geographic'] = $params['geographic'];
+                if(is_array($params['vocabulary'])) {
+                    foreach ($params['vocabulary'] as $singleVoc) {
+                        if(!empty ($singleVoc) ) {
+                            $items = $items->vocabularyIds($singleVoc);
+                        }
+                    }
+                } else {
+                    $items = $items->vocabularyIds($params['vocabulary']);
+                }
             }
         }
-
 
         if(isset($params['objectGroup'])) {
             $items = $items->objectGroup($params['objectGroup']);
