@@ -135,16 +135,18 @@ class MuseumPlusItemQuery extends ElementQuery
             foreach ($this->vocabularyIds as $vocabularyId) {
                 $descendantsIds = [];
                 $record = VocabularyEntryRecord::findOne($vocabularyId);
-                $allDescendantVocabularyIds[$record->type][] = $vocabularyId;
-                // $record->type
-                $descendants = $record->getDescendants();
-                foreach ($descendants as $descendant) {
-                    $descendantsIds[] = $descendant->id;
+                if (!empty($record)) {
+                    $allDescendantVocabularyIds[$record->type][] = $vocabularyId;
+                    // $record->type
+                    $descendants = $record->getDescendants();
+                    foreach ($descendants as $descendant) {
+                        $descendantsIds[] = $descendant->id;
+                    }
+                    if (!empty($descendantsIds)) {
+                        $allDescendantVocabularyIds[$record->type] = array_merge($allDescendantVocabularyIds[$record->type],$descendantsIds);
+                    }
+                    $allDescendantVocabularyIds[$record->type] = array_map('intval', $allDescendantVocabularyIds[$record->type]);
                 }
-                if (!empty($descendantsIds)) {
-                    $allDescendantVocabularyIds[$record->type] = array_merge($allDescendantVocabularyIds[$record->type],$descendantsIds);
-                }
-                $allDescendantVocabularyIds[$record->type] = array_map('intval', $allDescendantVocabularyIds[$record->type]);
             }
             //dd($allDescendantVocabularyIds);
             /*
