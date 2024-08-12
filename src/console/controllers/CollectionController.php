@@ -737,6 +737,8 @@ class CollectionController extends Controller
             $vocabularyEntry->title = $data->content;
         } else {
             //update
+            $vocabularyEntry->title = $data->content;
+            //strange, can be removed ??
             if (empty($vocabularyEntry->title)) {
                 $vocabularyEntry->title = $data->LitLiteratureVrt;
             }
@@ -921,7 +923,7 @@ class CollectionController extends Controller
                             }
                             //echo 'vocabularyEntry id: ' . $vocabularyEntry->id . ' pid: ' . $vocabularyEntry->parentId . '<br>';
                             //probaly can be remooved to get all the tree
-                            if(($type=='GenGeoCultureVgr')||($type=='GenGeoPoliticalVgr')||($type=='GenGeoGeographyVgr')||($type=='GenGeoHistoryVgr') ){
+                            //if(($type=='GenGeoCultureVgr')||($type=='GenGeoPoliticalVgr')||($type=='GenGeoGeographyVgr')||($type=='GenGeoHistoryVgr') ){
                                 // for geo vocabularies we need the whole tree
                                 $currentParentId = $vocabularyEntry->parentId;
                                 $currentParentNodeId = $vc['id'];
@@ -945,7 +947,7 @@ class CollectionController extends Controller
                                         $currentParentNodeId = $parentNodeId;
                                     }
                                 }
-                            } else {
+                            /*} else {
                                 // we get only the direct parent
                                 if($vocabularyEntry->parentId > 0) {
                                     //echo 'we have a parent: '.$vocabularyEntry->parentId.'<br>';
@@ -956,7 +958,7 @@ class CollectionController extends Controller
                                         $vocabularyEntryParent = $this->createOrUpdateVocabularyEntry($type, $dp);
                                     }
                                 }
-                            }
+                            }*/
                         }
                     }
                 } catch (\GuzzleHttp\Exception\ClientException $e) {
