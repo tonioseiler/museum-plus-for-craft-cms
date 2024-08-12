@@ -737,6 +737,9 @@ class CollectionController extends Controller
             $vocabularyEntry->title = $data->content;
         } else {
             //update
+
+            //TODO: Paolo check the last mod date
+
             $vocabularyEntry->title = $data->content;
             //strange, can be removed ??
             if (empty($vocabularyEntry->title)) {
