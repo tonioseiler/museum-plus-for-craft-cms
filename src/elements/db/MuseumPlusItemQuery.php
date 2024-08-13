@@ -17,6 +17,7 @@ class MuseumPlusItemQuery extends ElementQuery
     public $objectGroupId;
     public $person;
     public $ownership;
+    public $literature;
     public $inventoryNumber;
     public $extraTitle;
     public $extraDescription;
@@ -52,6 +53,11 @@ class MuseumPlusItemQuery extends ElementQuery
     public function ownership($value)
     {
         $this->ownership = $value;
+        return $this;
+    }
+    public function literature($value)
+    {
+        $this->literature = $value;
         return $this;
     }
 
@@ -143,6 +149,14 @@ class MuseumPlusItemQuery extends ElementQuery
                 ->select(['itemId'])
                 ->from(['{{%museumplus_items_ownerships}}'])
                 ->where(['ownershipId' => $this->ownership]);
+            $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
+        }
+
+        if ($this->literature) {
+            $subQuery = (new Query())
+                ->select(['itemId'])
+                ->from(['{{%museumplus_items_literature}}'])
+                ->where(['literatureId' => $this->literature]);
             $this->subQuery->andWhere(['in', 'museumplus_items.id', $subQuery]);
         }
 
