@@ -124,6 +124,10 @@ class MuseumPlusForCraftCmsVariable
         return MuseumPlusForCraftCms::$plugin->collection->getPeopleById($id);
     }
 
+    public function getOwnershipById($id) {
+        return MuseumPlusForCraftCms::$plugin->collection->getOwnershipById($id);
+    }
+
     public function getObjectGroupById($id) {
         return MuseumPlusForCraftCms::$plugin->collection->getObjectGroupById($id);
     }

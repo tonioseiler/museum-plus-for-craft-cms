@@ -19,6 +19,7 @@ use Craft;
 use craft\base\Component;
 use craft\helpers\App;
 use furbo\museumplusforcraftcms\records\PersonRecord;
+use furbo\museumplusforcraftcms\records\OwnershipRecord;
 use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 use yii\db\Expression;
 
@@ -63,6 +64,20 @@ class CollectionService extends Component
                 ->orderBy(['title' => SORT_ASC])
                 ->all();
         return $people;
+    }
+
+    public function getOwnershipById($id) {
+        $ownership = OwnershipRecord::find()
+            ->where(['id' => $id])
+            ->one();
+        return $ownership;
+    }
+
+    public function getAllOwnerships() {
+        $ownerships = OwnershipRecord::find()
+            ->orderBy(['title' => SORT_ASC])
+            ->all();
+        return $ownerships;
     }
 
     public function getItemById($id) {
@@ -126,9 +141,15 @@ class CollectionService extends Component
             $items = $items->objectGroup($params['objectGroup']);
             $criteria['objectGroup'] = $params['objectGroup'];
         }
+
         if(isset($params['person'])) {
             $items = $items->person($params['person']);
             $criteria['person'] = $params['person'];
+        }
+
+        if(isset($params['ownership'])) {
+            $items = $items->ownership($params['ownership']);
+            $criteria['ownership'] = $params['ownership'];
         }
 
         if(isset($params['inventoryNumber'])) {
