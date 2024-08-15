@@ -49,6 +49,8 @@ class Settings extends Model
 
     public $password = '';
 
+    public $languageHeader = '';
+
     public $objectGroups = [];
 
     public $exhibitions = [];
@@ -58,7 +60,6 @@ class Settings extends Model
     public $attachmentFileTypes = '';
 
     public $googleGeminiApiKey = '';
-
 
     public $sites = [];
 

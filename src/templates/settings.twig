@@ -107,6 +107,14 @@
             }}
 
             {{ forms.textField({
+                label: 'Language Header',
+                instructions: '',
+                id: 'languageHeader',
+                name: 'languageHeader',
+                value: settings['languageHeader']})
+            }}
+
+            {{ forms.textField({
                 label: 'Google Gemini API Key (Gemini 1.0 Pro with billing account linked)',
                 instructions: 'The api key can be created <a href="https://aistudio.google.com/app/apikey" target="_blank">here</a>',
                 id: 'googleGeminiApiKey',

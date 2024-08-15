@@ -508,7 +508,7 @@ class MuseumPlusService extends Component
             $this->classifier = $settings['classifier'];
             $this->hostname = $settings['hostname'];
             $this->requestHeaders = [
-                'Accept-Language'  => 'de',
+                'Accept-Language'  => $settings['languageHeader'],
             ];
         }
     }
