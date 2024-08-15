@@ -49,7 +49,7 @@ class Settings extends Model
 
     public $password = '';
 
-    public $languageHeader = '';
+    public $languageHeader = 'en';
 
     public $objectGroups = [];
 
