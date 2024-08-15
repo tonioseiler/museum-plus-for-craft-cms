@@ -66,7 +66,7 @@ class MuseumPlusForCraftCmsVariable
     /**
      * Get all exhibitions
      * @return array
-     * 
+     *
      * untested, probably does not work
      */
     public function getExhibitions() {
@@ -104,7 +104,7 @@ class MuseumPlusForCraftCmsVariable
         return MuseumPlusForCraftCms::$plugin->collection->getItemsByIds($ids,$limit, $offset);
     }
 
-    public function getVocabularies($type = null) { 
+    public function getVocabularies($type = null) {
         return MuseumPlusForCraftCms::$plugin->vocabulary->getVocabularies($type);
     }
 
@@ -122,6 +122,14 @@ class MuseumPlusForCraftCmsVariable
 
     public function getPeopleById($id) {
         return MuseumPlusForCraftCms::$plugin->collection->getPeopleById($id);
+    }
+
+    public function getOwnershipById($id) {
+        return MuseumPlusForCraftCms::$plugin->collection->getOwnershipById($id);
+    }
+
+    public function getLiteratureById($id) {
+        return MuseumPlusForCraftCms::$plugin->collection->getLiteratureById($id);
     }
 
     public function getObjectGroupById($id) {

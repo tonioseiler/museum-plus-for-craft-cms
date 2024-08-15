@@ -1,12 +1,12 @@
 <?php
 /**
-* MuseumPlus for CraftCMS plugin for Craft CMS 3.x
-*
-* Allows to import MuseumsPlus Collection data to Craft CMS and publish data. Additioanl Web Specific Data can be added to the imported data.
-*
-* @link      https://furbo.ch
-* @copyright Copyright (c) 2022 Furbo GmbH
-*/
+ * MuseumPlus for CraftCMS plugin for Craft CMS 3.x
+ *
+ * Allows to import MuseumsPlus Collection data to Craft CMS and publish data. Additioanl Web Specific Data can be added to the imported data.
+ *
+ * @link      https://furbo.ch
+ * @copyright Copyright (c) 2022 Furbo GmbH
+ */
 
 namespace furbo\museumplusforcraftcms\services;
 
@@ -19,28 +19,30 @@ use Craft;
 use craft\base\Component;
 use craft\helpers\App;
 use furbo\museumplusforcraftcms\records\PersonRecord;
+use furbo\museumplusforcraftcms\records\OwnershipRecord;
+use furbo\museumplusforcraftcms\records\LiteratureRecord;
 use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 use yii\db\Expression;
 
 
 /**
-* MuseumPlus Service
-*
-* From any other plugin file, call it like this:
-*
-*     MuseumPlusForCraftCms::$plugin->collection->someMethod()
-*
-*
-* @author    Furbo GmbH
-* @package   MuseumPlusForCraftCms
-* @since     1.0.0
-*/
+ * MuseumPlus Service
+ *
+ * From any other plugin file, call it like this:
+ *
+ *     MuseumPlusForCraftCms::$plugin->collection->someMethod()
+ *
+ *
+ * @author    Furbo GmbH
+ * @package   MuseumPlusForCraftCms
+ * @since     1.0.0
+ */
 class CollectionService extends Component
 {
     public function getAllObjectGroups() {
         $objectGroupRecords = ObjectGroupRecord::find()
-                ->orderBy(['title' => SORT_ASC])
-                ->all();
+            ->orderBy(['title' => SORT_ASC])
+            ->all();
         return $objectGroupRecords;
     }
 
@@ -60,9 +62,37 @@ class CollectionService extends Component
 
     public function getAllPeople() {
         $people = PersonRecord::find()
-                ->orderBy(['title' => SORT_ASC])
-                ->all();
+            ->orderBy(['title' => SORT_ASC])
+            ->all();
         return $people;
+    }
+
+    public function getOwnershipById($id) {
+        $ownership = OwnershipRecord::find()
+            ->where(['id' => $id])
+            ->one();
+        return $ownership;
+    }
+
+    public function getAllOwnerships() {
+        $ownerships = OwnershipRecord::find()
+            ->orderBy(['title' => SORT_ASC])
+            ->all();
+        return $ownerships;
+    }
+
+    public function getLiteratureById($id) {
+        $literature = LiteratureRecord::find()
+            ->where(['id' => $id])
+            ->one();
+        return $literature;
+    }
+
+    public function getAllLiteratures() {
+        $literature = LiteratureRecord::find()
+            ->orderBy(['title' => SORT_ASC])
+            ->all();
+        return $literature;
     }
 
     public function getItemById($id) {
@@ -126,9 +156,20 @@ class CollectionService extends Component
             $items = $items->objectGroup($params['objectGroup']);
             $criteria['objectGroup'] = $params['objectGroup'];
         }
+
         if(isset($params['person'])) {
             $items = $items->person($params['person']);
             $criteria['person'] = $params['person'];
+        }
+
+        if(isset($params['ownership'])) {
+            $items = $items->ownership($params['ownership']);
+            $criteria['ownership'] = $params['ownership'];
+        }
+
+        if(isset($params['literature'])) {
+            $items = $items->literature($params['literature']);
+            $criteria['literature'] = $params['literature'];
         }
 
         if(isset($params['inventoryNumber'])) {

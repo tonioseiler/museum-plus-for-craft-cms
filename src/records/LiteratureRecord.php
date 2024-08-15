@@ -27,7 +27,7 @@ class LiteratureRecord extends DataRecord
 
     public function getItems() {
         return $this->hasMany(MuseumPlusItemRecord::className(), ['id' => 'itemId'])
-            ->viaTable('museumplus_items_literure', ['literatureId' => 'id']);
+            ->viaTable('museumplus_items_literature', ['literatureId' => 'id']);
     }
 
 
