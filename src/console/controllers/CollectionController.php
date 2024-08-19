@@ -664,7 +664,7 @@ class CollectionController extends Controller
             $objectGroup->title = $data->OgrNameTxt;
         } else {
             //update
-            $objectGroup->data = json_encode($data);
+            //TODO: Paolo check the last mod date
             $objectGroup->title = $data->OgrNameTxt;
         }
         $objectGroup->data = json_encode($data);
@@ -687,6 +687,7 @@ class CollectionController extends Controller
             $ownerhsip->title = $data->OwsOwnershipVrt;
         } else {
             //update
+            //TODO: Paolo check the last mod date
             $ownerhsip->title = $data->OwsOwnershipVrt;
         }
         $ownerhsip->data = json_encode($data);
@@ -709,6 +710,7 @@ class CollectionController extends Controller
             $literature->title = $data->LitLiteratureVrt;
         } else {
             //update
+            //TODO: Paolo check the last mod date
             $literature->title = $data->LitLiteratureVrt;
         }
         $literature->data = json_encode($data);
