@@ -665,9 +665,7 @@ class CollectionController extends Controller
         } else {
             //update
             $objectGroup->data = json_encode($data);
-            if (empty($objectGroup->title)) {
-                $objectGroup->title = $data->OgrNameTxt;
-            }
+            $objectGroup->title = $data->OgrNameTxt;
         }
         $objectGroup->data = json_encode($data);
         $success = $objectGroup->save();
@@ -689,9 +687,7 @@ class CollectionController extends Controller
             $ownerhsip->title = $data->OwsOwnershipVrt;
         } else {
             //update
-            if (empty($ownerhsip->title)) {
-                $ownerhsip->title = $data->OwsOwnershipVrt;
-            }
+            $ownerhsip->title = $data->OwsOwnershipVrt;
         }
         $ownerhsip->data = json_encode($data);
         $success = $ownerhsip->save();
@@ -713,9 +709,7 @@ class CollectionController extends Controller
             $literature->title = $data->LitLiteratureVrt;
         } else {
             //update
-            if (empty($literature->title)) {
-                $literature->title = $data->LitLiteratureVrt;
-            }
+            $literature->title = $data->LitLiteratureVrt;
         }
         $literature->data = json_encode($data);
         $success = $literature->save();
@@ -737,14 +731,9 @@ class CollectionController extends Controller
             $vocabularyEntry->title = $data->content;
         } else {
             //update
-
             //TODO: Paolo check the last mod date
-
             $vocabularyEntry->title = $data->content;
-            //strange, can be removed ??
-            if (empty($vocabularyEntry->title)) {
-                $vocabularyEntry->title = $data->LitLiteratureVrt;
-            }
+            
         }
         $vocabularyEntry->type = $type;
         $vocabularyEntry->parentId = $data->parentId;
