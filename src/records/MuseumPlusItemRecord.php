@@ -68,12 +68,20 @@ class MuseumPlusItemRecord extends DataRecord
     }
 
     public function getAssociationPeople() {
-        //TODO: FIX order/sort
+        /*
         return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
             ->viaTable('museumplus_items_people', ['itemId' => 'id'], function ($query) {
                 $query->andWhere(['type' => 'ObjPerAssociationRef']);
                 $query->orderBy(['sort' => SORT_ASC]);
             });
+        */
+        return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
+            ->viaTable('museumplus_items_people', ['itemId' => 'id'])
+            ->innerJoin('museumplus_items_people', 'museumplus_items_people.personId = museumplus_people.id')
+            ->where(['museumplus_items_people.itemId' => $this->id])
+            ->andWhere(['type' => 'ObjPerAssociationRef'])
+            ->orderBy(['museumplus_items_people.sort' => SORT_ASC]);
+
 
     }
 
@@ -84,6 +92,15 @@ class MuseumPlusItemRecord extends DataRecord
                 $query->andWhere(['type' => 'ObjPerOwnerRef']);
                 $query->orderBy(['sort' => SORT_ASC]);
             });
+        /*
+        return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
+            ->viaTable('museumplus_items_people', ['itemId' => 'id'])
+            ->innerJoin('museumplus_items_people', 'museumplus_items_people.personId = museumplus_people.id')
+            ->where(['museumplus_items_people.itemId' => $this->id])
+            ->andWhere(['type' => 'ObjPerOwnerRef'])
+            ->orderBy(['museumplus_items_people.sort' => SORT_DESC]);
+            */
+
     }
 
     public function getAdministrationPeople() {
@@ -224,7 +241,7 @@ class MuseumPlusItemRecord extends DataRecord
                                     $ret[] = $i[$attribute];
                                 }
                             }
-                            
+
                         } else {
                             if(isset($i['TypeVoc'])){
                                 if (in_array($i['TypeVoc'], $filterTypes)) {
@@ -236,7 +253,7 @@ class MuseumPlusItemRecord extends DataRecord
                                 }
                             }
                         }
-                        
+
                     }
                 }
             }
