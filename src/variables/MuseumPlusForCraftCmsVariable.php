@@ -115,6 +115,10 @@ class MuseumPlusForCraftCmsVariable
     public function getAllCountries($type = null, $depth = null) {
         return MuseumPlusForCraftCms::$plugin->vocabulary->getAllCountries($type,$depth);
     }
+    
+    public function getAllContinents($type = null, $depth = null) {
+        return MuseumPlusForCraftCms::$plugin->vocabulary->getAllContinents();
+    }
 
     public function getAllPeople() {
         return MuseumPlusForCraftCms::$plugin->collection->getAllPeople();

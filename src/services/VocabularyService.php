@@ -72,13 +72,8 @@ class VocabularyService extends Component
         return $tmp->orderBy('title')
             ->all();
     }
-
     public function getAllCountries() {
-        $tmp = MuseumPlusVocabulary::find();
-        $tmp->type('GenGeoPoliticalVgr');
-        $tmp->parentId(['==', 0]);
-        $tmp->orderBy('title');
-        $continents = $tmp->all();
+        $continents = $this->getAllContinents();
         $continentsIds = [];
         foreach($continents as $continent) {
             $continentsIds[] = $continent->collectionId;
@@ -86,6 +81,13 @@ class VocabularyService extends Component
         $tmp = MuseumPlusVocabulary::find();
         $tmp->type('GenGeoPoliticalVgr');
         $tmp->parentId($continentsIds);
+        $tmp->orderBy('title');
+        return $tmp->all();
+    }
+    public function getAllContinents() {
+        $tmp = MuseumPlusVocabulary::find();
+        $tmp->type('GenGeoPoliticalVgr');
+        $tmp->parentId(['==', 0]);
         $tmp->orderBy('title');
         return $tmp->all();
     }
