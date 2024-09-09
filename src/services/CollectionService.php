@@ -121,7 +121,8 @@ class CollectionService extends Component
             $searchTermsArrayWithAsterisks = array_map(function($item) {
                 return '*' . $item . '*';
             }, $searchTermsArray);
-            $searchTermsString = implode(' OR ', $searchTermsArrayWithAsterisks);
+            //$searchTermsString = implode(' OR ', $searchTermsArrayWithAsterisks);
+            $searchTermsString = implode(' ', $searchTermsArrayWithAsterisks); // AND
             $items = $items->search($searchTermsString);
 
             /*
