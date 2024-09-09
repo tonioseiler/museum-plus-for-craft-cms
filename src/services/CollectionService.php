@@ -117,9 +117,19 @@ class CollectionService extends Component
         $items = MuseumPlusItem::find();
         $items->orderBy(['sort' => SORT_ASC]);
         if(isset($params['search'])) {
-            //escape special characters
+            $searchTermsArray = preg_split('/[\s,;]+/', $params['search']);
+            $searchTermsArrayWithAsterisks = array_map(function($item) {
+                return '*' . $item . '*';
+            }, $searchTermsArray);
+            $searchTermsString = implode(' OR ', $searchTermsArrayWithAsterisks);
+            $items = $items->search($searchTermsString);
+
+            /*
+            $this->search = implode(' OR ', $searchTerms);
             $params['search'] = str_replace(array(".", "-"), "* *", $params['search']);
             $items = $items->search("*" . $params['search'] . "*");
+            */
+
             $criteria['search'] = $params['search'];
         }
 
