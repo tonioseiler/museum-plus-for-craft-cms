@@ -378,8 +378,19 @@ class Install extends Migration
      */
     public function safeDown(): bool
     {
-        //$this->dropTable('{{%museumplus_items}}');
-        //TODO: but later
+        $this->dropTable('{{%museumplus_items}}');
+        $this->dropTable('{{%museumplus_objectgroups}}');
+        $this->dropTable('{{%museumplus_items_objectgroups}}');
+        $this->dropTable('{{%museumplus_items_items}}');
+        $this->dropTable('{{%museumplus_literature}}');
+        $this->dropTable('{{%museumplus_items_literature}}');
+        $this->dropTable('{{%museumplus_people}}');
+        $this->dropTable('{{%museumplus_items_people}}');
+        $this->dropTable('{{%museumplus_ownerships}}');
+        $this->dropTable('{{%museumplus_items_ownerships}}');
+        $this->dropTable('{{%museumplus_items_assets}}');
+        $this->dropTable('{{%museumplus_vocabulary}}');
+        $this->dropTable('{{%museumplus_items_vocabulary}}');
         return true;
     }
 }
