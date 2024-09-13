@@ -191,6 +191,7 @@ class CollectionController extends Controller
                     }
                 } else {
                     $startUpdating = $o->id == $this->startId;
+                    echo 'skip item '.$o->id.PHP_EOL;
                 }
 
                 
