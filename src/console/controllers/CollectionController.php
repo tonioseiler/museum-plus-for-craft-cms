@@ -84,6 +84,11 @@ class CollectionController extends Controller
      */
     public $ignoreLiterature;
 
+    /**
+     * @var int startId - skip all items with id before this
+     */
+    public $startId;
+
     // Private Properties
     private $start;
     private $settings;
@@ -154,28 +159,41 @@ class CollectionController extends Controller
         $this->downloadObjectGroups();
         echo 'Updating Items'.PHP_EOL;
         $objectIds = [];
+
+        $startUpdating = true;
+        if (empty($this->startId)) {
+            $startUpdating = false;
+        }
+
         foreach ($this->settings['objectGroups'] as $objectGroupId) {
             $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
             foreach ($objects as $o) {
-                $objectIds[$o->id] = $o->id;
-                //check if item exists and if last mod is before last mod in mplus
+
+                if ($startUpdating) {
+                    $objectIds[$o->id] = $o->id;
+                    //check if item exists and if last mod is before last mod in mplus
 
 
-                $objectLastModified = new \DateTime($o->__lastModified);
-                $item = MuseumPlusItem::find()
-                    ->where(['collectionId' => $o->id])
-                    ->one();
-                if (!$item) {
-                    echo 'Creating item (id: '.$o->id.')'.PHP_EOL;
-                    $this->updateItemFromMuseumPlus($o->id);
-                    $this->triggerUpdateEvent($o->id, true);
-                } else if ($this->forceAll || $item->dateUpdated < $objectLastModified) {
-                    echo 'Updating item (id: '.$o->id.')'.PHP_EOL;
-                    $this->updateItemFromMuseumPlus($o->id);
-                    $this->triggerUpdateEvent($o->id, false);
+                    $objectLastModified = new \DateTime($o->__lastModified);
+                    $item = MuseumPlusItem::find()
+                        ->where(['collectionId' => $o->id])
+                        ->one();
+                    if (!$item) {
+                        echo 'Creating item (id: '.$o->id.')'.PHP_EOL;
+                        $this->updateItemFromMuseumPlus($o->id);
+                        $this->triggerUpdateEvent($o->id, true);
+                    } else if ($this->forceAll || $item->dateUpdated < $objectLastModified) {
+                        echo 'Updating item (id: '.$o->id.')'.PHP_EOL;
+                        $this->updateItemFromMuseumPlus($o->id);
+                        $this->triggerUpdateEvent($o->id, false);
+                    } else {
+                        //echo '.';
+                    }
                 } else {
-                    //echo '.';
+                    $startUpdating = $o->id == $this->startId;
                 }
+
+                
             }
         }
 
@@ -395,6 +413,7 @@ class CollectionController extends Controller
         $options[] = 'ignoreAttachments';
         $options[] = 'ignoreMultimedia';
         $options[] = 'ignoreLiterature';
+        $options[] = 'startId';
         return $options;
     }
 
