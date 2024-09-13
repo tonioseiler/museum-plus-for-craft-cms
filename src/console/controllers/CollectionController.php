@@ -161,7 +161,7 @@ class CollectionController extends Controller
         $objectIds = [];
 
         $startUpdating = true;
-        if (empty($this->startId)) {
+        if (!empty($this->startId)) {
             $startUpdating = false;
         }
 
