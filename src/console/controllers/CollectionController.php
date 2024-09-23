@@ -169,8 +169,9 @@ class CollectionController extends Controller
             $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
             foreach ($objects as $o) {
 
+                $objectIds[$o->id] = $o->id;
+                
                 if ($startUpdating) {
-                    $objectIds[$o->id] = $o->id;
                     //check if item exists and if last mod is before last mod in mplus
 
 
@@ -402,6 +403,8 @@ class CollectionController extends Controller
         } catch (\Exception $e) {
             //     echo $item->id . " could not be fully updated." . PHP_EOL;
             echo $e->getMessage() . PHP_EOL;
+        } finally {
+            gc_collect_cycles(); //force garbage collection
         }
 
     }
