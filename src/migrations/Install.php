@@ -328,15 +328,6 @@ class Install extends Migration
                 null
             );
 
-            $this->addForeignKey(
-                $this->db->getForeignKeyName('{{%museumplus_literature}}', 'assetId'),
-                '{{%museumplus_literature}}',
-                'assetId',
-                '{{%assets}}',
-                'id',
-                'CASCADE',
-                'CASCADE'
-            );
         }
 
 
@@ -378,6 +369,7 @@ class Install extends Migration
      */
     public function safeDown(): bool
     {
+        Craft::$app->getDb()->createCommand('SET FOREIGN_KEY_CHECKS = 0;')->execute();
         $this->dropTable('{{%museumplus_items}}');
         $this->dropTable('{{%museumplus_objectgroups}}');
         $this->dropTable('{{%museumplus_items_objectgroups}}');
@@ -391,6 +383,7 @@ class Install extends Migration
         $this->dropTable('{{%museumplus_items_assets}}');
         $this->dropTable('{{%museumplus_vocabulary}}');
         $this->dropTable('{{%museumplus_items_vocabulary}}');
+        Craft::$app->getDb()->createCommand('SET FOREIGN_KEY_CHECKS = 1;')->execute();
         return true;
     }
 }
