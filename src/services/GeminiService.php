@@ -65,7 +65,7 @@ class GeminiService extends Component
         );
         $prefix = "```json\n";
         $txt = $result->text();
-        $txt = substr($txt, strlen($prefix) + 1);
+        $txt = substr($txt, strlen($prefix));
         $txt = substr($txt, 0, -3);
 
         //dd($txt);
