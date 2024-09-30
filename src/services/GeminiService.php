@@ -55,7 +55,8 @@ class GeminiService extends Component
         $imageEncoded = base64_encode(file_get_contents($imagePath));
         $pluginsettings = MuseumPlusForCraftCms::$plugin->getSettings();
         $client = new Client($pluginsettings['googleGeminiApiKey']);
-        $result = $client->geminiProVision()->generateContent(
+        //$result = $client->geminiProVision()->generateContent(
+        $result = $client->geminiProFlash1_5()->generateContent(
             new TextPart($prompt),
             new ImagePart(
                 MimeType::IMAGE_JPEG,
