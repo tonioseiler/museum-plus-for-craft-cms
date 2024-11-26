@@ -30,6 +30,7 @@ use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
 use Craft;
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 use yii\console\Controller;
+use yii\console\ExitCode;
 use yii\helpers\Console;
 
 /**
@@ -454,6 +455,29 @@ class CollectionController extends Controller
                 'status' => null,
             ],
         ]));
+    }
+
+    public function actionResaveItem()
+    {
+        // usage: ./craft museum-plus-for-craft-cms/collection/resave-item --collectionItemId=647868
+        $id = $this->collectionItemId;
+        if (!$id) {
+            $this->stderr("Please provide a collection item ID using the --collectionItemId parameter.\n");
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+        $item = Craft::$app->elements->getElementById($id, MuseumPlusItem::class);
+        if (!$item) {
+            $this->stderr("Element with collectionItemId {$id} not found.\n");
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+        Craft::$app->getQueue()->push(new ResaveElements([
+            'elementType' => MuseumPlusItem::class,
+            'criteria' => [
+                'id' => $id,
+            ],
+        ]));
+        $this->stdout("Resave job added for collection item with ID {$id}.\n");
+        return ExitCode::OK;
     }
 
     public function actionUpdateSearchIndex()
