@@ -1,4 +1,4 @@
-# MuseumPlus for CraftCMS plugin for Craft CMS 4.x
+# MuseumPlus for CraftCMS plugin for Craft CMS 4.x BRANCH craft-queue
 
 Allows to import MuseumsPlus Collection data to Craft CMS and publish data.
 
