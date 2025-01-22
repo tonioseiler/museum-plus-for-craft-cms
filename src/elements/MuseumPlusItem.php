@@ -42,7 +42,7 @@ use craft\helpers\Db;
  * @package   MuseumPlusForCraftCms
  * @since     1.0.0
  */
-class MuseumPlusItem  extends Element
+class MuseumPlusItem extends Element
 {
 
     // Public Properties
@@ -395,7 +395,7 @@ class MuseumPlusItem  extends Element
                 return '-';
             case 'multimedia':
                 $assets = $this->getMultimedia();
-                if(count($assets)) {
+                if (count($assets)) {
                     return Cp::elementPreviewHtml($assets, Cp::ELEMENT_SIZE_SMALL, false, true, true, false);
                 }
                 return '-';
@@ -433,7 +433,7 @@ class MuseumPlusItem  extends Element
 
     protected static function defineDefaultTableAttributes(string $source): array
     {
-        return ['collectionId', 'assetId', 'multimedia','frontendLink'];
+        return ['collectionId', 'assetId', 'multimedia', 'frontendLink'];
     }
 
 
@@ -457,13 +457,15 @@ class MuseumPlusItem  extends Element
         return $this->title;
     }
 
-    public function getUriFormat(): ?string {
+    public function getUriFormat(): ?string
+    {
         $settings = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
 
         return $settings[$this->site->handle]['uriFormat'];
     }
 
-    protected function route(): array|string|null {
+    protected function route(): array|string|null
+    {
         $settings = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
         return [
             'templates/render', [
@@ -475,144 +477,172 @@ class MuseumPlusItem  extends Element
         ];
     }
 
-    public function syncMultimediaRelations($assetIds) {
+    public function syncMultimediaRelations($assetIds)
+    {
         $this->getRecord()->syncMultimediaRelations($assetIds);
     }
 
-    public function syncPeopleRelations($peopleIds, $type) {
+    public function syncPeopleRelations($peopleIds, $type)
+    {
         $this->getRecord()->syncPeopleRelations($peopleIds, $type);
     }
 
-    public function syncOwnershipRelations($ownershipIds) {
+    public function syncOwnershipRelations($ownershipIds)
+    {
         $this->getRecord()->syncOwnershipRelations($ownershipIds);
     }
 
-    public function syncLiteratureRelations($literureIds) {
+    public function syncLiteratureRelations($literureIds)
+    {
         $this->getRecord()->syncLiteratureRelations($literureIds);
     }
 
-    public function syncItemRelations($itemIds) {
+    public function syncItemRelations($itemIds)
+    {
         $this->getRecord()->syncItemRelations($itemIds);
     }
 
-    public function syncVocabularyRelations($syncData) {
+    public function syncVocabularyRelations($syncData)
+    {
         $this->getRecord()->syncVocabularyRelations($syncData);
     }
 
-    public function getObjectGroups() {
+    public function getObjectGroups()
+    {
         $rec = $this->getRecord();
         return $rec->getObjectGroups();
     }
 
-    public function getLiterature() {
+    public function getLiterature()
+    {
         $rec = $this->getRecord();
         return $rec->getLiterature();
     }
 
-    public function getOwnerships() {
+    public function getOwnerships()
+    {
         $rec = $this->getRecord();
         return $rec->getOwnerships();
     }
 
-    public function getAssociationPeople() {
+    public function getAssociationPeople()
+    {
         $rec = $this->getRecord();
         return $rec->getAssociationPeople();
     }
 
-    public function getOwnerPeople() {
+    public function getOwnerPeople()
+    {
         $rec = $this->getRecord();
         return $rec->getOwnerPeople();
     }
 
-    public function getAdministrationPeople() {
+    public function getAdministrationPeople()
+    {
         $rec = $this->getRecord();
         return $rec->getAdministrationPeople();
     }
 
-    public function getRelatedItems() {
+    public function getRelatedItems()
+    {
         $rec = $this->getRecord();
         return $rec->getRelatedItems();
     }
 
-    public function getVocabularyEntries() {
+    public function getVocabularyEntries()
+    {
         $rec = $this->getRecord();
         return $rec->getVocabularyEntries();
     }
 
-    public function getVocabularyEntriesByType($type) {
+    public function getVocabularyEntriesByType($type)
+    {
         $rec = $this->getRecord();
         $vcs = $rec->getVocabularyEntriesByType($type);
     }
 
-    public function getRecord() {
+    public function getRecord()
+    {
         if (empty($this->record)) {
             $this->record = MuseumPlusItemRecord::findOne($this->id);
         }
         return $this->record;
     }
 
-    public function getDating() {
+    public function getDating()
+    {
         $rec = $this->getRecord();
         return $rec->getRepeatableGroupValues('ObjDateGrp', 'DateTxt');
     }
 
-    public function getGeographicReferencesOld() {
+    public function getGeographicReferencesOld()
+    {
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'GenPlaceVgr']);
     }
 
-    public function getGeographicReferences() {
+    public function getGeographicReferences()
+    {
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'GenGeoPoliticalVgr']);
     }
 
-    public function getGeographicReferencesHistory() {
+    public function getGeographicReferencesHistory()
+    {
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'GenGeoHistoryVgr']);
     }
 
-    public function getGeographicReferencesGeography() {
+    public function getGeographicReferencesGeography()
+    {
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'GenGeoGeographyVgr']);
     }
 
-    public function getGeographyCulture() {
+    public function getGeographyCulture()
+    {
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'GenGeoCultureVgr']);
     }
 
-    public function getTags() {
+    public function getTags()
+    {
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'ObjKeyWordVgr']);
     }
 
-    public function getClassification() {
+    public function getClassification()
+    {
         $rec = $this->getRecord();
         return $this->getVocabularyEntries()->where(['type' => 'ObjClassificationVgr']);
     }
 
-    public function getMaterial() {
+    public function getMaterial()
+    {
         $rec = $this->getRecord();
         return $rec->getRepeatableGroupValues('ObjMaterialTechniqueGrp', 'DetailsTxt');
     }
 
-    public function getDimensions() {
+    public function getDimensions()
+    {
         $rec = $this->getRecord();
         return $rec->getRepeatableGroupValues('ObjDimAllGrp', 'PreviewVrt');
     }
 
-    public function getCreditLine() {
+    public function getCreditLine()
+    {
         $rec = $this->getRecord();
         $creditLineEntries = $this->getVocabularyEntries()->where(['type' => 'ObjCreditlineVgr'])->all();
 
         $creditLines = [];
-        foreach($creditLineEntries as $cle) {
+        foreach ($creditLineEntries as $cle) {
             $creditLines[] = $cle->getDataAttribute('content');
         }
         return implode(PHP_EOL, $creditLines);
     }
 
-    public function getDetailText() {
+    public function getDetailText()
+    {
         $rec = $this->getRecord();
         $tmp = $rec->getRepeatableGroupValues('ObjLabelRaisonneTextGrp', 'TextClb', ['Objekttext', 'Jahresbericht RBG']);
         $tmp = implode(PHP_EOL, $tmp);
@@ -622,12 +652,14 @@ class MuseumPlusItem  extends Element
         return $tmp;
     }
 
-    public function getDataAttributes() {
+    public function getDataAttributes()
+    {
         $rec = $this->getRecord();
         return $rec->getDataAttributes();
     }
 
-    public function getDataAttribute($name) {
+    public function getDataAttribute($name)
+    {
         $rec = $this->getRecord();
         return $rec->getDataAttribute($name);
     }
@@ -653,7 +685,7 @@ class MuseumPlusItem  extends Element
     private function getCriteria()
     {
         $criteria = false;
-        if(Craft::$app->session->get('museumPlusCriteria')) {
+        if (Craft::$app->session->get('museumPlusCriteria')) {
             $criteria = Craft::$app->session->get('museumPlusCriteria');
             $criteria->limit = -1;
             $criteria->offset = 0;
@@ -677,6 +709,19 @@ class MuseumPlusItem  extends Element
             $metaKeywords[] = $tag->title;
         }
         return implode(", ", $metaKeywords);
+    }
+
+    public function getSupportedSites(): array
+    {
+        $sites = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
+        $filteredSites = [];
+        foreach ($sites as $siteHandle => $siteSettings) {
+            if (!empty($siteSettings['uriFormat'])) {
+                $site = \Craft::$app->sites->getSiteByHandle($siteHandle);
+                $filteredSites[] = $site->id;
+            }
+        }
+        return $filteredSites;
     }
 
 
