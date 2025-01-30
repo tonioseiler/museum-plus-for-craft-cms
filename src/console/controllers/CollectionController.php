@@ -678,8 +678,8 @@ class CollectionController extends Controller
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
         }
-        //$success = Craft::$app->elements->saveElement($item, false);
-        $success = Craft::$app->elements->saveElement($item, false,false);
+        $success = Craft::$app->elements->saveElement($item, false);
+        //$success = Craft::$app->elements->saveElement($item, false,false);
 
         //insert object relations if they do not exist
         $itemRecord = $item->getRecord();
@@ -854,8 +854,8 @@ class CollectionController extends Controller
 
         if($inventoryNumber){
             $item->inventoryNumber = $inventoryNumber;
-            //if(Craft::$app->elements->saveElement($item, false)) {
-            if(Craft::$app->elements->saveElement($item, false, false)) {
+            if(Craft::$app->elements->saveElement($item, false)) {
+            //if(Craft::$app->elements->saveElement($item, false, false)) {
                 echo $item->id . " - " . $inventoryNumber;
             } else {
                 echo 'Could not save item';
