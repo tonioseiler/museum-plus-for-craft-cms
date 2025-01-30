@@ -678,6 +678,18 @@ class MuseumPlusItem  extends Element
         }
         return implode(", ", $metaKeywords);
     }
+    public function getSupportedSites(): array
+    {
+        $sites = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
+        $filteredSites = [];
+        foreach ($sites as $siteHandle => $siteSettings) {
+            if (!empty($siteSettings['uriFormat'])) {
+                $site = \Craft::$app->sites->getSiteByHandle($siteHandle);
+                $filteredSites[] = $site->id;
+            }
+        }
+        return $filteredSites;
+    }
 
 
 }
