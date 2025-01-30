@@ -402,7 +402,11 @@ class MuseumPlusItem  extends Element
             case 'collectionId':
                 return $this->collectionId;
             case 'inventoryNumber':
-                return $this->inventoryNumber;
+                //return $this->inventoryNumber;
+                if($this->inventoryNumber) {
+                    return $this->inventoryNumber;
+                }
+                return '--';
             case 'frontendLink':
                 $url = $this->getUrl();
                 if ($url !== null) {
