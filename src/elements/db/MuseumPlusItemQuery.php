@@ -211,7 +211,22 @@ class MuseumPlusItemQuery extends ElementQuery
                 }
             }
         }
-        $this->subQuery->groupBy('museumplus_items.id');
+
+       // $this->subQuery->groupBy('museumplus_items.id')
+
+        $this->subQuery->groupBy([
+            'museumplus_items.id',
+            'museumplus_items.collectionId',
+            'museumplus_items.data',
+            'museumplus_items.assetId',
+            'museumplus_items.inventoryNumber',
+            'museumplus_items.extraTitle',
+            'museumplus_items.extraDescription',
+            'elements_sites.id',
+            'elements_sites.siteId'
+        ]);
+
+
         //die($subQuery->createCommand()->getRawSql());
         return parent::beforePrepare();
     }
