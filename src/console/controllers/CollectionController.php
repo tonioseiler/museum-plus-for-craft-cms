@@ -854,7 +854,8 @@ class CollectionController extends Controller
 
         if($inventoryNumber){
             $item->inventoryNumber = $inventoryNumber;
-            if(Craft::$app->elements->saveElement($item, false)) {
+            //if(Craft::$app->elements->saveElement($item, false)) {
+            if(Craft::$app->elements->saveElement($item, false, false)) {
                 echo $item->id . " - " . $inventoryNumber;
             } else {
                 echo 'Could not save item';
