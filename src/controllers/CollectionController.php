@@ -134,7 +134,8 @@ class CollectionController extends Controller
         $item->setScenario(\craft\base\Element::SCENARIO_DEFAULT);
 
         // Save it
-        if (!Craft::$app->getElements()->saveElement($item, true)) {
+        if (!Craft::$app->getElements()->saveElement($item, false,false)) {
+        //if (!Craft::$app->getElements()->saveElement($item, true)) { this is the original line
             if ($request->getAcceptsJson()) {
                 return $this->asJson([
                     'errors' => $item->getErrors(),

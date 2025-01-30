@@ -678,7 +678,8 @@ class CollectionController extends Controller
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
         }
-        $success = Craft::$app->elements->saveElement($item, false);
+        //$success = Craft::$app->elements->saveElement($item, false);
+        $success = Craft::$app->elements->saveElement($item, false,false);
 
         //insert object relations if they do not exist
         $itemRecord = $item->getRecord();
