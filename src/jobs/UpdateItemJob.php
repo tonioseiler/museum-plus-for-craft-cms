@@ -18,6 +18,14 @@ class UpdateItemJob extends BaseJob
     {
         $logger = MuseumPlusForCraftCms::getLogger();
 
+
+        if (empty($this->collectionId)) {
+            $message = "Missing param: collectionId.";
+            Craft::error($message, 'museumplus');
+            $logger->error($message);
+            return;
+        }
+
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $this->collectionId])
             ->one();
