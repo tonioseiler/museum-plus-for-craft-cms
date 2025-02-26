@@ -3,6 +3,9 @@
 namespace furbo\museumplusforcraftcms\jobs;
 
 use Craft;
+use craft\elements\Asset;
+use craft\helpers\Assets;
+use craft\helpers\FileHelper;
 use craft\models\VolumeFolder;
 use craft\queue\BaseJob;
 use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
@@ -447,8 +450,42 @@ class UpdateItemJob extends BaseJob
                 return $folder;
             }        }
 
-
-
     }
+
+    private function createAsset($id, $attachment, $parentFolder)
+    {
+        $basename = pathinfo($attachment, PATHINFO_FILENAME);
+        $basename = FileHelper::sanitizeFilename($basename,[true,'_']);
+        $extension = pathinfo($attachment, PATHINFO_EXTENSION);
+        $filename = $basename . '_' . $id . '.' . $extension;
+        $title = Assets::filename2Title($basename . '_' . $id);
+        try {
+            $asset = Asset::find()->title($title)->folderId($parentFolder->id)->one();
+            if(is_null($asset)){
+                $asset = new Asset();
+            }
+            $asset->tempFilePath = $attachment;
+            $asset->filename = $filename;
+            $asset->newFolderId = $parentFolder->id;
+            $asset->setVolumeId($parentFolder->volumeId);
+            $asset->setScenario(Asset::SCENARIO_CREATE);
+            $asset->avoidFilenameConflicts = true;
+
+            $result = Craft::$app->getElements()->saveElement($asset);
+            if ($result){
+                //echo '- File '.$id.PHP_EOL;
+                return $asset;
+            }else{
+                return false;
+            }
+        } catch (\Throwable $e) {
+            return false;
+        }
+        return false;
+    }
+
+
+
+
 
 }
