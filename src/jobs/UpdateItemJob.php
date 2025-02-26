@@ -15,11 +15,19 @@ use furbo\museumplusforcraftcms\services\MuseumPlusService;
 class UpdateItemJob extends BaseJob
 {
     public int $collectionId;
+    private $settings;
+    private $museumPlus;
+    public $assets;
+
+
 
     public function execute($queue): void
     {
         $logger = MuseumPlusForCraftCms::getLogger();
 
+        $this->settings = MuseumPlusForCraftCms::$plugin->getSettings();
+        $this->museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
+        $this->assets = Craft::$app->getAssets();
 
 
         $item = MuseumPlusItem::find()
@@ -368,7 +376,7 @@ class UpdateItemJob extends BaseJob
         $attachment = $museumPlus->getAttachmentByObjectId($id);
 
         $settings = MuseumPlusForCraftCms::$plugin->getSettings();
-       // $folderId = $this->settings['attachmentVolumeId'];
+        // $folderId = $this->settings['attachmentVolumeId'];
         $folderId = $settings['attachmentVolumeId'];
         $logger->info('attachmentVolumeId: '.$folderId);
 
