@@ -144,7 +144,7 @@ class CollectionController extends Controller
             'collectionId' => $this->collectionItemId,
         ]));
 
-        echo "Queued update for MuseumPlusItem {$collectionId}.\n";
+        echo "Queued update for MuseumPlusItem {$this->collectionItemId}.\n";
 
         // Force queue to process immediately TODO: remove thiså
         $queue->run();
