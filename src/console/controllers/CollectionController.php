@@ -188,7 +188,9 @@ class CollectionController extends Controller
         }
 
         foreach ($this->settings['objectGroups'] as $objectGroupId) {
+            echo 'getObjectsByObjectGroup START'.PHP_EOL;
             $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
+            echo 'getObjectsByObjectGroup END'.PHP_EOL;
             foreach ($objects as $o) {
 
                 $objectIds[$o->id] = $o->id;
