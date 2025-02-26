@@ -207,8 +207,7 @@ class CollectionController extends Controller
                     if (!$item) {
 
                         $jobId = $queue->push(new UpdateItemJob([
-                            /*'description' => 'Updating item (id: '.$o->id.')',*/
-                            'description' => 'Updating item',
+                            'description' => 'Updating item (id: '.$o->id.')',
                             'collectionId' => $o->id,
                             'ignoreAttachments' => false,
                             'ignoreMultimedia' => false,
@@ -218,15 +217,14 @@ class CollectionController extends Controller
 
 
                         // Force queue to process immediately TODO: remove this
-                        $queue->run();
+                        //$queue->run();
 
                         echo 'Creating item (id: '.$o->id.')'.PHP_EOL;
                         //$this->updateItemFromMuseumPlus($o->id);
                         //$this->triggerUpdateEvent($o->id, true);
                     } else if ($this->forceAll || $item->dateUpdated < $objectLastModified) {
                         $jobId = $queue->push(new UpdateItemJob([
-                            /*'description' => 'Creating item (id: '.$o->id.')',*/
-                            'description' => 'Updating item',
+                            'description' => 'Creating item (id: '.$o->id.')',
                             'collectionId' => $o->id,
                             'ignoreAttachments' => false,
                             'ignoreMultimedia' => false,
@@ -236,7 +234,7 @@ class CollectionController extends Controller
 
 
                         // Force queue to process immediately TODO: remove this
-                        $queue->run();
+                        //$queue->run();
 
                         // TODO careful: triggerUpdateEvent should be false in this case, but why? maybe add a public property "isNewItem" in the job and pass the value from here
 
