@@ -496,6 +496,21 @@ class UpdateItemJob extends BaseJob
         return false;
     }
 
+    private function sortArray(&$array, $key) {
+        usort($array, function($a, $b) use ($key) {
+
+            if (!isset($a[$key]) || !isset($b[$key])) {
+                return 0;
+            } else if (!isset($a[$key]) && isset($b[$key])) {
+                return -1;
+            } else if (isset($a[$key]) && !isset($b[$key])) {
+                return 1;
+            } else if ($a[$key] == $b[$key]) {
+                return 0;
+            }
+            return ($a[$key] < $b[$key]) ? -1 : 1;
+        });
+    }
 
 
 
