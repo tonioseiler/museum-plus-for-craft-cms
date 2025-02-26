@@ -136,11 +136,27 @@ class CollectionController extends Controller
             return false;
         }
 
+
+        $queue = Craft::$app->queue;
+
+        // Push job to queue
+        $jobId = $queue->push(new UpdateItemJob([
+            'collectionId' => $this->collectionItemId,
+        ]));
+
+        echo "Queued update for MuseumPlusItem {$collectionId}.\n";
+
+        // Force queue to process immediately TODO: remove thiså
+        $queue->run();
+
+
+        /*
         Craft::$app->queue->push(new UpdateItemJob([
             'collectionId' => $this->collectionItemId,
         ]));
 
         echo "Queued update for MuseumPlusItem {$this->collectionItemId}.\n";
+        */
     }
 
 
