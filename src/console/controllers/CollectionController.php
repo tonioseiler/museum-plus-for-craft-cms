@@ -207,7 +207,8 @@ class CollectionController extends Controller
                     if (!$item) {
 
                         $jobId = $queue->push(new UpdateItemJob([
-                            'description' => 'Updating item (id: '.$o->id.')',
+                            /*'description' => 'Updating item (id: '.$o->id.')',*/
+                            'description' => 'Updating item',
                             'collectionId' => $o->id,
                             'ignoreAttachments' => false,
                             'ignoreMultimedia' => false,
@@ -224,7 +225,8 @@ class CollectionController extends Controller
                         //$this->triggerUpdateEvent($o->id, true);
                     } else if ($this->forceAll || $item->dateUpdated < $objectLastModified) {
                         $jobId = $queue->push(new UpdateItemJob([
-                            'description' => 'Updating item (id: '.$o->id.')',
+                            /*'description' => 'Creating item (id: '.$o->id.')',*/
+                            'description' => 'Updating item',
                             'collectionId' => $o->id,
                             'ignoreAttachments' => false,
                             'ignoreMultimedia' => false,
