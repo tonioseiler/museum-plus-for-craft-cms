@@ -172,9 +172,88 @@ class CollectionController extends Controller
 
     }
 
-
-
     public function actionUpdateItems()
+    {
+        //$this->forceAll = true;
+
+        echo 'Downloading list of object groups'.PHP_EOL;
+        $this->downloadObjectGroups();
+        echo 'Updating Items'.PHP_EOL;
+        $objectIds = [];
+
+        $startUpdating = true;
+        if (!empty($this->startId)) {
+            $startUpdating = false;
+        }
+
+        foreach ($this->settings['objectGroups'] as $objectGroupId) {
+            $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
+            foreach ($objects as $o) {
+
+                $objectIds[$o->id] = $o->id;
+
+                if ($startUpdating) {
+                    //check if item exists and if last mod is before last mod in mplus
+
+
+                    $objectLastModified = new \DateTime($o->__lastModified);
+                    $item = MuseumPlusItem::find()
+                        ->where(['collectionId' => $o->id])
+                        ->one();
+                    $queue = Craft::$app->queue;
+                    if (!$item) {
+
+                        $jobId = $queue->push(new UpdateItemJob([
+                            'collectionId' => $o->id,
+                        ]));
+
+                        echo 'Creating item (id: '.$o->id.')'.PHP_EOL;
+                        //$this->updateItemFromMuseumPlus($o->id);
+                        //$this->triggerUpdateEvent($o->id, true);
+                    } else if ($this->forceAll || $item->dateUpdated < $objectLastModified) {
+                        $jobId = $queue->push(new UpdateItemJob([
+                            'collectionId' => $o->id,
+                        ]));
+                        // TODO careful: triggerUpdateEvent should be false in this case, but why? maybe add a public property "isNewItem" in the job and pass the value from here
+
+
+                        echo 'Updating item (id: '.$o->id.')'.PHP_EOL;
+                        //$this->updateItemFromMuseumPlus($o->id);
+                        //$this->triggerUpdateEvent($o->id, false);
+                    } else {
+                        //echo '.';
+                    }
+                } else {
+                    $startUpdating = $o->id == $this->startId;
+                    echo 'skip item '.$o->id.PHP_EOL;
+                }
+
+
+            }
+        }
+
+        /* TODO reactivate, or better recode and put stuff in new jobs
+        //delete items which do not exist anymore
+        $itemIds = MuseumPlusItem::find()->ids();
+        foreach($itemIds as $itemId) {
+            $item = MuseumPlusItem::find()
+                ->id($itemId)
+                ->one();
+            if (!isset($objectIds[$item->collectionId])) {
+                $success = Craft::$app->elements->deleteElement($item);
+                echo 'Item deleted: '.$item->title.' ('.$item->id.')'.PHP_EOL;
+            }
+        }
+
+        $this->actionUpdateItemsInventory();
+        $this->actionUpdateItemToItemRelationShips();
+        $this->actionUpdateItemParentChildRelations();
+        $this->optimizeSearchIndex();
+        */
+        return true;
+    }
+
+    public function actionUpdateItemsOLD()
     {
         //$this->forceAll = true;
 
@@ -202,6 +281,7 @@ class CollectionController extends Controller
                     $item = MuseumPlusItem::find()
                         ->where(['collectionId' => $o->id])
                         ->one();
+                    $queue = Craft::$app->queue;
                     if (!$item) {
                         echo 'Creating item (id: '.$o->id.')'.PHP_EOL;
                         $this->updateItemFromMuseumPlus($o->id);

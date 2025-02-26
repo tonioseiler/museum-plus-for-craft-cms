@@ -67,12 +67,6 @@ class UpdateItemJob extends BaseJob
             $this->updateItemInventory($this->collectionId);
             $this->updateItemSort($this->collectionId);
 
-
-            /* TODO finish and reactivate
-
-
-            */
-
             $message = "Successfully processed MuseumPlusItem (ID: {$this->collectionId}).";
             Craft::info($message, 'museumplus');
             $logger->info($message);
