@@ -133,8 +133,7 @@ class UpdateItemJob extends BaseJob
                 }
             }
 
-            // debug TODO Paolo go on from here
-            return;
+
 
             //add literature relations
             $literatureIds = [];
@@ -159,6 +158,7 @@ class UpdateItemJob extends BaseJob
             //sync
             if(count($literatureIds)){
                 $item->syncLiteratureRelations($literatureIds);
+                $logger->info("Literatures added");
                 //echo 'l';
             }
 
@@ -174,11 +174,16 @@ class UpdateItemJob extends BaseJob
                         //echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
                         $literature->assetId = $assetId;
                         $literature->save();
+                        $logger->info("Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId);
+
                     }else{
                         //echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: NULL" . PHP_EOL;
                     }
                 }
             }
+
+            // debug TODO Paolo go on from here
+            return;
 
             //add people refs
             $peopleTypes = ['ObjAdministrationRef', 'ObjPerOwnerRef', 'ObjPerAssociationRef'];
