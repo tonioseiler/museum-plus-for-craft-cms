@@ -22,7 +22,7 @@ class UpdateItemJob extends BaseJob
         if (empty($this->collectionId)) {
             $message = "Missing param: collectionId.";
             Craft::error($message, 'museumplus');
-            $logger->error($message);
+            $logger->info($message);
             return;
         }
 
