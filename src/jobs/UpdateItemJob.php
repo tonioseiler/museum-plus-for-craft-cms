@@ -27,7 +27,10 @@ class UpdateItemJob extends BaseJob
     private $settings;
     private $museumPlus;
     public $assets;
+    public $ignoreAttachments;
+
     public $ignoreMultimedia;
+    public $ignoreLiterature;
 
 
 
@@ -39,8 +42,10 @@ class UpdateItemJob extends BaseJob
         $this->museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
         $this->assets = Craft::$app->getAssets();
 
-        // TODO: this should not be static...
+        // TODO: these should not be static...
+        $this->ignoreAttachments = false;
         $this->ignoreMultimedia = false;
+        $this->ignoreLiterature = false;
 
 
         $item = MuseumPlusItem::find()
@@ -96,7 +101,7 @@ class UpdateItemJob extends BaseJob
 
             //add attachment
             //echo '- Main image'.PHP_EOL;
-            /*if (!$this->ignoreAttachments) {*/
+            if (!$this->ignoreAttachments) {
                 $assetId = $this->createAttachmentFromObjectId($item->collectionId);
                 if($assetId){
                     //echo "Attachment for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
@@ -107,7 +112,7 @@ class UpdateItemJob extends BaseJob
                     //echo "Attachment for item " . $item->id . " AssetID: NULL" . PHP_EOL;
                     $logger->info("Attachment for item " . $item->id . " AssetID: NULL");
                 }
-           /*}*/
+           }
 
 
 
