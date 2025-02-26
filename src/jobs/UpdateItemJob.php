@@ -67,7 +67,7 @@ class UpdateItemJob extends BaseJob
         try {
 
 
-            $museumPlusService = Craft::$app->getModule('museumplusforcraftcms')->get('museumPlusService');
+            $museumPlusService = Craft::$app->getModule('museum-plus-for-craft-cms')->get('museumPlusService');
             return;
 
 
