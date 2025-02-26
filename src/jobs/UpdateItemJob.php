@@ -15,24 +15,37 @@ class UpdateItemJob extends BaseJob
 
     public function execute($queue): void
     {
+        $logger = Craft::getLogger()->dispatcher->targets['museumplus'];
+
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $this->collectionId])
             ->one();
 
         if (!$item) {
-            Craft::error("MuseumPlusItem with collectionId {$this->collectionId} not found.", __METHOD__);
+            $message = "MuseumPlusItem with collectionId {$this->collectionId} not found.";
+            Craft::error($message, 'museumplus');
+            $logger->error($message);
             return;
         }
 
         try {
             $item->title = $item->getDataAttribute('ObjObjectTitleVrt');
             if (Craft::$app->elements->saveElement($item)) {
-                Craft::info("Updated MuseumPlusItem {$item->id} successfully.", __METHOD__);
+                //Craft::info("Updated MuseumPlusItem {$item->id} successfully.", __METHOD__);
+                $message = "Successfully updated MuseumPlusItem ID {$item->id}.";
+                Craft::info($message, 'museumplus');
+                $logger->info($message);
             } else {
-                Craft::error("Failed to update MuseumPlusItem {$item->id}.", __METHOD__);
+                //Craft::error("Failed to update MuseumPlusItem {$item->id}.", __METHOD__);
+                $message = "Failed to update MuseumPlusItem ID {$item->id}.";
+                Craft::error($message, 'museumplus');
+                $logger->error($message);
             }
         } catch (\Throwable $e) {
-            Craft::error("Error updating MuseumPlusItem: " . $e->getMessage(), __METHOD__);
+            //Craft::error("Error updating MuseumPlusItem: " . $e->getMessage(), __METHOD__);
+            $message = "Error updating MuseumPlusItem: " . $e->getMessage();
+            Craft::error($message, 'museumplus');
+            $logger->error($message);
         }
     }
 

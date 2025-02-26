@@ -41,6 +41,10 @@ use craft\events\RegisterUrlRulesEvent;
 
 use yii\base\Event;
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+
 /**
  * Craft plugins are very much like little applications in and of themselves. We’ve made
  * it as simple as we can, but the training wheels are off. A little prior knowledge is
@@ -120,8 +124,14 @@ class MuseumPlusForCraftCms extends Plugin
     public function init()
     {
         parent::init();
+
         self::$plugin = $this;
 
+        $logPath = Craft::$app->path->getLogPath() . '/museumplus.log';
+        $logger = new Logger('museumplus');
+        $logger->pushHandler(new StreamHandler($logPath, Logger::DEBUG));
+
+        Craft::getLogger()->dispatcher->targets['museumplus'] = $logger;
         // Add in our console commands
         if (Craft::$app instanceof ConsoleApplication) {
             $this->controllerNamespace = 'furbo\museumplusforcraftcms\console\controllers';
