@@ -4,14 +4,19 @@ namespace furbo\museumplusforcraftcms\jobs;
 
 use Craft;
 use craft\elements\Asset;
+use craft\helpers\App;
 use craft\helpers\Assets;
 use craft\helpers\FileHelper;
 use craft\models\VolumeFolder;
 use craft\queue\BaseJob;
+use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
+use furbo\museumplusforcraftcms\records\LiteratureRecord;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
+use furbo\museumplusforcraftcms\records\OwnershipRecord;
+use furbo\museumplusforcraftcms\records\PersonRecord;
 use furbo\museumplusforcraftcms\services\MuseumPlusService;
 /**
  * Job to update a MuseumPlusItem.
@@ -416,7 +421,6 @@ class UpdateItemJob extends BaseJob
         return false;
     }
 
-
     private function createFolder($folderName, $parentFolderId = null,$parentFolderPath = null)
     {
         $volumeId = $this->settings['attachmentVolumeId'];
@@ -563,7 +567,126 @@ class UpdateItemJob extends BaseJob
         return false;
     }
 
+    private function createOrUpdateOwnership($data)
+    {
+        $collectionId = $data->id;
+        $ownerhsip = OwnershipRecord::find()
+            ->where(['collectionId' => $collectionId])
+            ->one();
 
+        if (empty($ownerhsip)) {
+            //create new
+            $ownerhsip = new OwnershipRecord();
+            $ownerhsip->id = 0;
+            $ownerhsip->collectionId = $collectionId;
+            $ownerhsip->title = $data->OwsOwnershipVrt;
+        } else {
+            //update
+            //TODO: Paolo check the last mod date
+            $ownerhsip->title = $data->OwsOwnershipVrt;
+        }
+        $ownerhsip->data = json_encode($data);
+        $success = $ownerhsip->save();
+        return $ownerhsip;
+    }
+
+    private function createOrUpdateLiterature($data)
+    {
+        $collectionId = $data->id;
+        $literature = LiteratureRecord::find()
+            ->where(['collectionId' => $collectionId])
+            ->one();
+
+        if (empty($literature)) {
+            //create new
+            $literature = new LiteratureRecord();
+            $literature->id = 0;
+            $literature->collectionId = $collectionId;
+            $literature->title = $data->LitLiteratureVrt;
+        } else {
+            //update
+            //TODO: Paolo check the last mod date
+            $literature->title = $data->LitLiteratureVrt;
+        }
+        $literature->data = json_encode($data);
+        $success = $literature->save();
+        return $literature;
+    }
+
+    private function createOrUpdateVocabularyEntry($type, $data)
+    {
+
+        $collectionId = $data->id;
+        $vocabularyEntry = MuseumPlusVocabulary::find()
+            ->where(['collectionId' => $collectionId])
+            ->one();
+
+        if (empty($vocabularyEntry)) {
+            //create new
+            $vocabularyEntry = new MuseumPlusVocabulary();
+            $vocabularyEntry->collectionId = $data->id;
+            $vocabularyEntry->title = $data->content;
+        } else {
+            //update
+            //TODO: Paolo check the last mod date
+            $vocabularyEntry->title = $data->content;
+
+        }
+        $vocabularyEntry->type = $type;
+        $vocabularyEntry->parentId = $data->parentId;
+        $vocabularyEntry->language = $data->isoLanguageCode;
+        $vocabularyEntry->data = json_encode($data);
+        $success = Craft::$app->elements->saveElement($vocabularyEntry, false);
+        return $vocabularyEntry;
+    }
+
+    private function createOrUpdatePerson($data)
+    {
+        $collectionId = $data->id;
+
+        $person = PersonRecord::find()
+            ->where(['collectionId' => $collectionId])
+            ->one();
+
+        if (empty($person)) {
+            //create new
+            $person = new PersonRecord();
+            $person->id = 0;
+            $person->collectionId = $collectionId;
+
+            $success = $person->save();
+        }
+        //update
+        $person->data = json_encode($data);
+        if (!empty($data->PerNameTxt))
+            $person->title = $data->PerNameTxt;
+        else if (!empty($data->PerNameTxt))
+            $person->title = $data->PerPersonTxt;
+        else if (!empty($data->PerNameVrt))
+            $person->title = $data->PerNameVrt;
+        else
+            $person->title = 'Unknown';
+
+        $success = $person->save();
+        return $person;
+    }
+
+    public function actionUpdateItemsInventory()
+    {
+        App::maxPowerCaptain();
+        $itemIds = MuseumPlusItem::find()->ids();
+        foreach($itemIds as $itemId) {
+            $item = MuseumPlusItem::find()
+                ->id($itemId)
+                ->one();
+            echo $itemId . " => ";
+            try {
+                $this->updateItemInventory($item->collectionId);
+            } catch (\Exception $e) {
+                echo $e->getMessage().PHP_EOL;
+            }
+        }
+    }
 
 
 
