@@ -75,12 +75,8 @@ class UpdateItemJob extends BaseJob
 
             $museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
             $o = $museumPlus->getObjectDetail($collectionId);
-            return;
-
-
-
-            $o = $museumPlusService->getObjectDetail($collectionId);
             $item = $this->createOrUpdateItem($o);
+            return;
 
             //add attachment
             //echo '- Main image'.PHP_EOL;
@@ -315,23 +311,39 @@ class UpdateItemJob extends BaseJob
     private function createOrUpdateItem($object) {
         $collectionId = $object->id;
 
+        $logger = MuseumPlusForCraftCms::getLogger();
+        $logger->info('running createOrUpdateItem()');
+
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
 
         if (empty($item)) {
+            $logger->info('running createOrUpdateItem(): create new item');
             //create new
             $item = new MuseumPlusItem();
             $item->collectionId = $collectionId;
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
         } else {
+            $logger->info('running createOrUpdateItem(): update existing item');
+
             //update
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
         }
         $success = Craft::$app->elements->saveElement($item, false);
         //$success = Craft::$app->elements->saveElement($item, false,false);
+        if (!$success) {
+            $logger->error('Could not save item: ' . print_r($item->getErrors(), true));
+            return false;
+        } else {
+            $logger->info('Item successfully saved ');
+        }
+
+        // debug
+        return $item;
+
 
         //insert object relations if they do not exist
         $itemRecord = $item->getRecord();
