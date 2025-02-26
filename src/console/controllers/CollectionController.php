@@ -178,6 +178,7 @@ class CollectionController extends Controller
 
         echo 'Downloading list of object groups'.PHP_EOL;
         $this->downloadObjectGroups();
+        echo 'Download finished'.PHP_EOL;
         echo 'Updating Items'.PHP_EOL;
         $objectIds = [];
 
