@@ -4,6 +4,7 @@ namespace furbo\museumplusforcraftcms\jobs;
 
 use Craft;
 use craft\queue\BaseJob;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 
 /**
@@ -15,7 +16,7 @@ class UpdateItemJob extends BaseJob
 
     public function execute($queue): void
     {
-        $logger = Craft::getLogger()->dispatcher->targets['museumplus'];
+        $logger = MuseumPlusForCraftCms::getLogger();
 
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $this->collectionId])

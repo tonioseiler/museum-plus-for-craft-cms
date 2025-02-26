@@ -105,7 +105,7 @@ class MuseumPlusForCraftCms extends Plugin
     // =========================================================================
     const EVENT_ITEM_UPDATED_FROM_MUSEUM_PLUS = 'itemUpdatedFromMuseumPlus';
 
-
+    private static ?Logger $logger = null;
 
     // Public Methods
     // =========================================================================
@@ -127,11 +127,12 @@ class MuseumPlusForCraftCms extends Plugin
 
         self::$plugin = $this;
 
-        $logPath = Craft::$app->path->getLogPath() . '/museumplus.log';
-        $logger = new Logger('museumplus');
-        $logger->pushHandler(new StreamHandler($logPath, Logger::DEBUG));
+        if (self::$logger === null) {
+            $logPath = Craft::getAlias('@storage/logs/museumplus.log');
+            self::$logger = new Logger('museumplus');
+            self::$logger->pushHandler(new StreamHandler($logPath, Logger::DEBUG));
+        }
 
-        Craft::getLogger()->dispatcher->targets['museumplus'] = $logger;
         // Add in our console commands
         if (Craft::$app instanceof ConsoleApplication) {
             $this->controllerNamespace = 'furbo\museumplusforcraftcms\console\controllers';
@@ -344,6 +345,14 @@ class MuseumPlusForCraftCms extends Plugin
             __METHOD__
         );
     }
+
+
+
+    public static function getLogger(): Logger
+    {
+        return self::$logger;
+    }
+
 
     // Protected Methods
     // =========================================================================
