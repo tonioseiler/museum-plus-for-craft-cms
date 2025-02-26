@@ -20,6 +20,8 @@ class UpdateItemJob extends BaseJob
     {
         $logger = MuseumPlusForCraftCms::getLogger();
 
+
+
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $this->collectionId])
             ->one();
@@ -63,11 +65,16 @@ class UpdateItemJob extends BaseJob
         $message = "Running updateItemFromMuseumPlus('{$this->collectionId}').";
         $logger->info($message);
 
+
+
+
+
+
         //echo 'Update item '.$collectionId.PHP_EOL;
         try {
 
-
-            $museumPlusService = Craft::$app->getModule('museum-plus-for-craft-cms')->get('museumPlusService');
+            $museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
+            $o = $museumPlus->getObjectDetail($collectionId);
             return;
 
 
