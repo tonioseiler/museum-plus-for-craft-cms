@@ -65,18 +65,13 @@ class UpdateItemJob extends BaseJob
         $message = "Running updateItemFromMuseumPlus('{$this->collectionId}').";
         $logger->info($message);
 
-
-
-
-
-
         //echo 'Update item '.$collectionId.PHP_EOL;
         try {
 
             $museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
             $o = $museumPlus->getObjectDetail($collectionId);
             $item = $this->createOrUpdateItem($o);
-            return;
+
 
             //add attachment
             //echo '- Main image'.PHP_EOL;
@@ -86,10 +81,16 @@ class UpdateItemJob extends BaseJob
                     //echo "Attachment for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
                     $item->assetId = $assetId;
                     Craft::$app->elements->saveElement($item);
+                    $logger->info("Attachment for item " . $item->id . " AssetID: " . $assetId);
                 } else {
                     //echo "Attachment for item " . $item->id . " AssetID: NULL" . PHP_EOL;
+                    $logger->info("Attachment for item " . $item->id . " AssetID: NULL");
                 }
            /*}*/
+
+            // debug
+            return;
+
 
             $moduleRefs = $item->getDataAttribute('moduleReferences');
 
