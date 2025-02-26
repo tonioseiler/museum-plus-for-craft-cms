@@ -512,6 +512,54 @@ class UpdateItemJob extends BaseJob
         });
     }
 
+    private function createMultimediaFromId($id, $itemId = null)
+    {
+        $attachment = $this->museumPlus->getMultimediaById($id);
+        $folderId = $this->settings['attachmentVolumeId'];
+        $folder = $this->assets->findFolder(['id' => $folderId]);
+        $parentFolder = $this->createFolder("Multimedia");
+        $itemFolder = $this->createFolder($itemId,$parentFolder->id,$parentFolder->path);
+        if ($attachment) {
+            $fileTypes = $this->settings['attachmentFileTypes'];
+            if (!empty($fileTypes)) {
+                // only allow file types defined in plugin settings.
+                $pattern = '/\.(' . str_replace(', ', '|', $fileTypes) . ')$/i';
+                if (preg_match($pattern, $attachment)) {
+                    $asset = $this->createAsset($id, $attachment, $itemFolder);
+                    if ($asset) {
+                        return $asset->id;
+                    }
+                }
+            } else {
+                // allow any file type
+                $asset = $this->createAsset($id, $attachment, $itemFolder);
+                if ($asset) {
+                    return $asset->id;
+                }
+            }
+        }
+        return false;
+    }
+
+    private function createLiteratureFromId($id)
+    {
+        $folderId = $this->settings['attachmentVolumeId'];
+        $folder = $this->assets->findFolder(['id' => $folderId]);
+        //$parentFolder = $this->createFolder("Literature", $folderId);
+        $parentFolder = $this->createFolder("Literature");
+        $attachment = $this->museumPlus->getLiteratureById($id);
+
+        if ($attachment) {
+            $asset = $this->createAsset($id, $attachment, $parentFolder);
+            if($asset){
+                return $asset->id;
+            }
+        }
+        return false;
+    }
+
+
+
 
 
 
