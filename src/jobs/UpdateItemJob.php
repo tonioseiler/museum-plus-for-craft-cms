@@ -341,20 +341,9 @@ class UpdateItemJob extends BaseJob
             $logger->info('Item successfully saved ');
         }
 
-
-
-
         //insert object relations if they do not exist
         $itemRecord = $item->getRecord();
         $itemRecord->unlinkAll('objectGroups', true);
-
-
-        // debug
-        return;
-
-
-
-
         $moduleReferences = $item->getDataAttribute('moduleReferences');
         if (isset($moduleReferences['ObjObjectGroupsRef'])) {
             foreach($moduleReferences['ObjObjectGroupsRef']['items'] as $og) {
