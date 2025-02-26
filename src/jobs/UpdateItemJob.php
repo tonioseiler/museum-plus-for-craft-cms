@@ -80,7 +80,7 @@ class UpdateItemJob extends BaseJob
 
     protected function defaultDescription(): string
     {
-        return Craft::t('app', 'Updating MuseumPlusItem');
+        return Craft::t('app', "Updating MuseumPlusItem collectionId: {$this->collectionId}");
     }
 
     private function updateItemFromMuseumPlus($collectionId)
