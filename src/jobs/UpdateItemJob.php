@@ -3,6 +3,7 @@
 namespace furbo\museumplusforcraftcms\jobs;
 
 use Craft;
+use craft\models\VolumeFolder;
 use craft\queue\BaseJob;
 use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
@@ -395,5 +396,59 @@ class UpdateItemJob extends BaseJob
         return false;
     }
 
+
+    private function createFolder($folderName, $parentFolderId = null,$parentFolderPath = null)
+    {
+        $volumeId = $this->settings['attachmentVolumeId'];
+        $volume = Craft::$app->volumes->getVolumeById($volumeId);
+        if (!$volume) {
+            Craft::error("Volume with ID {$volumeId} not found.", __METHOD__);
+            return false;
+        }
+        // Find the root folder for this volume
+        $rootFolder = Craft::$app->assets->getRootFolderByVolumeId($volumeId);
+        if (!$rootFolder) {
+            Craft::error("Root folder for volume ID {$volumeId} not found.", __METHOD__);
+            return false;
+        }
+
+        if ($parentFolderId !== null) {
+            // Check if the folder already exists
+            $existingFolder = Craft::$app->assets->findFolder([
+                'name' => $folderName,
+                'parentId' => $parentFolderId
+            ]);
+            if ($existingFolder) {
+                return $existingFolder;
+            } else {
+                $folder = new VolumeFolder();
+                $folder->parentId = $parentFolderId;
+                $folder->name = $folderName;
+                $folder->volumeId = $volumeId;
+                $folder->path = $parentFolderPath . $folderName . '/';
+                $this->assets->createFolder($folder);
+                return $folder;
+            }
+        } else {
+// Check if the folder already exists
+            $existingFolder = Craft::$app->assets->findFolder([
+                'name' => $folderName,
+                'parentId' => $rootFolder->id
+            ]);
+            if ($existingFolder) {
+                return $existingFolder;
+            } else {
+                $folder = new VolumeFolder();
+                $folder->parentId = $rootFolder->id;
+                $folder->name = $folderName;
+                $folder->volumeId = $volumeId;
+                $folder->path = $folderName . '/';
+                $this->assets->createFolder($folder);
+                return $folder;
+            }        }
+
+
+
+    }
 
 }
