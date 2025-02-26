@@ -359,6 +359,9 @@ class UpdateItemJob extends BaseJob
 
     private function createAttachmentFromObjectId($id)
     {
+        $logger = MuseumPlusForCraftCms::getLogger();
+        $logger->info('running createAttachmentFromObjectId()');
+
         $attachment = $this->museumPlus->getAttachmentByObjectId($id);
         $folderId = $this->settings['attachmentVolumeId'];
         $folder = $this->assets->findFolder(['id' => $folderId]);
@@ -370,6 +373,8 @@ class UpdateItemJob extends BaseJob
                 return $asset->id;
             }
         }
+        $logger->info('finished createAttachmentFromObjectId()');
+
         return false;
     }
 
