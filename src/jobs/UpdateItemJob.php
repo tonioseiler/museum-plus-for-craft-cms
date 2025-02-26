@@ -22,6 +22,7 @@ class UpdateItemJob extends BaseJob
     private $settings;
     private $museumPlus;
     public $assets;
+    public $ignoreMultimedia;
 
 
 
@@ -32,6 +33,9 @@ class UpdateItemJob extends BaseJob
         $this->settings = MuseumPlusForCraftCms::$plugin->getSettings();
         $this->museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
         $this->assets = Craft::$app->getAssets();
+
+        // TODO: this should not be static...
+        $this->ignoreMultimedia = false;
 
 
         $item = MuseumPlusItem::find()
@@ -100,8 +104,7 @@ class UpdateItemJob extends BaseJob
                 }
            /*}*/
 
-            // debug
-            return;
+
 
 
             $moduleRefs = $item->getDataAttribute('moduleReferences');
@@ -116,13 +119,22 @@ class UpdateItemJob extends BaseJob
                     $assetId = $this->createMultimediaFromId($mm['id'],$collectionId);
                     if ($assetId) {
                         $assetIds[] = $assetId;
+                        $logger->info("Asset created: AssetID: " . $assetId);
+
                     }
                 }
                 if(count($assetIds)){
+                    $logger->info("At least one asset");
+
                     $item->syncMultimediaRelations($assetIds);
+                    $logger->info("syncMultimediaRelations() executed");
+
                     //echo "Multimedia assets for Item Id: " . $item->id . " Asset IDs: " . implode(",", $assetIds) . PHP_EOL;
                 }
             }
+
+            // debug TODO Paolo go on from here
+            return;
 
             //add literature relations
             $literatureIds = [];
