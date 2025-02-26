@@ -135,28 +135,14 @@ class CollectionController extends Controller
             echo 'Missing param: collectionItemId' . PHP_EOL;
             return false;
         }
-
-
         $queue = Craft::$app->queue;
-
-        // Push job to queue
         $jobId = $queue->push(new UpdateItemJob([
             'collectionId' => $this->collectionItemId,
         ]));
 
         echo "Queued update for MuseumPlusItem {$this->collectionItemId}.\n";
-
-        // Force queue to process immediately TODO: remove thiså
+        // Force queue to process immediately TODO: remove this
         $queue->run();
-
-
-        /*
-        Craft::$app->queue->push(new UpdateItemJob([
-            'collectionId' => $this->collectionItemId,
-        ]));
-
-        echo "Queued update for MuseumPlusItem {$this->collectionItemId}.\n";
-        */
     }
 
 
