@@ -62,8 +62,9 @@ class UpdateItemJob extends BaseJob
         try {
             // Call the correct update functions
             $this->updateItemFromMuseumPlus($this->collectionId);
-            /* TODO finish and reactivate
             $this->triggerUpdateEvent($this->collectionId, $isNewItem);
+
+            /* TODO finish and reactivate
             $this->updateItemToItemRelationShips($this->collectionId);
             $this->updateItemInventory($this->collectionId);
             $this->updateItemSort($this->collectionId);
@@ -243,8 +244,6 @@ class UpdateItemJob extends BaseJob
             }
 
             $this->updateVocabularyRefs($item);
-            // debug TODO Paolo go on from here
-            return;
 
         } catch (\Exception $e) {
             //     echo $item->id . " could not be fully updated." . PHP_EOL;
@@ -257,6 +256,9 @@ class UpdateItemJob extends BaseJob
 
     private function triggerUpdateEvent($collectionItemId, $isNewItem = false)
     {
+        $logger = MuseumPlusForCraftCms::getLogger();
+        $logger->info('running triggerUpdateEvent()');
+
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionItemId])
             ->one();
