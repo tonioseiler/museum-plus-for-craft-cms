@@ -39,7 +39,7 @@ class UpdateItemJob extends BaseJob
             $item->title = $item->getDataAttribute('ObjObjectTitleVrt');
             if (Craft::$app->elements->saveElement($item)) {
                 //Craft::info("Updated MuseumPlusItem {$item->id} successfully.", __METHOD__);
-                $message = "Successfully updated MuseumPlusItem ID {$item->id}.";
+                $message = "Successfully updated MuseumPlusItem ID: {$this->collectionId} --- Element ID: {$item->id}";
                 Craft::info($message, 'museumplus');
                 $logger->info($message);
             } else {
