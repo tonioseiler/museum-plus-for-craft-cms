@@ -362,8 +362,17 @@ class UpdateItemJob extends BaseJob
         $logger = MuseumPlusForCraftCms::getLogger();
         $logger->info('running createAttachmentFromObjectId()');
 
-        $attachment = $this->museumPlus->getAttachmentByObjectId($id);
-        $folderId = $this->settings['attachmentVolumeId'];
+
+        $museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
+        // Paolo search this $this->museumPlus
+        $attachment = $museumPlus->getAttachmentByObjectId($id);
+
+        $settings = MuseumPlusForCraftCms::$plugin->getSettings();
+       // $folderId = $this->settings['attachmentVolumeId'];
+        $folderId = $settings['attachmentVolumeId'];
+        $logger->info('attachmentVolumeId: '.$folderId);
+
+
         $folder = $this->assets->findFolder(['id' => $folderId]);
         $parentFolder = $this->createFolder("Items");
         $itemFolder = $this->createFolder($id,$parentFolder->id,$parentFolder->path);
