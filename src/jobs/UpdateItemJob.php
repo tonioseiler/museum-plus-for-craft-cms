@@ -216,8 +216,7 @@ class UpdateItemJob extends BaseJob
                     }
                 }
             }
-            // debug TODO Paolo go on from here
-            return;
+
 
             //add owenrship refs
             $ownershipIds = [];
@@ -239,11 +238,13 @@ class UpdateItemJob extends BaseJob
             //sync
             if (count($ownershipIds)) {
                 $item->syncOwnershipRelations($ownershipIds);
+                $logger->info("Ownerships added");
                 //echo 'o';
             }
 
             $this->updateVocabularyRefs($item);
-
+            // debug TODO Paolo go on from here
+            return;
 
         } catch (\Exception $e) {
             //     echo $item->id . " could not be fully updated." . PHP_EOL;
@@ -694,6 +695,92 @@ class UpdateItemJob extends BaseJob
             }
         }
     }
+
+    private function updateVocabularyRefs(MuseumPlusItem $item)
+    {
+        //add vocabulary refs
+        $vocabularyRefs = $item->getDataAttribute('vocabularyReferences');
+        // '$vocabularyRefs:<br><textarea style="width:600px;height:500px;">'.print_r($vocabularyRefs,true).'</textarea><br>';
+        $syncData = [];
+        foreach ($vocabularyRefs as $vocabularyRef) {
+            $ids = [];
+            $type = $vocabularyRef['instanceName'];
+            //echo '<br><br>$vocabularyRef[items] ['.$type.']<br><textarea style="width:600px;height:100px;">'.print_r($vocabularyRef['items'],true).'</textarea><br>';
+            foreach ($vocabularyRef['items'] as $vc) {
+                try {
+                    // Using the node id from above we get the vocabulary data for the entry: content, id, parentId (directly from the m+ server)
+                    // this node id is not the collection id, but the id of the vocabulary node connection
+                    $data = $this->museumPlus->getVocabularyNode($type, $vc['id']);
+                    //echo '<textarea style="width:600px;height:500px;">Type: '.$type.' ['.$vc['id'].'] '.print_r($data,true).'</textarea>';
+                    foreach ($data as $d) {
+                        $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
+                        if ($vocabularyEntry) {
+                            if (!empty($vocabularyEntry->id)) {
+                                $ids[] = $vocabularyEntry->id;
+                            }
+                            //echo 'vocabularyEntry id: ' . $vocabularyEntry->id . ' pid: ' . $vocabularyEntry->parentId . '<br>';
+                            //probaly can be remooved to get all the tree
+                            //if(($type=='GenGeoCultureVgr')||($type=='GenGeoPoliticalVgr')||($type=='GenGeoGeographyVgr')||($type=='GenGeoHistoryVgr') ){
+                            // for geo vocabularies we need the whole tree
+                            $currentParentId = $vocabularyEntry->parentId;
+                            $currentParentNodeId = $vc['id'];
+                            $counter = 0;
+                            while ($currentParentId > 0) {
+                                $counter++;
+                                //echo '------- counter: ' . $counter. '<br>';
+                                if ($counter > 15) {
+                                    //die('infinite loop? '.$counter);
+                                    break;
+                                }
+                                //echo 'we have a parent: ' . $currentParentId . ' ['.$counter.']<br>';
+                                $parentNodeId = $this->museumPlus->getVocabularyParentNodeId($type, $currentParentNodeId);
+                                //echo 'parentNodeId: ' . $parentNodeId . '<br>';
+                                $dataParent = $this->museumPlus->getVocabularyNode($type, $parentNodeId);
+                                $currentParentId = 0;
+                                // its always one, but an array
+                                foreach ($dataParent as $dp) {
+                                    $vocabularyEntryParent = $this->createOrUpdateVocabularyEntry($type, $dp);
+                                    $currentParentId = $vocabularyEntryParent->parentId;
+                                    $currentParentNodeId = $parentNodeId;
+                                }
+                            }
+                            /*} else {
+                                // we get only the direct parent
+                                if($vocabularyEntry->parentId > 0) {
+                                    //echo 'we have a parent: '.$vocabularyEntry->parentId.'<br>';
+                                    $parentNodeId = $this->museumPlus->getVocabularyParentNodeId($type,$vc['id']);
+                                    //echo 'parentNodeId: '.$parentNodeId.'<br>';
+                                    $dataParent = $this->museumPlus->getVocabularyNode($type,$parentNodeId);
+                                    foreach ($dataParent as $dp) {
+                                        $vocabularyEntryParent = $this->createOrUpdateVocabularyEntry($type, $dp);
+                                    }
+                                }
+                            }*/
+                        }
+                    }
+                } catch (\GuzzleHttp\Exception\ClientException $e) {
+                    echo "WARNING: " . $e->getMessage() . PHP_EOL;
+                }
+            }
+            if (isset($syncData[$type])) {
+                foreach ($ids as $id) {
+                    $syncData[$type][] = $id;
+                }
+            } else {
+                $syncData[$type] = $ids;
+            }
+        }
+        if (count($syncData)) {
+            $item->syncVocabularyRelations($syncData);
+            //echo 'v';
+        }
+    }
+
+
+
+
+
+
 
 
 }
