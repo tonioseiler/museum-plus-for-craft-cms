@@ -63,11 +63,14 @@ class UpdateItemJob extends BaseJob
             // Call the correct update functions
             $this->updateItemFromMuseumPlus($this->collectionId);
             $this->triggerUpdateEvent($this->collectionId, $isNewItem);
-
-            /* TODO finish and reactivate
             $this->updateItemToItemRelationShips($this->collectionId);
             $this->updateItemInventory($this->collectionId);
             $this->updateItemSort($this->collectionId);
+
+
+            /* TODO finish and reactivate
+
+
             */
 
             $message = "Successfully processed MuseumPlusItem (ID: {$this->collectionId}).";
@@ -273,7 +276,8 @@ class UpdateItemJob extends BaseJob
 
     private function updateItemToItemRelationShips($collectionId)
     {
-
+        $logger = MuseumPlusForCraftCms::getLogger();
+        $logger->info('running updateItemToItemRelationShips()');
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
@@ -304,7 +308,8 @@ class UpdateItemJob extends BaseJob
 
     private function updateItemInventory($collectionId)
     {
-
+        $logger = MuseumPlusForCraftCms::getLogger();
+        $logger->info('running updateItemInventory()');
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
@@ -329,7 +334,8 @@ class UpdateItemJob extends BaseJob
 
     private function updateItemSort($collectionId)
     {
-
+        $logger = MuseumPlusForCraftCms::getLogger();
+        $logger->info('running updateItemSort()');
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
