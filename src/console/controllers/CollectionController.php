@@ -160,8 +160,8 @@ class CollectionController extends Controller
     }
 
 
-    /*
-    public function actionUpdateItem() {
+
+    public function actionUpdateItemOLD() {
         if (empty($this->collectionItemId)) {
             echo 'Missing param: collectionItemId'.PHP_EOL;
             return false;
@@ -185,7 +185,7 @@ class CollectionController extends Controller
         $this->updateItemSort($this->collectionItemId);
 
     }
-    */
+
 
 
     public function actionUpdateItems()
