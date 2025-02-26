@@ -197,6 +197,7 @@ class CollectionController extends Controller
 
                 if ($startUpdating) {
                     //check if item exists and if last mod is before last mod in mplus
+                    // TODO BUG here? $objectLastModified weird logic
 
 
                     $objectLastModified = new \DateTime($o->__lastModified);
@@ -207,7 +208,7 @@ class CollectionController extends Controller
                     if (!$item) {
 
                         $jobId = $queue->push(new UpdateItemJob([
-                            'description' => 'Updating item (id: '.$o->id.')',
+                            'description' => 'Creating item (id: '.$o->id.')',
                             'collectionId' => $o->id,
                             'ignoreAttachments' => false,
                             'ignoreMultimedia' => false,
@@ -224,7 +225,7 @@ class CollectionController extends Controller
                         //$this->triggerUpdateEvent($o->id, true);
                     } else if ($this->forceAll || $item->dateUpdated < $objectLastModified) {
                         $jobId = $queue->push(new UpdateItemJob([
-                            'description' => 'Creating item (id: '.$o->id.')',
+                            'description' => 'Updating item (id: '.$o->id.')',
                             'collectionId' => $o->id,
                             'ignoreAttachments' => false,
                             'ignoreMultimedia' => false,
