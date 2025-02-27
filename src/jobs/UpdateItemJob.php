@@ -412,7 +412,7 @@ class UpdateItemJob extends BaseJob
                // $logger->info('running createOrUpdateItem(): create new item, new id: ' . $item->id);
             }
 
-            $logger->info('running createOrUpdateItem(): create new item, collectionId: '.$item->collectionId.' - element id: ' . $item->id);
+            $logger->info('running createOrUpdateItem(): create new item, collectionId: '.$item->collectionId.' - element id: not yet available');
 
 
 
@@ -428,6 +428,8 @@ class UpdateItemJob extends BaseJob
             $item->title = $object->ObjObjectTitleVrt;
         }
         $success = Craft::$app->elements->saveElement($item, false);
+
+
         //$success = Craft::$app->elements->saveElement($item, false,false);
         if (!$success) {
             $logger->error('Could not save item: ' . print_r($item->getErrors(), true));
@@ -436,6 +438,8 @@ class UpdateItemJob extends BaseJob
             if ($this->showDetailedLog) {
                 $logger->info('Item successfully saved ');
             }
+            $logger->info('new or already existing element id: '.$item->id.' -- collectionId: '.$item->collectionId);
+
         }
 
         //insert object relations if they do not exist
