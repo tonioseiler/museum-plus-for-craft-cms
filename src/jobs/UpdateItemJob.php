@@ -438,9 +438,9 @@ class UpdateItemJob extends BaseJob
 
         }
 //dd($item->data);
-        $inventoryNumber = $object['ObjObjectNumberVrt'] ?? '';//$item->getDataAttribute('ObjObjectNumberVrt');
+        $inventoryNumber = $object->ObjObjectNumberVrt ?? '';//$item->getDataAttribute('ObjObjectNumberVrt');
         if (empty($inventoryNumber))
-            $inventoryNumber = $object['ObjObjectNumberTxt']?? '';
+            $inventoryNumber = $object->ObjObjectNumberTxt ?? '';
         if ($inventoryNumber) {
             $item->inventoryNumber = $inventoryNumber;
         }
