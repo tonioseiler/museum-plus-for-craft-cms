@@ -356,7 +356,7 @@ class UpdateItemJob extends BaseJob
 
             echo 'inventoryNumber: '.$inventoryNumber.PHP_EOL;
             $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $item->inventoryNumber)));
-            $item->slug = $slug;
+            //$item->slug = $slug;
 
             // TODO debug $item->slug for all sites
 

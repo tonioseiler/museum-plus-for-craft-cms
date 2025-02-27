@@ -252,9 +252,15 @@ class MuseumPlusItem  extends Element
      */
     public function beforeSave(bool $isNew): bool
     {
+
+
         // TODO reactivate
         $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $this->inventoryNumber)));
-        //$this->slug = $slug;
+        $this->slug = $slug;
+
+
+        echo 'beforeSave - inventoryNumber: '.$this->inventoryNumber.PHP_EOL;
+        echo 'beforeSave - slug: '.$slug.PHP_EOL;
        // $this->slug = 'paolo';
 
         return true;
