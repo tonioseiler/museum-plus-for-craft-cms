@@ -252,10 +252,10 @@ class MuseumPlusItem extends Element
      */
     public function beforeSave(bool $isNew): bool
     {
-
         $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $this->inventoryNumber)));
         $this->slug = $slug;
-
+        //echo 'beforeSave - inventoryNumber: '.$this->inventoryNumber.PHP_EOL;
+        //echo 'beforeSave - slug: '.$slug.PHP_EOL;
         return true;
     }
 
@@ -276,7 +276,6 @@ class MuseumPlusItem extends Element
         else {
             $itemRecord = MuseumPlusItemRecord::findOne($this->id);
         }
-
         $itemRecord->collectionId = $this->collectionId;
         $itemRecord->data = $this->data;
         $itemRecord->assetId = $this->assetId;
@@ -284,9 +283,7 @@ class MuseumPlusItem extends Element
         $itemRecord->sort = $this->sort;
         $itemRecord->extraTitle = $this->extraTitle;
         $itemRecord->extraDescription = $this->extraDescription;
-
         $itemRecord->save(false);
-
         parent::afterSave($isNew);
 
     }
@@ -402,7 +399,11 @@ class MuseumPlusItem extends Element
             case 'collectionId':
                 return $this->collectionId;
             case 'inventoryNumber':
-                return $this->inventoryNumber;
+                //return $this->inventoryNumber;
+                if($this->inventoryNumber) {
+                    return $this->inventoryNumber;
+                }
+                return '--';
             case 'frontendLink':
                 $url = $this->getUrl();
                 if ($url !== null) {
@@ -460,7 +461,9 @@ class MuseumPlusItem extends Element
     public function getUriFormat(): ?string
     {
         $settings = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
-
+        //echo 'current site id: '.Craft::$app->getSites()->getCurrentSite()->id.PHP_EOL;
+        //echo 'current site handle: '.$this->site->handle.PHP_EOL;
+        //echo 'getUriFormat: '.$settings[$this->site->handle]['uriFormat'].PHP_EOL;
         return $settings[$this->site->handle]['uriFormat'];
     }
 
@@ -723,6 +726,24 @@ class MuseumPlusItem extends Element
         }
         return $filteredSites;
     }
+
+
+
+
+
+    public function getSupportedSites(): array
+    {
+        $sites = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
+        $filteredSites = [];
+        foreach ($sites as $siteHandle => $siteSettings) {
+            if (!empty($siteSettings['uriFormat'])) {
+                $site = \Craft::$app->sites->getSiteByHandle($siteHandle);
+                $filteredSites[] = $site->id;
+            }
+        }
+        return $filteredSites;
+    }
+
 
 
 }

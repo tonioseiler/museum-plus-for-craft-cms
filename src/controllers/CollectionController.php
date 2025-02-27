@@ -134,6 +134,7 @@ class CollectionController extends Controller
         $item->setScenario(\craft\base\Element::SCENARIO_DEFAULT);
 
         // Save it
+        //if (!Craft::$app->getElements()->saveElement($item, false,false)) {
         if (!Craft::$app->getElements()->saveElement($item, true)) {
             // if (!Craft::$app->getElements()->saveElement($item, false,false)) { TODO Paolo: this fixes the save problem, but probably stopping the propagation is not the right way to do it
             if ($request->getAcceptsJson()) {
