@@ -39,42 +39,26 @@ class UpdateItemJob extends BaseJob
     public function execute($queue): void
     {
         $logger = MuseumPlusForCraftCms::getLogger();
-
         $this->settings = MuseumPlusForCraftCms::$plugin->getSettings();
         $this->museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
         $this->assets = Craft::$app->getAssets();
-
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $this->collectionId])
             ->one();
-
         $isNewItem = !$item;
         $message = $isNewItem
             ? "Creating new MuseumPlusItem (ID: {$this->collectionId})."
             : "Updating MuseumPlusItem (ID: {$this->collectionId}).";
-
         Craft::info($message, 'museumplus');
         $logger->info($message);
         try {
-            // Call the correct update functions
             $this->updateItemFromMuseumPlus($this->collectionId);
             $this->triggerUpdateEvent($this->collectionId, $isNewItem);
             $this->updateItemToItemRelationShips($this->collectionId);
             $this->updateItemSort($this->collectionId);
-
-
-//TODO do this, but be sure the item id correct
-/*
-            Craft::$app->getQueue()->push(new UpdateSearchIndex([
-                'elementType' => MuseumPlusItem::class,
-                'elementId' => $item->id,
-            ]));
-*/
-
             $message = "Successfully processed MuseumPlusItem (ID: {$this->collectionId}).";
             Craft::info($message, 'museumplus');
             $logger->info($message);
-
         } catch (\Throwable $e) {
             $message = "Error processing MuseumPlusItem (ID: {$this->collectionId}): " . $e->getMessage();
             Craft::error($message, 'museumplus');
@@ -95,13 +79,15 @@ class UpdateItemJob extends BaseJob
             $message = "Running updateItemFromMuseumPlus('{$this->collectionId}').";
             $logger->info($message);
         }
-
-        //echo 'Update item '.$collectionId.PHP_EOL;
         try {
 
-            // TODO cleanup
+            /*
             $museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
             $o = $museumPlus->getObjectDetail($collectionId);
+            $item = $this->createOrUpdateItem($o);
+            */
+
+            $o = $this->museumPlus->getObjectDetail($collectionId);
             $item = $this->createOrUpdateItem($o);
 
 
@@ -639,7 +625,6 @@ class UpdateItemJob extends BaseJob
             $ownerhsip->title = $data->OwsOwnershipVrt;
         } else {
             //update
-            //TODO: Paolo check the last mod date
             $ownerhsip->title = $data->OwsOwnershipVrt;
         }
         $ownerhsip->data = json_encode($data);
@@ -662,7 +647,6 @@ class UpdateItemJob extends BaseJob
             $literature->title = $data->LitLiteratureVrt;
         } else {
             //update
-            //TODO: Paolo check the last mod date
             $literature->title = $data->LitLiteratureVrt;
         }
         $literature->data = json_encode($data);
@@ -685,9 +669,7 @@ class UpdateItemJob extends BaseJob
             $vocabularyEntry->title = $data->content;
         } else {
             //update
-            //TODO: Paolo check the last mod date
             $vocabularyEntry->title = $data->content;
-
         }
         $vocabularyEntry->type = $type;
         $vocabularyEntry->parentId = $data->parentId;

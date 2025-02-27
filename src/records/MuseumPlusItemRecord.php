@@ -31,14 +31,16 @@ class MuseumPlusItemRecord extends DataRecord
         return '{{%museumplus_items}}';
     }
 
-    public function getObjectGroups() {
+    public function getObjectGroups()
+    {
         return $this->hasMany(ObjectGroupRecord::className(), ['id' => 'objectGroupId'])
             ->viaTable('museumplus_items_objectgroups', ['itemId' => 'id'], function ($query) {
                 $query->orderBy(['sort' => SORT_ASC]);
             });
     }
 
-    public function getOwnerships() {
+    public function getOwnerships()
+    {
         $tmp = $this->hasMany(OwnershipRecord::className(), ['id' => 'ownershipId'])
             ->viaTable('museumplus_items_ownerships', ['itemId' => 'id'])
             ->innerJoin('museumplus_items_ownerships', 'museumplus_items_ownerships.ownershipId = museumplus_ownerships.id')
@@ -47,7 +49,8 @@ class MuseumPlusItemRecord extends DataRecord
         return $tmp;
     }
 
-    public function getLiterature() {
+    public function getLiterature()
+    {
         return $this->hasMany(LiteratureRecord::className(), ['id' => 'literatureId'])
             ->viaTable('museumplus_items_literature', ['itemId' => 'id'])
             ->innerJoin('museumplus_items_literature', 'museumplus_items_literature.literatureId = museumplus_literature.id')
@@ -55,7 +58,8 @@ class MuseumPlusItemRecord extends DataRecord
             ->orderBy(['museumplus_items_literature.sort' => SORT_ASC]);
     }
 
-    public function getVocabularyEntries() {
+    public function getVocabularyEntries()
+    {
         return $this->hasMany(VocabularyEntryRecord::className(), ['id' => 'vocabularyId'])
             ->viaTable('museumplus_items_vocabulary', ['itemId' => 'id'])
             ->innerJoin('museumplus_items_vocabulary', 'museumplus_items_vocabulary.vocabularyId = museumplus_vocabulary.id')
@@ -63,11 +67,13 @@ class MuseumPlusItemRecord extends DataRecord
             ->orderBy(['museumplus_items_vocabulary.sort' => SORT_ASC]);
     }
 
-    public function getVocabularyEntriesByType($type) {
+    public function getVocabularyEntriesByType($type)
+    {
         return $this->getVocabularyEntries()->where(['type' => $type]);
     }
 
-    public function getAssociationPeople() {
+    public function getAssociationPeople()
+    {
         /*
         return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
             ->viaTable('museumplus_items_people', ['itemId' => 'id'], function ($query) {
@@ -85,26 +91,18 @@ class MuseumPlusItemRecord extends DataRecord
 
     }
 
-    public function getOwnerPeople() {
+    public function getOwnerPeople()
+    {
         //TODO: FIX order/sort
         return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
             ->viaTable('museumplus_items_people', ['itemId' => 'id'], function ($query) {
                 $query->andWhere(['type' => 'ObjPerOwnerRef']);
                 $query->orderBy(['sort' => SORT_ASC]);
             });
-        /*
-        return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
-            ->viaTable('museumplus_items_people', ['itemId' => 'id'])
-            ->innerJoin('museumplus_items_people', 'museumplus_items_people.personId = museumplus_people.id')
-            ->where(['museumplus_items_people.itemId' => $this->id])
-            ->andWhere(['type' => 'ObjPerOwnerRef'])
-            ->orderBy(['museumplus_items_people.sort' => SORT_DESC]);
-            */
-
     }
 
-    public function getAdministrationPeople() {
-        //TODO: FIX order/sort
+    public function getAdministrationPeople()
+    {
         return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
             ->viaTable('museumplus_items_people', ['itemId' => 'id'], function ($query) {
                 $query->andWhere(['type' => 'ObjAdministrationRef']);
@@ -112,7 +110,8 @@ class MuseumPlusItemRecord extends DataRecord
             });
     }
 
-    public function getRelatedItems() {
+    public function getRelatedItems()
+    {
         return $this->hasMany(MuseumPlusitemRecord::className(), ['id' => 'relatedItemId'])
             ->viaTable('museumplus_items_items', ['itemId' => 'id'])
             ->innerJoin('museumplus_items_items', 'museumplus_items_items.relatedItemId = museumplus_items.id')
@@ -120,13 +119,14 @@ class MuseumPlusItemRecord extends DataRecord
             ->orderBy(['museumplus_items_items.sort' => SORT_ASC]);
     }
 
-    public function syncMultimediaRelations($assetIds) {
+    public function syncMultimediaRelations($assetIds)
+    {
         Craft::$app->db->createCommand()
             ->delete('{{%museumplus_items_assets}}', ['itemId' => $this->id])
             ->execute();
 
         $sort = 1;
-        foreach($assetIds as $assetId){
+        foreach ($assetIds as $assetId) {
             Craft::$app->db->createCommand()
                 ->insert('{{%museumplus_items_assets}}', [
                     'itemId' => $this->id,
@@ -137,13 +137,14 @@ class MuseumPlusItemRecord extends DataRecord
         }
     }
 
-    public function syncPeopleRelations($peopleIds, $type) {
+    public function syncPeopleRelations($peopleIds, $type)
+    {
         Craft::$app->db->createCommand()
             ->delete('{{%museumplus_items_people}}', ['itemId' => $this->id, 'type' => $type])
             ->execute();
 
         $sort = 1;
-        foreach($peopleIds as $personId){
+        foreach ($peopleIds as $personId) {
             Craft::$app->db->createCommand()
                 ->insert('{{%museumplus_items_people}}', [
                     'itemId' => $this->id,
@@ -155,15 +156,16 @@ class MuseumPlusItemRecord extends DataRecord
         }
     }
 
-    public function syncVocabularyRelations($syncData) {
+    public function syncVocabularyRelations($syncData)
+    {
 
         Craft::$app->db->createCommand()
             ->delete('{{%museumplus_items_vocabulary}}', ['itemId' => $this->id])
             ->execute();
 
-        foreach($syncData as $type => $ids) {
+        foreach ($syncData as $type => $ids) {
             $sort = 1;
-            foreach($ids as $id) {
+            foreach ($ids as $id) {
                 Craft::$app->db->createCommand()
                     ->insert('{{%museumplus_items_vocabulary}}', [
                         'itemId' => $this->id,
@@ -175,13 +177,14 @@ class MuseumPlusItemRecord extends DataRecord
         }
     }
 
-    public function syncOwnershipRelations($ownershipIds) {
+    public function syncOwnershipRelations($ownershipIds)
+    {
         Craft::$app->db->createCommand()
             ->delete('{{%museumplus_items_ownerships}}', ['itemId' => $this->id])
             ->execute();
 
         $sort = 1;
-        foreach($ownershipIds as $ownershipId){
+        foreach ($ownershipIds as $ownershipId) {
             Craft::$app->db->createCommand()
                 ->insert('{{%museumplus_items_ownerships}}', [
                     'itemId' => $this->id,
@@ -192,13 +195,14 @@ class MuseumPlusItemRecord extends DataRecord
         }
     }
 
-    public function syncLiteratureRelations($literureIds) {
+    public function syncLiteratureRelations($literureIds)
+    {
         Craft::$app->db->createCommand()
             ->delete('{{%museumplus_items_literature}}', ['itemId' => $this->id])
             ->execute();
 
         $sort = 1;
-        foreach($literureIds as $literureId){
+        foreach ($literureIds as $literureId) {
             Craft::$app->db->createCommand()
                 ->insert('{{%museumplus_items_literature}}', [
                     'itemId' => $this->id,
@@ -209,13 +213,14 @@ class MuseumPlusItemRecord extends DataRecord
         }
     }
 
-    public function syncItemRelations($itemIds) {
+    public function syncItemRelations($itemIds)
+    {
         Craft::$app->db->createCommand()
             ->delete('{{%museumplus_items_items}}', ['itemId' => $this->id])
             ->execute();
 
         $sort = 1;
-        foreach($itemIds as $itemId){
+        foreach ($itemIds as $itemId) {
             Craft::$app->db->createCommand()
                 ->insert('{{%museumplus_items_items}}', [
                     'itemId' => $this->id,
@@ -226,13 +231,14 @@ class MuseumPlusItemRecord extends DataRecord
         }
     }
 
-    public function getRepeatableGroupValues($groupName, $attribute = null, $filterTypes = []) {
+    public function getRepeatableGroupValues($groupName, $attribute = null, $filterTypes = [])
+    {
         $data = $this->getDataAttributes();
         $ret = [];
         if (isset($data['repeatableGroups'])) {
-            foreach($data['repeatableGroups'] as $group) {
+            foreach ($data['repeatableGroups'] as $group) {
                 if ($group['name'] == $groupName) {
-                    foreach($group['items'] as $i) {
+                    foreach ($group['items'] as $i) {
                         if (empty($filterTypes)) {
                             if (empty($attribute)) {
                                 $ret[] = $i;
@@ -243,7 +249,7 @@ class MuseumPlusItemRecord extends DataRecord
                             }
 
                         } else {
-                            if(isset($i['TypeVoc'])){
+                            if (isset($i['TypeVoc'])) {
                                 if (in_array($i['TypeVoc'], $filterTypes)) {
                                     if (empty($attribute)) {
                                         $ret[] = $i;
@@ -261,15 +267,17 @@ class MuseumPlusItemRecord extends DataRecord
         return $ret;
     }
 
-    public function hasChildren() {
+    public function hasChildren()
+    {
         return !empty($this->getChildren()) && $this->getChildren()->count() > 0;
     }
 
-    public function getChildren() {
+    public function getChildren()
+    {
         return $this->hasMany(MuseumPlusItemRecord::className(), ['parentId' => 'collectionId']);
     }
 
-    public function getParent():MuseumPlusItemRecord|null
+    public function getParent(): MuseumPlusItemRecord|null
     {
         if (empty($this->parentId)) {
             return null;

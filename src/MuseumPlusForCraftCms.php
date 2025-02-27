@@ -128,7 +128,7 @@ class MuseumPlusForCraftCms extends Plugin
         self::$plugin = $this;
 
         if (self::$logger === null) {
-            $logPath = Craft::getAlias('@storage/logs/museumplus.log');
+            $logPath = Craft::getAlias('@storage/logs/museumplus-import-'.date('Y-m-d').'.log');
             self::$logger = new Logger('museumplus');
             self::$logger->pushHandler(new StreamHandler($logPath, Logger::DEBUG));
         }
