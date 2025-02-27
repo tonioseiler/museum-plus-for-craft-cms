@@ -682,6 +682,8 @@ class MuseumPlusItem  extends Element
         }
         return implode(", ", $metaKeywords);
     }
+
+    /*
     public function getSupportedSites(): array
     {
         $sites = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
@@ -692,9 +694,9 @@ class MuseumPlusItem  extends Element
                 $filteredSites[] = $site->id;
             }
         }
-        echo 'active sites: '.print_r($filteredSites,true);
         return $filteredSites;
     }
+    */
 
 
 }
