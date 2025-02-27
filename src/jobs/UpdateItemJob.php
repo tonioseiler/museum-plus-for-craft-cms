@@ -66,7 +66,7 @@ class UpdateItemJob extends BaseJob
             $this->updateItemFromMuseumPlus($this->collectionId);
             $this->triggerUpdateEvent($this->collectionId, $isNewItem);
             $this->updateItemToItemRelationShips($this->collectionId);
-            //$this->updateItemInventory($this->collectionId);
+            $this->updateItemInventory($this->collectionId);
             $this->updateItemSort($this->collectionId);
 
 
