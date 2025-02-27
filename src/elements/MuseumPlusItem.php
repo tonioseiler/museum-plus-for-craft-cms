@@ -688,7 +688,7 @@ class MuseumPlusItem  extends Element
 
 
 
-    /*
+    /* TODO switch back on
     public function getSupportedSites(): array
     {
         $sites = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;

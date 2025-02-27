@@ -33,7 +33,7 @@ class UpdateItemJob extends BaseJob
     public $ignoreMultimedia;
     public $ignoreLiterature;
 
-    private $showDetailedLog = false;
+    private $showDetailedLog = true;
 
 
     public function execute($queue): void
