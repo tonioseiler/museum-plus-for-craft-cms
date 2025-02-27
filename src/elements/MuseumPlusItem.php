@@ -689,7 +689,7 @@ class MuseumPlusItem  extends Element
 
 
 
-    /* TODO switch back on
+
     public function getSupportedSites(): array
     {
         $sites = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
@@ -702,7 +702,6 @@ class MuseumPlusItem  extends Element
         }
         return $filteredSites;
     }
-    */
 
 
 
