@@ -46,6 +46,7 @@ class UpdateItemJob extends BaseJob
             ->where(['collectionId' => $this->collectionId])
             ->one();
         $isNewItem = !$item;
+        Craft::info('-------', 'museumplus');
         $message = $isNewItem
             ? "Creating new MuseumPlusItem (ID: {$this->collectionId})."
             : "Updating MuseumPlusItem (ID: {$this->collectionId}).";
