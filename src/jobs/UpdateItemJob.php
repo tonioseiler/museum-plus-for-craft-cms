@@ -437,7 +437,7 @@ class UpdateItemJob extends BaseJob
 
 
         }
-
+dd($item->data);
         $inventoryNumber = "mz-stupi-inv-890";//$item->getDataAttribute('ObjObjectNumberVrt');
         if (empty($inventoryNumber))
             $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
