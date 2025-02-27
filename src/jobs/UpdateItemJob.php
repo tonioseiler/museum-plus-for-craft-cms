@@ -427,7 +427,7 @@ class UpdateItemJob extends BaseJob
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
         }
-        $success = Craft::$app->elements->saveElement($item, false);
+        $success = Craft::$app->elements->saveElement($item, false, true,true);
 
 
         //$success = Craft::$app->elements->saveElement($item, false,false);
@@ -440,10 +440,12 @@ class UpdateItemJob extends BaseJob
             }
             $logger->info('new or already existing element id: '.$item->id.' -- collectionId: '.$item->collectionId.' - now updating search index');
 
+            /*
             Craft::$app->getQueue()->push(new UpdateSearchIndex([
                 'elementType' => MuseumPlusItem::class,
                 'elementId' => $item->id,
             ]));
+            */
 
         }
 
