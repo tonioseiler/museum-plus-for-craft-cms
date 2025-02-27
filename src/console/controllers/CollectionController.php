@@ -142,7 +142,7 @@ class CollectionController extends Controller
 
         echo "Queued update for MuseumPlusItem {$this->collectionItemId}.\n";
         // Force queue to process immediately
-        $queue->run();
+        //$queue->run();
     }
 
     public function actionUpdateItems()
@@ -201,7 +201,7 @@ class CollectionController extends Controller
                 }
             }
         }
-        $queue->run(); // popo
+        //$queue->run();
         //$this->optimizeSearchIndex();
         return true;
     }
