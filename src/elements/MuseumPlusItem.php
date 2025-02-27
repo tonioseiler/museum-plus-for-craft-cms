@@ -252,10 +252,10 @@ class MuseumPlusItem  extends Element
      */
     public function beforeSave(bool $isNew): bool
     {
-
+        // TODO reactivate
         $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $this->inventoryNumber)));
-        $this->slug = $slug;
-        $this->slug = 'paolo';
+        //$this->slug = $slug;
+       // $this->slug = 'paolo';
 
         return true;
     }
@@ -277,7 +277,6 @@ class MuseumPlusItem  extends Element
         else {
             $itemRecord = MuseumPlusItemRecord::findOne($this->id);
         }
-
         $itemRecord->collectionId = $this->collectionId;
         $itemRecord->data = $this->data;
         $itemRecord->assetId = $this->assetId;
@@ -285,11 +284,7 @@ class MuseumPlusItem  extends Element
         $itemRecord->sort = $this->sort;
         $itemRecord->extraTitle = $this->extraTitle;
         $itemRecord->extraDescription = $this->extraDescription;
-
         $itemRecord->save(false);
-        echo "item aftersave()
-        ";
-
         parent::afterSave($isNew);
 
     }
