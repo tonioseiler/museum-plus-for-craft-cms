@@ -286,7 +286,7 @@ class MuseumPlusItem  extends Element
         $itemRecord->extraDescription = $this->extraDescription;
 
         $itemRecord->save(false);
-        echo "saving the record
+        echo "item aftersave()
         ";
 
         parent::afterSave($isNew);
@@ -687,6 +687,8 @@ class MuseumPlusItem  extends Element
 
 
 
+
+    /*
     public function getSupportedSites(): array
     {
         $sites = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
@@ -699,6 +701,7 @@ class MuseumPlusItem  extends Element
         }
         return $filteredSites;
     }
+    */
 
 
 
