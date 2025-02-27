@@ -438,7 +438,12 @@ class UpdateItemJob extends BaseJob
             if ($this->showDetailedLog) {
                 $logger->info('Item successfully saved ');
             }
-            $logger->info('new or already existing element id: '.$item->id.' -- collectionId: '.$item->collectionId);
+            $logger->info('new or already existing element id: '.$item->id.' -- collectionId: '.$item->collectionId.' - now updating search index');
+
+            Craft::$app->getQueue()->push(new UpdateSearchIndex([
+                'elementType' => MuseumPlusItem::class,
+                'elementId' => $item->id,
+            ]));
 
         }
 
