@@ -44,12 +44,6 @@ class UpdateItemJob extends BaseJob
         $this->museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
         $this->assets = Craft::$app->getAssets();
 
-        // TODO: these should not be static...
-        $this->ignoreAttachments = false;
-        $this->ignoreMultimedia = false;
-        $this->ignoreLiterature = false;
-
-
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $this->collectionId])
             ->one();
@@ -66,7 +60,6 @@ class UpdateItemJob extends BaseJob
             $this->updateItemFromMuseumPlus($this->collectionId);
             $this->triggerUpdateEvent($this->collectionId, $isNewItem);
             $this->updateItemToItemRelationShips($this->collectionId);
-            //$this->updateItemInventory($this->collectionId);
             $this->updateItemSort($this->collectionId);
 
 
@@ -336,41 +329,6 @@ class UpdateItemJob extends BaseJob
         }
     }
 
-    private function updateItemInventory($collectionId)
-    {
-        $logger = MuseumPlusForCraftCms::getLogger();
-        if ($this->showDetailedLog) {
-            $logger->info('running updateItemInventory()');
-        }
-        $item = MuseumPlusItem::find()
-            ->where(['collectionId' => $collectionId])
-            ->one();
-
-        $inventoryNumber = $item->getDataAttribute('ObjObjectNumberVrt');
-        if (empty($inventoryNumber))
-            $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
-
-        if ($inventoryNumber) {
-            $item->inventoryNumber = $inventoryNumber;
-
-
-            echo 'inventoryNumber: '.$inventoryNumber.PHP_EOL;
-            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $item->inventoryNumber)));
-            //$item->slug = $slug;
-
-            // TODO debug $item->slug for all sites
-
-            if (Craft::$app->elements->saveElement($item, false,true,true)) {
-                //if(Craft::$app->elements->saveElement($item, false, false)) {
-                echo $item->id . " - " . $inventoryNumber;
-            } else {
-                echo 'Could not save item';
-            }
-        } else {
-            echo $item->id;
-        }
-        echo "\n";
-    }
 
     private function updateItemSort($collectionId)
     {

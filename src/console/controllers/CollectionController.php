@@ -141,35 +141,8 @@ class CollectionController extends Controller
         ]));
 
         echo "Queued update for MuseumPlusItem {$this->collectionItemId}.\n";
-        // Force queue to process immediately TODO: remove this
+        // Force queue to process immediately
         $queue->run();
-    }
-
-
-
-    public function actionUpdateItemOLD() {
-        if (empty($this->collectionItemId)) {
-            echo 'Missing param: collectionItemId'.PHP_EOL;
-            return false;
-        }
-
-        $item = MuseumPlusItem::find()
-            ->where(['collectionId' => $this->collectionItemId])
-            ->one();
-
-        $isNewItem = false;
-        if (!$item) {
-            echo 'Creating item (id: '.$this->collectionItemId.')'.PHP_EOL;
-            $isNewItem = true;
-        } else {
-            echo 'Updating item (id: '.$this->collectionItemId.')'.PHP_EOL;
-        }
-        $this->updateItemFromMuseumPlus($this->collectionItemId);
-        $this->triggerUpdateEvent($this->collectionItemId, $isNewItem);
-        $this->updateItemToItemRelationShips($this->collectionItemId);
-        $this->updateItemInventory($this->collectionItemId);
-        $this->updateItemSort($this->collectionItemId);
-
     }
 
     public function actionUpdateItems()
@@ -186,136 +159,39 @@ class CollectionController extends Controller
         if (!empty($this->startId)) {
             $startUpdating = false;
         }
-
+        $queue = Craft::$app->queue;
         foreach ($this->settings['objectGroups'] as $objectGroupId) {
             echo 'getObjectsByObjectGroup START'.PHP_EOL;
             $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
             echo 'getObjectsByObjectGroup END'.PHP_EOL;
             foreach ($objects as $o) {
-
                 $objectIds[$o->id] = $o->id;
-
                 if ($startUpdating) {
                     //check if item exists and if last mod is before last mod in mplus
-                    // TODO BUG here? $objectLastModified weird logic
-
-
                     $objectLastModified = new \DateTime($o->__lastModified);
                     $item = MuseumPlusItem::find()
                         ->where(['collectionId' => $o->id])
                         ->one();
-                    $queue = Craft::$app->queue;
+                    //$queue = Craft::$app->queue;
                     if (!$item) {
-
                         $jobId = $queue->push(new UpdateItemJob([
                             'description' => 'Creating item (id: '.$o->id.')',
                             'collectionId' => $o->id,
-                            'ignoreAttachments' => false,
-                            'ignoreMultimedia' => false,
-                            'ignoreLiterature' => false,
+                            'ignoreAttachments' => $this->ignoreAttachments,
+                            'ignoreMultimedia' => $this->ignoreMultimedia,
+                            'ignoreLiterature' => $this->ignoreLiterature,
                         ]));
-                        // TODO: get the above values from the class properties
-
-
-                        // Force queue to process immediately TODO: remove this
-                        //$queue->run();
-
                         echo 'Creating item (id: '.$o->id.')'.PHP_EOL;
-                        //$this->updateItemFromMuseumPlus($o->id);
-                        //$this->triggerUpdateEvent($o->id, true);
                     } else if ($this->forceAll || $item->dateUpdated < $objectLastModified) {
                         $jobId = $queue->push(new UpdateItemJob([
                             'description' => 'Updating item (id: '.$o->id.')',
                             'collectionId' => $o->id,
-                            'ignoreAttachments' => false,
-                            'ignoreMultimedia' => false,
-                            'ignoreLiterature' => false,
+                            'ignoreAttachments' => $this->ignoreAttachments,
+                            'ignoreMultimedia' => $this->ignoreMultimedia,
+                            'ignoreLiterature' => $this->ignoreLiterature,
                         ]));
-                        // TODO: get the above values from the class properties
-
-
-
-
-                        // TODO careful: triggerUpdateEvent should be false in this case, but why? maybe add a public property "isNewItem" in the job and pass the value from here
-
-
+                        // TODO careful: triggerUpdateEvent should be false in this case
                         echo 'Updating item (id: '.$o->id.')'.PHP_EOL;
-                        //$this->updateItemFromMuseumPlus($o->id);
-                        //$this->triggerUpdateEvent($o->id, false);
-                    } else {
-                        //echo '.';
-                    }
-
-
-
-
-                } else {
-                    $startUpdating = $o->id == $this->startId;
-                    echo 'skip item '.$o->id.PHP_EOL;
-                }
-
-
-            }
-        }
-
-        /* TODO reactivate, or better recode and put stuff in new jobs
-        //delete items which do not exist anymore
-        $itemIds = MuseumPlusItem::find()->ids();
-        foreach($itemIds as $itemId) {
-            $item = MuseumPlusItem::find()
-                ->id($itemId)
-                ->one();
-            if (!isset($objectIds[$item->collectionId])) {
-                $success = Craft::$app->elements->deleteElement($item);
-                echo 'Item deleted: '.$item->title.' ('.$item->id.')'.PHP_EOL;
-            }
-        }
-
-        $this->actionUpdateItemsInventory();
-        $this->actionUpdateItemToItemRelationShips();
-        $this->actionUpdateItemParentChildRelations();
-        $this->optimizeSearchIndex();
-        */
-        return true;
-    }
-
-    public function actionUpdateItemsOLD()
-    {
-        //$this->forceAll = true;
-
-        echo 'Downloading list of object groups'.PHP_EOL;
-        $this->downloadObjectGroups();
-        echo 'Updating Items'.PHP_EOL;
-        $objectIds = [];
-
-        $startUpdating = true;
-        if (!empty($this->startId)) {
-            $startUpdating = false;
-        }
-
-        foreach ($this->settings['objectGroups'] as $objectGroupId) {
-            $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
-            foreach ($objects as $o) {
-
-                $objectIds[$o->id] = $o->id;
-                
-                if ($startUpdating) {
-                    //check if item exists and if last mod is before last mod in mplus
-
-
-                    $objectLastModified = new \DateTime($o->__lastModified);
-                    $item = MuseumPlusItem::find()
-                        ->where(['collectionId' => $o->id])
-                        ->one();
-                    $queue = Craft::$app->queue;
-                    if (!$item) {
-                        echo 'Creating item (id: '.$o->id.')'.PHP_EOL;
-                        $this->updateItemFromMuseumPlus($o->id);
-                        $this->triggerUpdateEvent($o->id, true);
-                    } else if ($this->forceAll || $item->dateUpdated < $objectLastModified) {
-                        echo 'Updating item (id: '.$o->id.')'.PHP_EOL;
-                        $this->updateItemFromMuseumPlus($o->id);
-                        $this->triggerUpdateEvent($o->id, false);
                     } else {
                         //echo '.';
                     }
@@ -323,28 +199,10 @@ class CollectionController extends Controller
                     $startUpdating = $o->id == $this->startId;
                     echo 'skip item '.$o->id.PHP_EOL;
                 }
-
-                
             }
         }
-
-        //delete items which do not exist anymore
-        $itemIds = MuseumPlusItem::find()->ids();
-        foreach($itemIds as $itemId) {
-            $item = MuseumPlusItem::find()
-                ->id($itemId)
-                ->one();
-            if (!isset($objectIds[$item->collectionId])) {
-                $success = Craft::$app->elements->deleteElement($item);
-                echo 'Item deleted: '.$item->title.' ('.$item->id.')'.PHP_EOL;
-            }
-        }
-
-        $this->actionUpdateItemsInventory();
-        $this->actionUpdateItemToItemRelationShips();
-        $this->actionUpdateItemParentChildRelations();
-        $this->optimizeSearchIndex();
-
+        $queue->run(); // popo
+        //$this->optimizeSearchIndex();
         return true;
     }
 
@@ -840,7 +698,6 @@ class CollectionController extends Controller
             $objectGroup->title = $data->OgrNameTxt;
         } else {
             //update
-            //TODO: Paolo check the last mod date
             $objectGroup->title = $data->OgrNameTxt;
         }
         $objectGroup->data = json_encode($data);
@@ -863,7 +720,6 @@ class CollectionController extends Controller
             $ownerhsip->title = $data->OwsOwnershipVrt;
         } else {
             //update
-            //TODO: Paolo check the last mod date
             $ownerhsip->title = $data->OwsOwnershipVrt;
         }
         $ownerhsip->data = json_encode($data);
@@ -886,7 +742,6 @@ class CollectionController extends Controller
             $literature->title = $data->LitLiteratureVrt;
         } else {
             //update
-            //TODO: Paolo check the last mod date
             $literature->title = $data->LitLiteratureVrt;
         }
         $literature->data = json_encode($data);
@@ -909,7 +764,6 @@ class CollectionController extends Controller
             $vocabularyEntry->title = $data->content;
         } else {
             //update
-            //TODO: Paolo check the last mod date
             $vocabularyEntry->title = $data->content;
             
         }
