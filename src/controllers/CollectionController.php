@@ -101,7 +101,7 @@ class CollectionController extends Controller
         MuseumPlusForCraftCms::$plugin->getInstance()->controllerNamespace = 'furbo\museumplusforcraftcms\console\controllers';
         $command = MuseumPlusForCraftCms::$plugin->getInstance()->runAction('collection/update-item', ['collectionItemId' => $item->collectionId]);
 
-        Craft::$app->getSession()->setNotice(Craft::t('museum-plus-for-craft-cms', 'Item synchronized.'));
+        Craft::$app->getSession()->setNotice(Craft::t('museum-plus-for-craft-cms', 'Sync queued. Reload page in a while to see changes.'));
         return $this->redirectToPostedUrl($item);
     }
 
