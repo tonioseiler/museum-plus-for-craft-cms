@@ -360,7 +360,7 @@ class UpdateItemJob extends BaseJob
 
             // TODO debug $item->slug for all sites
 
-            if (Craft::$app->elements->saveElement($item, false)) {
+            if (Craft::$app->elements->saveElement($item, false,true,true)) {
                 //if(Craft::$app->elements->saveElement($item, false, false)) {
                 echo $item->id . " - " . $inventoryNumber;
             } else {
