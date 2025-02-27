@@ -33,6 +33,8 @@ class UpdateItemJob extends BaseJob
     public $ignoreMultimedia;
     public $ignoreLiterature;
 
+    private $showDetailedLog = false;
+
 
     public function execute($queue): void
     {
@@ -85,9 +87,11 @@ class UpdateItemJob extends BaseJob
 
     private function updateItemFromMuseumPlus($collectionId)
     {
-        $logger = MuseumPlusForCraftCms::getLogger();
-        $message = "Running updateItemFromMuseumPlus('{$this->collectionId}').";
-        $logger->info($message);
+        if ($this->showDetailedLog) {
+            $logger = MuseumPlusForCraftCms::getLogger();
+            $message = "Running updateItemFromMuseumPlus('{$this->collectionId}').";
+            $logger->info($message);
+        }
 
         //echo 'Update item '.$collectionId.PHP_EOL;
         try {
@@ -105,10 +109,14 @@ class UpdateItemJob extends BaseJob
                     //echo "Attachment for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
                     $item->assetId = $assetId;
                     Craft::$app->elements->saveElement($item);
-                    $logger->info("Attachment for item " . $item->id . " AssetID: " . $assetId);
+                    if ($this->showDetailedLog) {
+                        $logger->info("Attachment for item " . $item->id . " AssetID: " . $assetId);
+                    }
                 } else {
                     //echo "Attachment for item " . $item->id . " AssetID: NULL" . PHP_EOL;
-                    $logger->info("Attachment for item " . $item->id . " AssetID: NULL");
+                    if ($this->showDetailedLog) {
+                        $logger->info("Attachment for item " . $item->id . " AssetID: NULL");
+                    }
                 }
             }
 
@@ -123,15 +131,21 @@ class UpdateItemJob extends BaseJob
                     $assetId = $this->createMultimediaFromId($mm['id'], $collectionId);
                     if ($assetId) {
                         $assetIds[] = $assetId;
-                        $logger->info("Asset created: AssetID: " . $assetId);
+                        if ($this->showDetailedLog) {
+                            $logger->info("Asset created: AssetID: " . $assetId);
+                        }
 
                     }
                 }
                 if (count($assetIds)) {
-                    $logger->info("At least one asset");
+                    if ($this->showDetailedLog) {
+                        $logger->info("At least one asset");
+                    }
 
                     $item->syncMultimediaRelations($assetIds);
-                    $logger->info("syncMultimediaRelations() executed");
+                    if ($this->showDetailedLog) {
+                        $logger->info("syncMultimediaRelations() executed");
+                    }
 
                     //echo "Multimedia assets for Item Id: " . $item->id . " Asset IDs: " . implode(",", $assetIds) . PHP_EOL;
                 }
@@ -161,7 +175,9 @@ class UpdateItemJob extends BaseJob
             //sync
             if (count($literatureIds)) {
                 $item->syncLiteratureRelations($literatureIds);
-                $logger->info("Literatures added");
+                if ($this->showDetailedLog) {
+                    $logger->info("Literatures added");
+                }
                 //echo 'l';
             }
 
@@ -177,14 +193,15 @@ class UpdateItemJob extends BaseJob
                         //echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
                         $literature->assetId = $assetId;
                         $literature->save();
-                        $logger->info("Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId);
+                        if ($this->showDetailedLog) {
+                            $logger->info("Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId);
+                        }
 
                     } else {
                         //echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: NULL" . PHP_EOL;
                     }
                 }
             }
-
 
 
             //add people refs
@@ -208,7 +225,9 @@ class UpdateItemJob extends BaseJob
                     //sync
                     if (count($peopleIds)) {
                         $item->syncPeopleRelations($peopleIds, $peopleType);
-                        $logger->info("People added");
+                        if ($this->showDetailedLog) {
+                            $logger->info("People added");
+                        }
 
                         //echo 'p';
                     }
@@ -236,7 +255,9 @@ class UpdateItemJob extends BaseJob
             //sync
             if (count($ownershipIds)) {
                 $item->syncOwnershipRelations($ownershipIds);
-                $logger->info("Ownerships added");
+                if ($this->showDetailedLog) {
+                    $logger->info("Ownerships added");
+                }
                 //echo 'o';
             }
 
@@ -253,8 +274,10 @@ class UpdateItemJob extends BaseJob
 
     private function triggerUpdateEvent($collectionItemId, $isNewItem = false)
     {
-        $logger = MuseumPlusForCraftCms::getLogger();
-        $logger->info('running triggerUpdateEvent()');
+        if ($this->showDetailedLog) {
+            $logger = MuseumPlusForCraftCms::getLogger();
+            $logger->info('running triggerUpdateEvent()');
+        }
 
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionItemId])
@@ -271,7 +294,9 @@ class UpdateItemJob extends BaseJob
     private function updateItemToItemRelationShips($collectionId)
     {
         $logger = MuseumPlusForCraftCms::getLogger();
-        $logger->info('running updateItemToItemRelationShips()');
+        if ($this->showDetailedLog) {
+            $logger->info('running updateItemToItemRelationShips()');
+        }
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
@@ -303,7 +328,9 @@ class UpdateItemJob extends BaseJob
     private function updateItemInventory($collectionId)
     {
         $logger = MuseumPlusForCraftCms::getLogger();
-        $logger->info('running updateItemInventory()');
+        if ($this->showDetailedLog) {
+            $logger->info('running updateItemInventory()');
+        }
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
@@ -329,7 +356,9 @@ class UpdateItemJob extends BaseJob
     private function updateItemSort($collectionId)
     {
         $logger = MuseumPlusForCraftCms::getLogger();
-        $logger->info('running updateItemSort()');
+        if ($this->showDetailedLog) {
+            $logger->info('running updateItemSort()');
+        }
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
@@ -355,21 +384,27 @@ class UpdateItemJob extends BaseJob
         $collectionId = $object->id;
 
         $logger = MuseumPlusForCraftCms::getLogger();
-        $logger->info('running createOrUpdateItem()');
+        if ($this->showDetailedLog) {
+            $logger->info('running createOrUpdateItem()');
+        }
 
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
 
         if (empty($item)) {
-            $logger->info('running createOrUpdateItem(): create new item');
+            if ($this->showDetailedLog) {
+                $logger->info('running createOrUpdateItem(): create new item');
+            }
             //create new
             $item = new MuseumPlusItem();
             $item->collectionId = $collectionId;
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
         } else {
-            $logger->info('running createOrUpdateItem(): update existing item');
+            if ($this->showDetailedLog) {
+                $logger->info('running createOrUpdateItem(): update existing item');
+            }
 
             //update
             $item->data = json_encode($object);
@@ -381,7 +416,9 @@ class UpdateItemJob extends BaseJob
             $logger->error('Could not save item: ' . print_r($item->getErrors(), true));
             return false;
         } else {
-            $logger->info('Item successfully saved ');
+            if ($this->showDetailedLog) {
+                $logger->info('Item successfully saved ');
+            }
         }
 
         //insert object relations if they do not exist
@@ -402,7 +439,9 @@ class UpdateItemJob extends BaseJob
     private function createAttachmentFromObjectId($id)
     {
         $logger = MuseumPlusForCraftCms::getLogger();
-        $logger->info('running createAttachmentFromObjectId()');
+        if ($this->showDetailedLog) {
+            $logger->info('running createAttachmentFromObjectId()');
+        }
 
 
         $museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
@@ -412,8 +451,9 @@ class UpdateItemJob extends BaseJob
         $settings = MuseumPlusForCraftCms::$plugin->getSettings();
         // $folderId = $this->settings['attachmentVolumeId'];
         $folderId = $settings['attachmentVolumeId'];
-        $logger->info('attachmentVolumeId: ' . $folderId);
-
+        if ($this->showDetailedLog) {
+            $logger->info('attachmentVolumeId: ' . $folderId);
+        }
 
         $folder = $this->assets->findFolder(['id' => $folderId]);
         $parentFolder = $this->createFolder("Items");
@@ -424,7 +464,9 @@ class UpdateItemJob extends BaseJob
                 return $asset->id;
             }
         }
-        $logger->info('finished createAttachmentFromObjectId()');
+        if ($this->showDetailedLog) {
+            $logger->info('finished createAttachmentFromObjectId()');
+        }
 
         return false;
     }
@@ -777,12 +819,6 @@ class UpdateItemJob extends BaseJob
             //echo 'v';
         }
     }
-
-
-
-
-
-
 
 
 }
