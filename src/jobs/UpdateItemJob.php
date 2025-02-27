@@ -354,8 +354,10 @@ class UpdateItemJob extends BaseJob
             $item->inventoryNumber = $inventoryNumber;
 
 
-            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $this->inventoryNumber)));
+            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $item->inventoryNumber)));
             $item->slug = $slug;
+
+            // TODO debug $item->slug for all sites
 
             if (Craft::$app->elements->saveElement($item, false)) {
                 //if(Craft::$app->elements->saveElement($item, false, false)) {
