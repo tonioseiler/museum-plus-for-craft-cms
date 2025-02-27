@@ -692,6 +692,7 @@ class MuseumPlusItem  extends Element
                 $filteredSites[] = $site->id;
             }
         }
+        echo 'active sites: '.print_r($filteredSites,true);
         return $filteredSites;
     }
 
