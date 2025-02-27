@@ -461,6 +461,9 @@ class MuseumPlusItem  extends Element
 
     public function getUriFormat(): ?string {
         $settings = MuseumPlusForCraftCms::getInstance()->getSettings()->sites;
+
+        echo 'current site id:'.Craft::$app->getSites()->getCurrentSite()->id.PHP_EOL;
+
         echo 'getUriFormat: '.$settings[$this->site->handle]['uriFormat'].PHP_EOL;
         return $settings[$this->site->handle]['uriFormat'];
     }
