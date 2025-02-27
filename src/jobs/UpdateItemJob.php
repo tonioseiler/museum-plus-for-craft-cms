@@ -66,7 +66,7 @@ class UpdateItemJob extends BaseJob
             $this->updateItemFromMuseumPlus($this->collectionId);
             $this->triggerUpdateEvent($this->collectionId, $isNewItem);
             $this->updateItemToItemRelationShips($this->collectionId);
-            $this->updateItemInventory($this->collectionId);
+            //$this->updateItemInventory($this->collectionId);
             $this->updateItemSort($this->collectionId);
 
 
@@ -434,7 +434,19 @@ class UpdateItemJob extends BaseJob
             //update
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
+
+
         }
+
+        $inventoryNumber = $item->getDataAttribute('ObjObjectNumberVrt');
+        if (empty($inventoryNumber))
+            $inventoryNumber = $item->getDataAttribute('ObjObjectNumberTxt');
+
+        if ($inventoryNumber) {
+            $item->inventoryNumber = $inventoryNumber;
+        }
+
+
         $success = Craft::$app->elements->saveElement($item, false, true,true);
 
 
