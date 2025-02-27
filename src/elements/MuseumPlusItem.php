@@ -286,6 +286,8 @@ class MuseumPlusItem  extends Element
         $itemRecord->extraDescription = $this->extraDescription;
 
         $itemRecord->save(false);
+        echo "saving the record
+        ";
 
         parent::afterSave($isNew);
 
@@ -682,6 +684,7 @@ class MuseumPlusItem  extends Element
         }
         return implode(", ", $metaKeywords);
     }
+
 
 
     public function getSupportedSites(): array
