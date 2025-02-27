@@ -234,8 +234,7 @@ class CollectionController extends Controller
                         // TODO: get the above values from the class properties
 
 
-                        // Force queue to process immediately TODO: remove this
-                        //$queue->run();
+
 
                         // TODO careful: triggerUpdateEvent should be false in this case, but why? maybe add a public property "isNewItem" in the job and pass the value from here
 
@@ -246,6 +245,10 @@ class CollectionController extends Controller
                     } else {
                         //echo '.';
                     }
+
+
+
+
                 } else {
                     $startUpdating = $o->id == $this->startId;
                     echo 'skip item '.$o->id.PHP_EOL;
@@ -1152,7 +1155,8 @@ class CollectionController extends Controller
         $this->optimizeSearchIndex();
     }
 
-    private function optimizeSearchIndex() {
+    private function optimizeSearchIndex()
+    {
         Craft::$app->db->createCommand("OPTIMIZE TABLE searchindex")->execute();
     }
 

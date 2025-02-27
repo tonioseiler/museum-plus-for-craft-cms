@@ -9,6 +9,7 @@ use craft\helpers\Assets;
 use craft\helpers\FileHelper;
 use craft\models\VolumeFolder;
 use craft\queue\BaseJob;
+use craft\queue\jobs\UpdateSearchIndex;
 use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
@@ -17,7 +18,6 @@ use furbo\museumplusforcraftcms\records\LiteratureRecord;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
-use furbo\museumplusforcraftcms\services\MuseumPlusService;
 
 /**
  * Job to update a MuseumPlusItem.
@@ -69,6 +69,15 @@ class UpdateItemJob extends BaseJob
             $this->updateItemInventory($this->collectionId);
             $this->updateItemSort($this->collectionId);
 
+
+//TODO do this, but be sure the item id correct
+/*
+            Craft::$app->getQueue()->push(new UpdateSearchIndex([
+                'elementType' => MuseumPlusItem::class,
+                'elementId' => $item->id,
+            ]));
+*/
+
             $message = "Successfully processed MuseumPlusItem (ID: {$this->collectionId}).";
             Craft::info($message, 'museumplus');
             $logger->info($message);
@@ -87,8 +96,9 @@ class UpdateItemJob extends BaseJob
 
     private function updateItemFromMuseumPlus($collectionId)
     {
+        $logger = MuseumPlusForCraftCms::getLogger();
+
         if ($this->showDetailedLog) {
-            $logger = MuseumPlusForCraftCms::getLogger();
             $message = "Running updateItemFromMuseumPlus('{$this->collectionId}').";
             $logger->info($message);
         }
@@ -96,6 +106,7 @@ class UpdateItemJob extends BaseJob
         //echo 'Update item '.$collectionId.PHP_EOL;
         try {
 
+            // TODO cleanup
             $museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
             $o = $museumPlus->getObjectDetail($collectionId);
             $item = $this->createOrUpdateItem($o);
@@ -393,12 +404,18 @@ class UpdateItemJob extends BaseJob
             ->one();
 
         if (empty($item)) {
-            if ($this->showDetailedLog) {
-                $logger->info('running createOrUpdateItem(): create new item');
-            }
+
             //create new
             $item = new MuseumPlusItem();
             $item->collectionId = $collectionId;
+            if ($this->showDetailedLog) {
+               // $logger->info('running createOrUpdateItem(): create new item, new id: ' . $item->id);
+            }
+
+            $logger->info('running createOrUpdateItem(): create new item, collectionId: '.$item->collectionId.' - element id: ' . $item->id);
+
+
+
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
         } else {
