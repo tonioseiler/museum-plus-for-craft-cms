@@ -204,6 +204,7 @@ class CollectionController extends Controller
 
         $this->actionUpdateItemParentChildRelations();
         $this->actionDeleteRemovedItems();
+        $this->actionUpdateItemParentChildRelations();
         
         return true;
     }
@@ -315,41 +316,12 @@ class CollectionController extends Controller
     public function actionUpdateItemParentChildRelations()
     {
 
-        //TODO: trigger job and remove this code
-
-        App::maxPowerCaptain();
-
-        //reset parent ids
-        $itemRecords = MuseumPlusItemRecord::find()
-            ->where(['>', 'parentId', '0'])
-            ->all();
-        foreach ($itemRecords as $item) {
-            $item->parentId = 0;
-            $item->save();
-            echo '.';
-        }
-
-        //set the relations again
-        $itemRecords = MuseumPlusItemRecord::find()->all();
-        foreach ($itemRecords as $item) {
-            $moduleRefs = $item->getDataAttribute('moduleReferences');
-            if (isset($moduleRefs['ObjObjectPartRef'])) {
-                $parts = $moduleRefs['ObjObjectPartRef']['items'];
-                foreach ($parts as $part) {
-                    $child = MuseumPlusItemRecord::find()
-                        ->where(['collectionId' => $part['id']])
-                        ->one();
-                    if ($child) {
-                        $child->parentId = $item->collectionId;
-                        $child->save();
-                        echo 'x';
-                    }
-                }
-                echo '-';
-            } else {
-                echo '_';
-            }
-        }
+        $queue = Craft::$app->queue;
+        echo 'Updating item parent/child relations - job sent to queue'.PHP_EOL;
+        $jobId = $queue->push(new UpdateItemParentChildRelationsJob([
+            'description' => 'Updating item parent/child relations',
+        ]));
+        return true;
     }
 
     public function actionTriggerUpdateEvents() {

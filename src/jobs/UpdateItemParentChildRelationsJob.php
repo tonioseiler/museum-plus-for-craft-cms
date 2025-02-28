@@ -15,6 +15,7 @@ use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 use furbo\museumplusforcraftcms\records\LiteratureRecord;
+use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
@@ -35,35 +36,45 @@ class UpdateItemParentChildRelationsJob extends BaseJob
         $this->queue = $queue;
         $this->settings = MuseumPlusForCraftCms::$plugin->getSettings();
         $this->museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
-        $this->logger->info('---- Deleting removed items START ---------');
+        $this->logger->info('---- Updating item parent/child relations START ---------');
 
-        $objectIds = [];
-        foreach ($this->settings['objectGroups'] as $objectGroupId) {
-            $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
-            foreach ($objects as $o) {
-                $objectIds[$o->id] = $o->id;
-            }
+
+        //reset parent ids
+        $itemRecords = MuseumPlusItemRecord::find()
+            ->where(['>', 'parentId', '0'])
+            ->all();
+        $this->logger->info('Resetting all parent ids');
+        foreach ($itemRecords as $item) {
+            $item->parentId = 0;
+            $item->save();
+
         }
-        $itemIds = MuseumPlusItem::find()->ids();
-        $this->logger->info('Number of items from MuseumPlus: ' . count($objectIds));
-        $this->logger->info('Number of items from db: ' . count($itemIds));
-        if (floatval(count($objectIds)) / floatval(count($itemIds)) < 0.9) {
-            $this->logger->info('Less than 90% came from the MuseumPlus server Skipping delete.');
-            throw new  \Exception('Less than 90% came from the MuseumPlus server Skipping delete.');
-        }
+        $this->logger->info('Resetting all parent ids DONE');
+        $this->logger->info('Set the relations again');
+        //set the relations again
+        $itemRecords = MuseumPlusItemRecord::find()->all();
         $progressIndex = 0;
-        foreach ($itemIds as $itemId) {
-            $item = MuseumPlusItem::find()
-                ->id($itemId)
-                ->one();
+        foreach ($itemRecords as $item) {
             $progressIndex++;
-            $progressPercent = $progressIndex / count($itemIds);
-            $this->setProgress($this->queue, $progressPercent, 'Checking item: ' . $item->id);
-            if (!isset($objectIds[$item->collectionId])) {
-                $success = Craft::$app->elements->deleteElement($item);
-                $this->logger->info('Item deleted: ' . $item->title . ' (' . $item->id . ')');
+            $progressPercent = $progressIndex / count($itemRecords);
+            $this->setProgress($this->queue, $progressPercent, 'Settings relations');
+            $moduleRefs = $item->getDataAttribute('moduleReferences');
+            if (isset($moduleRefs['ObjObjectPartRef'])) {
+                $parts = $moduleRefs['ObjObjectPartRef']['items'];
+                foreach ($parts as $part) {
+                    $child = MuseumPlusItemRecord::find()
+                        ->where(['collectionId' => $part['id']])
+                        ->one();
+                    if ($child) {
+                        $this->logger->info('Relation set');
+                        $child->parentId = $item->collectionId;
+                        $child->save();
+                    }
+                }
+            } else {
+                //
             }
         }
-        $this->logger->info('---- Deleting removed items END ---------');
+        $this->logger->info('---- Updating item parent/child relations END ---------');
     }
 }
