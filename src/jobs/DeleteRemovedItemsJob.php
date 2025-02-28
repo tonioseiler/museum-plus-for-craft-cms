@@ -27,25 +27,18 @@ class DeleteRemovedItemsJob extends BaseJob
     private $settings;
     private $museumPlus;
     public $assets;
-    public $ignoreAttachments;
-
-    public $ignoreMultimedia;
-    public $ignoreLiterature;
-
     private $showDetailedLog = true;
-
     private $queue = null;
     private $logger = null;
 
-
     public function execute($queue): void
     {
-        $this->settings = MuseumPlusForCraftCms::$plugin->getSettings();
-        $this->museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
-        $this->assets = Craft::$app->getAssets();
         $this->logger = MuseumPlusForCraftCms::getLogger();
         $this->queue = $queue;
+        $this->settings = MuseumPlusForCraftCms::$plugin->getSettings();
+        $this->museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
         $this->logger->info('---- Deleting removed items START ---------');
+        //$this->setProgress($this->queue, 0.01, "Update initialized");
         $this->logger->info('---- Deleting removed items END ---------');
     }
 
