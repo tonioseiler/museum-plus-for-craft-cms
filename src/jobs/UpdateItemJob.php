@@ -416,7 +416,7 @@ class UpdateItemJob extends BaseJob
             if ($this->showDetailedLog) {
                 $this->logger->info('Item successfully saved ');
             }
-            $this->logger->info('new or already existing element id: '.$item->id.' -- collectionId: '.$item->collectionId.' - now updating search index');
+            $this->logger->info('new or already existing element id: '.$item->id.' -- collectionId: '.$item->collectionId);
 
             /*
             Craft::$app->getQueue()->push(new UpdateSearchIndex([
