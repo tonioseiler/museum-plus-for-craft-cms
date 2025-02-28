@@ -38,6 +38,31 @@ class DeleteRemovedItemsJob extends BaseJob
         $this->settings = MuseumPlusForCraftCms::$plugin->getSettings();
         $this->museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
         $this->logger->info('---- Deleting removed items START ---------');
+
+        $objectIds = [];
+        foreach ($this->settings['objectGroups'] as $objectGroupId) {
+            $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
+            foreach ($objects as $o) {
+                $objectIds[$o->id] = $o->id;
+            }
+
+        }
+        $itemIds = MuseumPlusItem::find()->ids();
+        $this->logger->info(' items from MuseumPlus: '.count($objectIds));
+        $this->logger->info(' items from db: '.count($itemIds));
+
+        /*
+        foreach($itemIds as $itemId) {
+            $item = MuseumPlusItem::find()
+                ->id($itemId)
+                ->one();
+            if (!isset($objectIds[$item->collectionId])) {
+                $success = Craft::$app->elements->deleteElement($item);
+                echo 'Item deleted: '.$item->title.' ('.$item->id.')'.PHP_EOL;
+            }
+        }
+        */
+
         //$this->setProgress($this->queue, 0.01, "Update initialized");
         $this->logger->info('---- Deleting removed items END ---------');
     }
