@@ -57,7 +57,7 @@ class DeleteRemovedItemsJob extends BaseJob
             $this->setProgress($this->queue, $progressPercent, 'Checking item: '.$item->id);
             if (!isset($objectIds[$item->collectionId])) {
                 //$success = Craft::$app->elements->deleteElement($item);
-                $this->logger->warning('Item deleted: '.$item->title.' ('.$item->id.')');
+                $this->logger->info('Item deleted: '.$item->title.' ('.$item->id.')');
             }
         }
         $this->logger->info('---- Deleting removed items END ---------');
