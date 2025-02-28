@@ -62,28 +62,30 @@ class UpdateItemParentChildRelationsJob extends BaseJob
             $this->setProgress($this->queue, $progressPercent, 'Settings relations ' . $item->id);
             try {
                 $moduleRefs = $item->getDataAttribute('moduleReferences');
-                if (isset($moduleRefs['ObjObjectPartRef'])) {
-                    $parts = $moduleRefs['ObjObjectPartRef']['items'];
-                    foreach ($parts as $part) {
-                        //$this->logger->info('Evaluating part');
-
-                        $child = MuseumPlusItemRecord::find()
-                            ->where(['collectionId' => $part['id']])
-                            ->one();
-                        if ($child) {
-                            //$this->logger->info('Relation set');
-                            $child->parentId = $item->collectionId;
-                            $child->save();
-                        } else {
-                            //$this->logger->info('Skipping');
-                        }
-                    }
-                } else {
-                    //$this->logger->info('Skipping');
-                }
             } catch (\Exception $e) {
                 throw new  \Exception('Something went wrong: ' . $e->getMessage());
             }
+            /*
+            if (isset($moduleRefs['ObjObjectPartRef'])) {
+                $parts = $moduleRefs['ObjObjectPartRef']['items'];
+                foreach ($parts as $part) {
+                    //$this->logger->info('Evaluating part');
+
+                    $child = MuseumPlusItemRecord::find()
+                        ->where(['collectionId' => $part['id']])
+                        ->one();
+                    if ($child) {
+                        //$this->logger->info('Relation set');
+                        $child->parentId = $item->collectionId;
+                        $child->save();
+                    } else {
+                        //$this->logger->info('Skipping');
+                    }
+                }
+            } else {
+                //$this->logger->info('Skipping');
+            }
+            */
 
 
             $this->logger->info('Element ' . $item->id . ' END');
