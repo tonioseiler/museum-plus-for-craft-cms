@@ -47,8 +47,7 @@ class DeleteRemovedItemsJob extends BaseJob
         $itemIds = MuseumPlusItem::find()->ids();
         $this->logger->info('Number of items from MuseumPlus: ' . count($objectIds));
         $this->logger->info('Number of items from db: ' . count($itemIds));
-        $objectIdsTest = [];
-        if (floatval(count($objectIdsTest)) / floatval(count($itemIds)) < 0.9) {
+        if (floatval(count($objectIds)) / floatval(count($itemIds)) < 0.9) {
             $this->logger->info('More than 90% of items are in MuseumPlus. Skipping delete.');
             throw new  \Exception('More than 90% of items are in MuseumPlus.  Skipping delete.');
         }
