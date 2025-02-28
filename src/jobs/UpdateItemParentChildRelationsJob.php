@@ -57,6 +57,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
 
         try {
             foreach ($itemRecords as $item) {
+                $this->logger->info('Element ' . $item->id. ' START');
                 $progressIndex++;
                 $progressPercent = floatval($progressIndex) / floatval(count($itemRecords));
                 $this->setProgress($this->queue, $progressPercent, 'Settings relations '.$item->id);
@@ -80,6 +81,8 @@ class UpdateItemParentChildRelationsJob extends BaseJob
                 } else {
                     //$this->logger->info('Skipping');
                 }
+                $this->logger->info('Element ' . $item->id. ' END');
+
             }
         } catch (\Exception $e) {
             throw new  \Exception('Something went wrong: ' . $e->getMessage());
