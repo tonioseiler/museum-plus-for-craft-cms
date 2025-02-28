@@ -29,7 +29,7 @@ use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
 
 use craft\queue\Queue;
 use furbo\museumplusforcraftcms\jobs\UpdateItemJob;
-
+use furbo\museumplusforcraftcms\jobs\DeleteRemovedItemsJob;
 
 use Craft;
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
@@ -203,6 +203,18 @@ class CollectionController extends Controller
         }
         //$queue->run();
         //$this->optimizeSearchIndex();
+        return true;
+    }
+
+
+    public function actionDeleteRemovedItems()
+    {
+        $queue = Craft::$app->queue;
+        echo 'Deleting removed items - START'.PHP_EOL;
+        $jobId = $queue->push(new DeleteRemovedItemsJob([
+            'description' => 'Deleting removed items',
+        ]));
+        echo 'Deleting removed items - END'.PHP_EOL;
         return true;
     }
 
