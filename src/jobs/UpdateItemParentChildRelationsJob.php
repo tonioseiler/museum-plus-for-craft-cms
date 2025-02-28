@@ -59,7 +59,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
             foreach ($itemRecords as $item) {
                 $progressIndex++;
                 $progressPercent = floatval($progressIndex) / floatval(count($itemRecords));
-                $this->setProgress($this->queue, $progressPercent, 'Settings relations');
+                $this->setProgress($this->queue, $progressPercent, 'Settings relations '.$item->id);
                 $moduleRefs = $item->getDataAttribute('moduleReferences');
                 if (isset($moduleRefs['ObjObjectPartRef'])) {
                     $parts = $moduleRefs['ObjObjectPartRef']['items'];
