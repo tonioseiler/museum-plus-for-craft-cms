@@ -55,13 +55,12 @@ class UpdateItemParentChildRelationsJob extends BaseJob
         $itemRecords = MuseumPlusItemRecord::find()->all();
         $progressIndex = 0;
 
-        try {
-            foreach ($itemRecords as $item) {
-                $this->logger->info('Element ' . $item->id. ' START');
-                $progressIndex++;
-                $progressPercent = floatval($progressIndex) / floatval(count($itemRecords));
-                $this->setProgress($this->queue, $progressPercent, 'Settings relations '.$item->id);
-                /*
+        foreach ($itemRecords as $item) {
+            $this->logger->info('Element ' . $item->id . ' START');
+            $progressIndex++;
+            $progressPercent = floatval($progressIndex) / floatval(count($itemRecords));
+            $this->setProgress($this->queue, $progressPercent, 'Settings relations ' . $item->id);
+            try {
                 $moduleRefs = $item->getDataAttribute('moduleReferences');
                 if (isset($moduleRefs['ObjObjectPartRef'])) {
                     $parts = $moduleRefs['ObjObjectPartRef']['items'];
@@ -82,14 +81,15 @@ class UpdateItemParentChildRelationsJob extends BaseJob
                 } else {
                     //$this->logger->info('Skipping');
                 }
-                */
-
-                $this->logger->info('Element ' . $item->id. ' END');
-
+            } catch (\Exception $e) {
+                throw new  \Exception('Something went wrong: ' . $e->getMessage());
             }
-        } catch (\Exception $e) {
-            throw new  \Exception('Something went wrong: ' . $e->getMessage());
+
+
+            $this->logger->info('Element ' . $item->id . ' END');
+
         }
+
 
         $this->logger->info('---- Updating item parent/child relations END ---------');
     }
