@@ -62,21 +62,21 @@ class UpdateItemParentChildRelationsJob extends BaseJob
             if (isset($moduleRefs['ObjObjectPartRef'])) {
                 $parts = $moduleRefs['ObjObjectPartRef']['items'];
                 foreach ($parts as $part) {
-                    $this->logger->info('Evaluating part');
+                    //$this->logger->info('Evaluating part');
 
                     $child = MuseumPlusItemRecord::find()
                         ->where(['collectionId' => $part['id']])
                         ->one();
                     if ($child) {
-                        $this->logger->info('Relation set');
+                        //$this->logger->info('Relation set');
                         $child->parentId = $item->collectionId;
                         $child->save();
                     } else {
-                        $this->logger->info('Skipping');
+                        //$this->logger->info('Skipping');
                     }
                 }
             } else {
-                $this->logger->info('Skipping');
+                //$this->logger->info('Skipping');
             }
         }
         $this->logger->info('---- Updating item parent/child relations END ---------');
