@@ -44,12 +44,10 @@ class DeleteRemovedItemsJob extends BaseJob
             foreach ($objects as $o) {
                 $objectIds[$o->id] = $o->id;
             }
-
         }
         $itemIds = MuseumPlusItem::find()->ids();
-        $this->logger->info(' items from MuseumPlus: '.count($objectIds));
-        $this->logger->info(' items from db: '.count($itemIds));
-
+        $this->logger->info('Number of items from MuseumPlus: '.count($objectIds));
+        $this->logger->info('Number of items from db: '.count($itemIds));
         $progressIndex = 0;
         foreach($itemIds as $itemId) {
             $item = MuseumPlusItem::find()
@@ -60,8 +58,7 @@ class DeleteRemovedItemsJob extends BaseJob
             $this->setProgress($this->queue, $progressPercent, 'Checking item: '.$item->id);
             if (!isset($objectIds[$item->collectionId])) {
                 //$success = Craft::$app->elements->deleteElement($item);
-                echo 'Item deleted: '.$item->title.' ('.$item->id.')'.PHP_EOL;
-                $this->logger->info('Item deleted: '.$item->title.' ('.$item->id.')');
+                $this->logger->notice('Item deleted: '.$item->title.' ('.$item->id.')');
             }
         }
         $this->logger->info('---- Deleting removed items END ---------');
