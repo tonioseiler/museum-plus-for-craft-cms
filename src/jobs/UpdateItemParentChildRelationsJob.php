@@ -62,6 +62,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
                 $progressPercent = floatval($progressIndex) / floatval(count($itemRecords));
                 $this->setProgress($this->queue, $progressPercent, 'Settings relations '.$item->id);
                 $moduleRefs = $item->getDataAttribute('moduleReferences');
+                /*
                 if (isset($moduleRefs['ObjObjectPartRef'])) {
                     $parts = $moduleRefs['ObjObjectPartRef']['items'];
                     foreach ($parts as $part) {
@@ -73,7 +74,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
                         if ($child) {
                             //$this->logger->info('Relation set');
                             $child->parentId = $item->collectionId;
-                            //$child->save();
+                            $child->save();
                         } else {
                             //$this->logger->info('Skipping');
                         }
@@ -81,6 +82,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
                 } else {
                     //$this->logger->info('Skipping');
                 }
+                */
                 $this->logger->info('Element ' . $item->id. ' END');
 
             }
