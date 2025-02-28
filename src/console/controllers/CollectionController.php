@@ -210,11 +210,10 @@ class CollectionController extends Controller
     public function actionDeleteRemovedItems()
     {
         $queue = Craft::$app->queue;
-        echo 'Deleting removed items - START'.PHP_EOL;
+        echo 'Deleting removed items - job sent to queue'.PHP_EOL;
         $jobId = $queue->push(new DeleteRemovedItemsJob([
             'description' => 'Deleting removed items',
         ]));
-        echo 'Deleting removed items - END'.PHP_EOL;
         return true;
     }
 
