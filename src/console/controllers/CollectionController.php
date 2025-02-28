@@ -193,7 +193,7 @@ class CollectionController extends Controller
                         // TODO careful: triggerUpdateEvent should be false in this case
                         echo 'Updating item (id: '.$o->id.')'.PHP_EOL;
                     } else {
-                        echo 'Skippin Item (id: '.$o->id.')'.PHP_EOL;
+                        echo 'Skipping Item (id: '.$o->id.')'.PHP_EOL;
                     }
                 } else {
                     $startUpdating = $o->id == $this->startId;
