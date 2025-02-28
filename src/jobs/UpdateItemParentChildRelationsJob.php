@@ -56,12 +56,14 @@ class UpdateItemParentChildRelationsJob extends BaseJob
         $progressIndex = 0;
         foreach ($itemRecords as $item) {
             $progressIndex++;
-            $progressPercent = $progressIndex / count($itemRecords);
+            $progressPercent = floatval($progressIndex) / floatval(count($itemRecords));
             $this->setProgress($this->queue, $progressPercent, 'Settings relations');
             $moduleRefs = $item->getDataAttribute('moduleReferences');
             if (isset($moduleRefs['ObjObjectPartRef'])) {
                 $parts = $moduleRefs['ObjObjectPartRef']['items'];
                 foreach ($parts as $part) {
+                    $this->logger->info('Evaluating part');
+
                     $child = MuseumPlusItemRecord::find()
                         ->where(['collectionId' => $part['id']])
                         ->one();
@@ -69,10 +71,12 @@ class UpdateItemParentChildRelationsJob extends BaseJob
                         $this->logger->info('Relation set');
                         $child->parentId = $item->collectionId;
                         $child->save();
+                    } else {
+                        $this->logger->info('Skipping');
                     }
                 }
             } else {
-                //
+                $this->logger->info('Skipping');
             }
         }
         $this->logger->info('---- Updating item parent/child relations END ---------');
