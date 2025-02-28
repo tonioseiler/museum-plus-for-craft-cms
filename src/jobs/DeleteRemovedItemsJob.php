@@ -51,17 +51,18 @@ class DeleteRemovedItemsJob extends BaseJob
         $this->logger->info(' items from MuseumPlus: '.count($objectIds));
         $this->logger->info(' items from db: '.count($itemIds));
 
-        /*
+
         foreach($itemIds as $itemId) {
             $item = MuseumPlusItem::find()
                 ->id($itemId)
                 ->one();
             if (!isset($objectIds[$item->collectionId])) {
-                $success = Craft::$app->elements->deleteElement($item);
+                //$success = Craft::$app->elements->deleteElement($item);
                 echo 'Item deleted: '.$item->title.' ('.$item->id.')'.PHP_EOL;
+                $this->logger->info('Item deleted: '.$item->title.' ('.$item->id.')');
             }
         }
-        */
+
 
         //$this->setProgress($this->queue, 0.01, "Update initialized");
         $this->logger->info('---- Deleting removed items END ---------');
