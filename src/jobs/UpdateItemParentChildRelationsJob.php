@@ -73,7 +73,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
                         if ($child) {
                             //$this->logger->info('Relation set');
                             $child->parentId = $item->collectionId;
-                            $child->save();
+                            //$child->save();
                         } else {
                             //$this->logger->info('Skipping');
                         }
