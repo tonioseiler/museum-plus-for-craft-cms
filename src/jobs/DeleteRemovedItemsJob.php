@@ -62,5 +62,4 @@ class DeleteRemovedItemsJob extends BaseJob
         }
         $this->logger->info('---- Deleting removed items END ---------');
     }
-
 }
