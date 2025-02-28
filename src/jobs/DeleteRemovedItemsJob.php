@@ -52,16 +52,16 @@ class DeleteRemovedItemsJob extends BaseJob
 
         $progressIndex = 0;
         foreach($itemIds as $itemId) {
-            $progressIndex++;
             $item = MuseumPlusItem::find()
                 ->id($itemId)
                 ->one();
+            $progressIndex++;
+            $progressPercent= $progressIndex*100/count($itemIds);
+            $this->setProgress($this->queue, $progressPercent, 'Checking item: '.$item->id);
             if (!isset($objectIds[$item->collectionId])) {
                 //$success = Craft::$app->elements->deleteElement($item);
                 echo 'Item deleted: '.$item->title.' ('.$item->id.')'.PHP_EOL;
                 $this->logger->info('Item deleted: '.$item->title.' ('.$item->id.')');
-                $progressPercent= $progressIndex*100/count($itemIds);
-                $this->setProgress($this->queue, $progressPercent, 'Item deleted: '.$item->id);
             }
         }
 
