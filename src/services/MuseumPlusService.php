@@ -38,9 +38,7 @@ class MuseumPlusService extends Component
 
     const QUERY_LIMIT = 100;
     const MAX_ITEMS = 10000000;
-    //const CACHE_DURATION = 24*60*60;
-    const CACHE_DURATION = 1;
-
+    const CACHE_DURATION = 24*60*60;
     private $client = null;
 
     private $classifier = null;

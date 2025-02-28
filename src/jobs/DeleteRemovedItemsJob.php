@@ -45,19 +45,19 @@ class DeleteRemovedItemsJob extends BaseJob
             }
         }
         $itemIds = MuseumPlusItem::find()->ids();
-        $this->logger->info('Number of items from MuseumPlus: '.count($objectIds));
-        $this->logger->info('Number of items from db: '.count($itemIds));
+        $this->logger->info('Number of items from MuseumPlus: ' . count($objectIds));
+        $this->logger->info('Number of items from db: ' . count($itemIds));
         $progressIndex = 0;
-        foreach($itemIds as $itemId) {
+        foreach ($itemIds as $itemId) {
             $item = MuseumPlusItem::find()
                 ->id($itemId)
                 ->one();
             $progressIndex++;
             $progressPercent = $progressIndex / count($itemIds);
-            $this->setProgress($this->queue, $progressPercent, 'Checking item: '.$item->id);
+            $this->setProgress($this->queue, $progressPercent, 'Checking item: ' . $item->id);
             if (!isset($objectIds[$item->collectionId])) {
-                //$success = Craft::$app->elements->deleteElement($item);
-                $this->logger->info('Item deleted: '.$item->title.' ('.$item->id.')');
+                $success = Craft::$app->elements->deleteElement($item);
+                $this->logger->info('Item deleted: ' . $item->title . ' (' . $item->id . ')');
             }
         }
         $this->logger->info('---- Deleting removed items END ---------');
