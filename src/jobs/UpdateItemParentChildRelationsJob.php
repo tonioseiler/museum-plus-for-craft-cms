@@ -22,7 +22,7 @@ use furbo\museumplusforcraftcms\records\PersonRecord;
 /**
  * Job to update a MuseumPlusItem.
  */
-class DeleteRemovedItemsJob extends BaseJob
+class UpdateItemParentChildRelationsJob extends BaseJob
 {
     private $settings;
     private $museumPlus;
@@ -57,7 +57,7 @@ class DeleteRemovedItemsJob extends BaseJob
                 ->id($itemId)
                 ->one();
             $progressIndex++;
-            $progressPercent = floatval($progressIndex) / floatval(count($itemIds));
+            $progressPercent = $progressIndex / count($itemIds);
             $this->setProgress($this->queue, $progressPercent, 'Checking item: ' . $item->id);
             if (!isset($objectIds[$item->collectionId])) {
                 $success = Craft::$app->elements->deleteElement($item);
