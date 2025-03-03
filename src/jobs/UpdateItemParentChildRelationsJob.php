@@ -79,6 +79,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
 
             if (isset($moduleRefs['ObjObjectPartRef'])) {
                 $parts = $moduleRefs['ObjObjectPartRef']['items'];
+                $this->logger->info('$moduleRefs[\'ObjObjectPartRef\'][\'items\'] has ' . count($parts) . ' items');
                 foreach ($parts as $part) {
                     //$this->logger->info('Evaluating part');
 
@@ -100,6 +101,8 @@ class UpdateItemParentChildRelationsJob extends BaseJob
                     }
                 }
             } else {
+                $this->logger->info('$moduleRefs[\'ObjObjectPartRef\'] is not set, skipping');
+
                 //$this->logger->info('Skipping');
             }
 
