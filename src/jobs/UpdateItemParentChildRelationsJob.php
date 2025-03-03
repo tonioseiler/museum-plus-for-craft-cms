@@ -54,7 +54,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
         //set the relations again
         // TODO reactivate $itemRecords = MuseumPlusItemRecord::find()->all();
         $itemRecord = MuseumPlusItemRecord::find()
-            ->where(['collectionId' =>'49772'])
+            ->where(['collectionId' =>'165603'])
             ->one();
 
         $itemRecords= [];
@@ -81,15 +81,11 @@ class UpdateItemParentChildRelationsJob extends BaseJob
                 $parts = $moduleRefs['ObjObjectPartRef']['items'];
                 $this->logger->info('$moduleRefs[\'ObjObjectPartRef\'][\'items\'] has ' . count($parts) . ' items');
                 foreach ($parts as $part) {
-                    //$this->logger->info('Evaluating part');
-
                     $child = MuseumPlusItemRecord::find()
                         ->where(['collectionId' => $part['id']])
                         ->one();
-
                     if ($child) {
                         $this->logger->info('Child found: settings its parentID to ' . $item->collectionId);
-                        //$this->logger->info('Relation set');
                         $child->parentId = $item->collectionId;
                         $savingChild = $child->save();
                         $this->logger->info('Saving child result: ' . $savingChild);
