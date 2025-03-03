@@ -4,9 +4,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## 1.0.4 - 2024-06-17
+## 1.0.4 - 2025-03-03
 ### Added
-* getItemsByIds method
+* import / update / delete of items jobs in craft queue
 
 ## 1.0.3 - 2024-06-13
 ### Added

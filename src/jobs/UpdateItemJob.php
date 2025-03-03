@@ -339,7 +339,7 @@ class UpdateItemJob extends BaseJob
     private function updateItemParentChildRelationShips($collectionId)
     {
         if ($this->showDetailedLog) {
-            $this->logger->info('running updateItemToItemRelationShips()');
+            $this->logger->info('running updateItemParentChildRelationShips()');
         }
 
         $this->setProgress($this->queue, 0.92, "Update item parent child relationships");
