@@ -52,7 +52,15 @@ class UpdateItemParentChildRelationsJob extends BaseJob
         $this->logger->info('Resetting all parent ids DONE');
         $this->logger->info('Set the relations again');
         //set the relations again
-        $itemRecords = MuseumPlusItemRecord::find()->all();
+        // TODO reactivate $itemRecords = MuseumPlusItemRecord::find()->all();
+        $itemRecord = MuseumPlusItemRecord::find()
+            ->where(['collectionId' =>'49772'])
+            ->one();
+
+        $itemRecords= [];
+        $itemRecords[] = $itemRecord;
+
+
         $progressIndex = 0;
 
         foreach ($itemRecords as $item) {
@@ -60,6 +68,9 @@ class UpdateItemParentChildRelationsJob extends BaseJob
             $progressIndex++;
             $progressPercent = floatval($progressIndex) / floatval(count($itemRecords));
             $this->setProgress($this->queue, $progressPercent, 'Settings relations ' . $item->id);
+
+
+
             try {
                 $moduleRefs = $item->getDataAttribute('moduleReferences');
             } catch (\Exception $e) {
