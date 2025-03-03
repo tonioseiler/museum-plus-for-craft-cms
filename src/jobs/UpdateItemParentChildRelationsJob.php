@@ -67,8 +67,8 @@ class UpdateItemParentChildRelationsJob extends BaseJob
         foreach ($itemRecords as $item) {
             //$this->logger->info('collectionId: ' . $item->collectionId . ' START');
             $progressIndex++;
-            //$progressPercent = floatval($progressIndex) / floatval(count($itemRecords));
-            //$this->setProgress($this->queue, $progressPercent, 'Settings relations ' . $item->id);
+            $progressPercent = floatval($progressIndex) / floatval(count($itemRecords));
+            $this->setProgress($this->queue, $progressPercent, 'Settings relations ' . $item->id);
 
 
 
