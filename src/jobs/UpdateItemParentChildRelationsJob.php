@@ -76,7 +76,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
             } catch (\Exception $e) {
                 throw new  \Exception('Something went wrong: ' . $e->getMessage());
             }
-            /*
+
             if (isset($moduleRefs['ObjObjectPartRef'])) {
                 $parts = $moduleRefs['ObjObjectPartRef']['items'];
                 foreach ($parts as $part) {
@@ -85,6 +85,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
                     $child = MuseumPlusItemRecord::find()
                         ->where(['collectionId' => $part['id']])
                         ->one();
+
                     if ($child) {
                         //$this->logger->info('Relation set');
                         $child->parentId = $item->collectionId;
@@ -96,7 +97,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
             } else {
                 //$this->logger->info('Skipping');
             }
-            */
+
 
 
             $this->logger->info('Element ' . $item->id . ' END');
