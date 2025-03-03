@@ -15,9 +15,11 @@ use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 use furbo\museumplusforcraftcms\records\LiteratureRecord;
+use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
+use Yii;
 
 /**
  * Job to update a MuseumPlusItem.
@@ -64,6 +66,7 @@ class UpdateItemJob extends BaseJob
             $this->updateItemFromMuseumPlus($this->collectionId);
             $this->triggerUpdateEvent($this->collectionId, $isNewItem);
             $this->updateItemToItemRelationShips($this->collectionId);
+            $this->updateItemParentChildRelationShips($this->collectionId);
             $this->updateItemSort($this->collectionId);
             $message = "Successfully processed MuseumPlusItem (ID: {$this->collectionId}).";
             Craft::info($message, 'museumplus');
@@ -327,6 +330,41 @@ class UpdateItemJob extends BaseJob
                 if (count($ids)) {
                     $item->syncItemRelations($ids);
                     echo '.';
+                }
+            }
+        }
+    }
+
+
+    private function updateItemParentChildRelationShips($collectionId)
+    {
+        if ($this->showDetailedLog) {
+            $this->logger->info('running updateItemToItemRelationShips()');
+        }
+
+        $this->setProgress($this->queue, 0.92, "Update item parent child relationships");
+
+        $item = MuseumPlusItem::find()
+            ->where(['collectionId' => $collectionId])
+            ->one();
+
+        //reset
+        $db = Yii::$app->db;
+        $rowsAffected = $db->createCommand()
+            ->update('museumplus_items', ['parentId' => '0'], ['parentId' => $item->collectionId])
+            ->execute();
+
+        $moduleRefs = $item->getDataAttribute('moduleReferences');
+
+        if (isset($moduleRefs['ObjObjectPartRef']) && count($moduleRefs['ObjObjectPartRef']['items']) > 0) {
+            $parts = $moduleRefs['ObjObjectPartRef']['items'];
+            foreach ($parts as $part) {
+                $child = MuseumPlusItemRecord::find()
+                    ->where(['collectionId' => $part['id']])
+                    ->one();
+                if ($child) {
+                    $child->parentId = $item->collectionId;
+                    $savingChild = $child->save();
                 }
             }
         }

@@ -313,17 +313,6 @@ class CollectionController extends Controller
         Craft::$app->db->createCommand("OPTIMIZE TABLE searchindex")->execute();
     }
 
-    public function actionUpdateItemParentChildRelations()
-    {
-
-        $queue = Craft::$app->queue;
-        echo 'Updating item parent/child relations - job sent to queue'.PHP_EOL;
-        $jobId = $queue->push(new UpdateItemParentChildRelationsJob([
-            'description' => 'Updating item parent/child relations',
-        ]));
-        return true;
-    }
-
     public function actionTriggerUpdateEvents() {
         $itemIds = MuseumPlusItem::find()->ids();
         foreach($itemIds as $itemId) {
