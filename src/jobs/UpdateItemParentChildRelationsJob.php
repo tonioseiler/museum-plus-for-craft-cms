@@ -52,13 +52,14 @@ class UpdateItemParentChildRelationsJob extends BaseJob
         $this->logger->info('Resetting all parent ids DONE');
         $this->logger->info('Set the relations again');
         //set the relations again
-        // TODO reactivate $itemRecords = MuseumPlusItemRecord::find()->all();
+        $itemRecords = MuseumPlusItemRecord::find()->all();
+        /* this finds an element with 2 children
         $itemRecord = MuseumPlusItemRecord::find()
             ->where(['collectionId' =>'165603'])
             ->one();
-
         $itemRecords= [];
         $itemRecords[] = $itemRecord;
+        */
 
 
         $progressIndex = 0;
