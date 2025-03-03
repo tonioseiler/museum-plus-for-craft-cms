@@ -87,10 +87,15 @@ class UpdateItemParentChildRelationsJob extends BaseJob
                         ->one();
 
                     if ($child) {
+                        $this->logger->info('Child found: settings its parentID to ' . $item->collectionId);
                         //$this->logger->info('Relation set');
                         $child->parentId = $item->collectionId;
-                        $child->save();
+                        $savingChild = $child->save();
+                        $this->logger->info('Saving child result: ' . $savingChild);
+
                     } else {
+                        $this->logger->info('Child not found');
+
                         //$this->logger->info('Skipping');
                     }
                 }
@@ -100,7 +105,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
 
 
 
-            $this->logger->info('Element ' . $item->collectionId . ' END');
+            $this->logger->info('collectionId ' . $item->collectionId . ' END');
 
         }
 
