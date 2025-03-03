@@ -43,14 +43,14 @@ class UpdateItemParentChildRelationsJob extends BaseJob
         $itemRecords = MuseumPlusItemRecord::find()
             ->where(['>', 'parentId', '0'])
             ->all();
-        $this->logger->info('Resetting all parent ids');
+        //$this->logger->info('Resetting all parent ids');
         foreach ($itemRecords as $item) {
             $item->parentId = 0;
             $item->save();
 
         }
-        $this->logger->info('Resetting all parent ids DONE');
-        $this->logger->info('Set the relations again');
+        //$this->logger->info('Resetting all parent ids DONE');
+        //$this->logger->info('Set the relations again');
         //set the relations again
         $itemRecords = MuseumPlusItemRecord::find()->all();
         /* this finds an element with 2 children
@@ -65,7 +65,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
         $progressIndex = 0;
 
         foreach ($itemRecords as $item) {
-            $this->logger->info('collectionId: ' . $item->collectionId . ' START');
+            //$this->logger->info('collectionId: ' . $item->collectionId . ' START');
             $progressIndex++;
             //$progressPercent = floatval($progressIndex) / floatval(count($itemRecords));
             //$this->setProgress($this->queue, $progressPercent, 'Settings relations ' . $item->id);
@@ -80,7 +80,7 @@ class UpdateItemParentChildRelationsJob extends BaseJob
 
             if (isset($moduleRefs['ObjObjectPartRef'])) {
                 $parts = $moduleRefs['ObjObjectPartRef']['items'];
-                $this->logger->info('$moduleRefs[\'ObjObjectPartRef\'][\'items\'] has ' . count($parts) . ' items');
+                //$this->logger->info('$moduleRefs[\'ObjObjectPartRef\'][\'items\'] has ' . count($parts) . ' items');
                 foreach ($parts as $part) {
                     $child = MuseumPlusItemRecord::find()
                         ->where(['collectionId' => $part['id']])
@@ -89,23 +89,23 @@ class UpdateItemParentChildRelationsJob extends BaseJob
                         $this->logger->info('Child found: settings its parentID to ' . $item->collectionId);
                         $child->parentId = $item->collectionId;
                         $savingChild = $child->save();
-                        $this->logger->info('Saving child result: ' . $savingChild);
+                        //$this->logger->info('Saving child result: ' . $savingChild);
 
                     } else {
-                        $this->logger->info('Child not found');
+                        //$this->logger->info('Child not found');
 
                         //$this->logger->info('Skipping');
                     }
                 }
             } else {
-                $this->logger->info('$moduleRefs[\'ObjObjectPartRef\'] is not set, skipping');
+                //$this->logger->info('$moduleRefs[\'ObjObjectPartRef\'] is not set, skipping');
 
                 //$this->logger->info('Skipping');
             }
 
 
 
-            $this->logger->info('collectionId ' . $item->collectionId . ' END');
+            //$this->logger->info('collectionId ' . $item->collectionId . ' END');
 
         }
 
