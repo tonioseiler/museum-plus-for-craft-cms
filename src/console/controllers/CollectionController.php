@@ -202,7 +202,6 @@ class CollectionController extends Controller
             }
         }
 
-        $this->actionUpdateItemParentChildRelations();
         $this->actionDeleteRemovedItems();
         
         return true;

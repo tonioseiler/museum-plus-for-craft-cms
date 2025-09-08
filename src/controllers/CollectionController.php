@@ -45,12 +45,17 @@ class CollectionController extends Controller
     {
         $request = Craft::$app->getRequest();
 
+        $siteHandle = $request->getParam('site', 1);
+        $site = Craft::$app->getSites()->getSiteByHandle($siteHandle);
+
+
         $variables = [];
 
         // Get the item
         // ---------------------------------------------------------------------
         $item = MuseumPlusItem::find()
             ->id($itemId)
+            ->site($site)
             ->one();
 
         // Set the variables
@@ -110,6 +115,9 @@ class CollectionController extends Controller
         $this->requirePostRequest();
         $request = Craft::$app->getRequest();
 
+        $siteHandle = $request->getParam('site', 1);
+        $site = Craft::$app->getSites()->getSiteByHandle($siteHandle);
+
 
         $params = \Craft::$app->getRequest()->getBodyParams();
         //dump(['d' => $params, 'at' => __CLASS__.'.'.__METHOD__.'.'.__LINE__]);
@@ -118,6 +126,7 @@ class CollectionController extends Controller
         $itemId = $request->getBodyParam('itemId');
         $item = MuseumPlusItem::find()
             ->id($itemId)
+            ->site($site)
             ->one();
 
         // Set the title

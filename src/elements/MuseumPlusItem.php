@@ -428,7 +428,7 @@ class MuseumPlusItem  extends Element
             'assetId' => 'Main Image',
             'multimedia' => 'Media',
             'id' => ['label' => Craft::t('app', 'ID')],
-            'frontendLink' => ['label' => Craft::t('app', 'Link'), 'icon' => 'world'],
+            'link' => ['label' => Craft::t('app', 'Link'), 'icon' => 'world'],
         ];
     }
 
