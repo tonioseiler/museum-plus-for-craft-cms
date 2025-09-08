@@ -10,10 +10,6 @@
         "craft-plugin",
         "museumplus"
     ],
-    "support": {
-        "docs": "https://furbo.ch",
-        "issues": "https://furbo.ch"
-    },
     "license": "proprietary",
     "authors": [
         {
