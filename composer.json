@@ -2,7 +2,7 @@
     "name": "furbo/museum-plus-for-craft-cms",
     "description": "Allows to import MuseumsPlus Collection data to Craft CMS and publish data.",
     "type": "craft-plugin",
-    "version": "1.0.4",
+    "version": "5.0.0-beta.1",
     "keywords": [
         "craft",
         "cms",
@@ -29,8 +29,8 @@
         "rss": "https://github.com/tonioseiler/museum-plus-for-craft-cms/releases.atom"
     },
     "require": {
-        "php": ">=8.0.2",
-        "craftcms/cms": "^4.3.4",
+        "php": "8.2",
+        "craftcms/cms": "^5.0.0",
         "gemini-api-php/client": "^1.4"
     },
     "autoload": {
