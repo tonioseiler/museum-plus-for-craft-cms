@@ -455,7 +455,7 @@ class MuseumPlusItem  extends Element
 
     public function __toString(): string
     {
-        return $this->title;
+        return (string)($this->title ?? '');
     }
 
     public function getUriFormat(): ?string {
