@@ -6,7 +6,7 @@ Allows to import MuseumsPlus Collection data to Craft CMS and publish data.
 
 ## Requirements
 
-This plugin requires Craft CMS 4.7 or later and php 8.1 or later.
+This plugin requires Craft CMS 5.0 or later and php 8.2 or later.
 
 ## Installation
 
@@ -21,6 +21,10 @@ To install the plugin, follow these instructions.
         composer require furbo/museum-plus-for-craft-cms
 
 3. In the Control Panel, go to Settings → Plugins and click the “Install” button for MuseumPlus for CraftCMS.
+
+4. (Optional) If you update the plugin from Craft CMS 4, you will need to execute:
+
+        craft migrate/all
 
 ## Overview
 
