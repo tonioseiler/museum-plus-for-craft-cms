@@ -378,7 +378,7 @@ class MuseumPlusItem  extends Element
         return new MuseumPlusItemQuery(static::class);
     }
 
-    protected function tableAttributeHtml(string $attribute): string
+    protected function attributeHtml(string $attribute): string
     {
         switch ($attribute) {
             case 'assetId':
@@ -417,7 +417,7 @@ class MuseumPlusItem  extends Element
                 }
                 return '';
         }
-        return parent::tableAttributeHtml($attribute);
+        return parent::attributeHtml($attribute);
     }
 
     protected static function defineTableAttributes(): array
@@ -428,7 +428,7 @@ class MuseumPlusItem  extends Element
             'assetId' => 'Main Image',
             'multimedia' => 'Media',
             'id' => ['label' => Craft::t('app', 'ID')],
-            'link' => ['label' => Craft::t('app', 'Link'), 'icon' => 'world'],
+            'frontendLink' => ['label' => Craft::t('app', 'Link'), 'icon' => 'world'],
         ];
     }
 
