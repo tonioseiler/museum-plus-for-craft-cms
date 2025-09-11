@@ -1,0 +1,9 @@
+{% extends '_layouts/elementindex' %}
+
+{% set elementType = 'furbo\\museumplusforcraftcms\\elements\\MuseumPlusPerson' %}
+
+{% set title = craft.museumPlus.cpTitle~' - People' %}
+{% set selectedSubnavItem = 'people' %}
+
+{% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\museumplusforcraftcms\\MuseumPlusForCraftCmsAsset") %}
+{% do view.registerAssetBundle("furbo\\museumplusforcraftcms\\assetbundles\\collectioncpsection\\CollectionCPSectionAsset") %}

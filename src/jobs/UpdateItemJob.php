@@ -10,6 +10,7 @@ use craft\helpers\FileHelper;
 use craft\models\VolumeFolder;
 use craft\queue\BaseJob;
 use craft\queue\jobs\UpdateSearchIndex;
+use furbo\museumplusforcraftcms\elements\MuseumPlusPerson;
 use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
@@ -735,17 +736,16 @@ class UpdateItemJob extends BaseJob
     {
         $collectionId = $data->id;
 
-        $person = PersonRecord::find()
+        $person = MuseumPlusPerson::find()
             ->where(['collectionId' => $collectionId])
             ->one();
 
         if (empty($person)) {
             //create new
-            $person = new PersonRecord();
-            $person->id = 0;
+            $person = new MuseumPlusPerson();
             $person->collectionId = $collectionId;
 
-            $success = $person->save();
+            $success = Craft::$app->elements->saveElement($person);
         }
         //update
         $person->data = json_encode($data);
@@ -758,7 +758,7 @@ class UpdateItemJob extends BaseJob
         else
             $person->title = 'Unknown';
 
-        $success = $person->save();
+        $success = Craft::$app->elements->saveElement($person);
         return $person;
     }
 

@@ -10,11 +10,11 @@
 
 {% block content %}
 
-    <input type="hidden" name="action" value="museum-plus-for-craft-cms/settings/save-field-layout">
+    <input type="hidden" name="action" value="museum-plus-for-craft-cms/settings/save-person-field-layout">
 
     {{ forms.fieldLayoutDesignerField({
         fieldLayout: craft.app.fields.getLayoutByType(
-            'furbo\\museumplusforcraftcms\\elements\\MuseumPlusItem'
+            'furbo\\museumplusforcraftcms\\elements\\MuseumPlusPerson'
         ),
     }) }}
 

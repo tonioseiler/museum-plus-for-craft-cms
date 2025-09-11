@@ -168,6 +168,17 @@ class Install extends Migration
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid()
             ]);
+
+            // give it a foreign key to the elements table
+            $this->addForeignKey(
+                $this->db->getForeignKeyName(),
+                '{{%museumplus_people}}',
+                'id',
+                '{{%elements}}',
+                'id',
+                'CASCADE',
+                null
+            );
         }
 
 

@@ -10,42 +10,39 @@
 
 namespace furbo\museumplusforcraftcms;
 
+use Craft;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use craft\base\Plugin;
+use craft\console\Application as ConsoleApplication;
 use craft\events\DefineAttributeKeywordsEvent;
 use craft\events\IndexKeywordsEvent;
+use craft\events\PluginEvent;
+use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterElementSearchableAttributesEvent;
+use craft\events\RegisterUrlRulesEvent;
 use craft\helpers\App;
 use craft\helpers\UrlHelper;
-use craft\services\Search;
-use craft\web\Response;
-use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
-use furbo\museumplusforcraftcms\services\MuseumPlusService;
-use furbo\museumplusforcraftcms\variables\MuseumPlusForCraftCmsVariable;
-use furbo\museumplusforcraftcms\models\Settings;
-use furbo\museumplusforcraftcms\fields\MuseumPlusItems as ItemsField;
-use     furbo\museumplusforcraftcms\fields\MuseumPlusVocabularies as VocabulariesField;
-use furbo\museumplusforcraftcms\utilities\Collection as CollectionUtility;
-use furbo\museumplusforcraftcms\widgets\Collection as CollectionWidget;
-use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
-
-use Craft;
-use craft\base\Plugin;
-use craft\services\Plugins;
-use craft\events\PluginEvent;
-use craft\console\Application as ConsoleApplication;
-use craft\web\UrlManager;
+use craft\services\Dashboard;
 use craft\services\Elements;
 use craft\services\Fields;
+use craft\services\Plugins;
+use craft\services\Search;
 use craft\services\Utilities;
+use craft\web\Response;
+use craft\web\UrlManager;
 use craft\web\twig\variables\CraftVariable;
-use craft\services\Dashboard;
-use craft\events\RegisterComponentTypesEvent;
-use craft\events\RegisterUrlRulesEvent;
-
+use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
+use furbo\museumplusforcraftcms\elements\MuseumPlusPerson;
+use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
+use furbo\museumplusforcraftcms\fields\MuseumPlusItems as ItemsField;
+use furbo\museumplusforcraftcms\fields\MuseumPlusVocabularies as VocabulariesField;
+use furbo\museumplusforcraftcms\models\Settings;
+use furbo\museumplusforcraftcms\services\MuseumPlusService;
+use furbo\museumplusforcraftcms\utilities\Collection as CollectionUtility;
+use furbo\museumplusforcraftcms\variables\MuseumPlusForCraftCmsVariable;
+use furbo\museumplusforcraftcms\widgets\Collection as CollectionWidget;
 use yii\base\Event;
-
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-
 
 /**
  * Craft plugins are very much like little applications in and of themselves. We’ve made
@@ -343,6 +340,9 @@ class MuseumPlusForCraftCms extends Plugin
             ),
             __METHOD__
         );
+        Event::on(Elements::class, Elements::EVENT_REGISTER_ELEMENT_TYPES, function (RegisterComponentTypesEvent $event) {
+            $event->types[] = MuseumPlusPerson::class;
+        });
     }
 
 
@@ -379,6 +379,8 @@ class MuseumPlusForCraftCms extends Plugin
             'museum-plus-for-craft-cms' => ['template' => 'museum-plus-for-craft-cms'],
             'museum-plus-for-craft-cms/collection' => ['template' => 'museum-plus-for-craft-cms/collection'],
             'museum-plus-for-craft-cms/collection/<itemId:\d+>' => 'museum-plus-for-craft-cms/collection/edit',
+            'museum-plus-for-craft-cms/people' => ['template' => 'museum-plus-for-craft-cms/people'],
+            'museum-plus-for-craft-cms/people/<personId:\d+>' => 'museum-plus-for-craft-cms/people/edit',
             'museum-plus-for-craft-cms/vocabularies' => ['template' => 'museum-plus-for-craft-cms/vocabularies'],
             'museum-plus-for-craft-cms/vocabularies/<vocabularyId:\d+>' => 'museum-plus-for-craft-cms/vocabularies/edit',
             'museum-plus-for-craft-cms/settings' => 'museum-plus-for-craft-cms/settings/index',
@@ -388,6 +390,7 @@ class MuseumPlusForCraftCms extends Plugin
             'museum-plus-for-craft-cms/settings/attachments' => 'museum-plus-for-craft-cms/settings/edit-attachments',
             'museum-plus-for-craft-cms/settings/objects-groups' => 'museum-plus-for-craft-cms/settings/edit-objects-groups',
             'museum-plus-for-craft-cms/settings/field-layout' => 'museum-plus-for-craft-cms/settings/edit-field-layout',
+            'museum-plus-for-craft-cms/settings/person-field-layout' => 'museum-plus-for-craft-cms/settings/edit-person-field-layout',
         ];
     }
 
@@ -415,6 +418,8 @@ class MuseumPlusForCraftCms extends Plugin
         $cpNavItem['subnav'] = [];
 
         $cpNavItem['subnav']['items'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Items'), 'url' => 'museum-plus-for-craft-cms/collection'];
+        $cpNavItem['subnav']['people'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'People'), 'url' => 'museum-plus-for-craft-cms/people'];
+
         if (Craft::$app->getUser()->getIsAdmin()) {
             $cpNavItem['subnav']['settings'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Settings'), 'url' => 'museum-plus-for-craft-cms/settings'];
             //$cpNavItem['subnav']['vocabularies'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Vocabularies'), 'url' => 'museum-plus-for-craft-cms/vocabularies'];

@@ -19,17 +19,17 @@
             </li>
             <li>
                 <a class="{{ segment3 == 'sites' ? 'sel' }}" href="{{ url('museum-plus-for-craft-cms/settings/sites') }}">
-                    {{ 'Sites'|t('museum-plus-for-craft-cms') }}
+                    {{ "Url's"|t('museum-plus-for-craft-cms') }}
                 </a>
             </li>
             <li>
                 <a class="{{ segment3 == 'api' ? 'sel' }}" href="{{ url('museum-plus-for-craft-cms/settings/api') }}">
-                    {{ 'Api'|t('museum-plus-for-craft-cms') }}
+                    {{ 'M+'|t('museum-plus-for-craft-cms') }}
                 </a>
             </li>
             <li>
                 <a class="{{ segment3 == 'attachments' ? 'sel' }}" href="{{ url('museum-plus-for-craft-cms/settings/attachments') }}">
-                    {{ 'Attachments'|t('museum-plus-for-craft-cms') }}
+                    {{ 'Files'|t('museum-plus-for-craft-cms') }}
                 </a>
             </li>
             <li>
@@ -39,7 +39,12 @@
             </li>
             <li>
                 <a class="{{ segment3 == 'field-layout' ? 'sel' }}" href="{{ url('museum-plus-for-craft-cms/settings/field-layout') }}">
-                    {{ 'Field Layout'|t('museum-plus-for-craft-cms') }}
+                    {{ 'Item Fields'|t('museum-plus-for-craft-cms') }}
+                </a>
+            </li>
+            <li>
+                <a class="{{ segment3 == 'person-field-layout' ? 'sel' }}" href="{{ url('museum-plus-for-craft-cms/settings/person-field-layout') }}">
+                    {{ 'Person Fields'|t('museum-plus-for-craft-cms') }}
                 </a>
             </li>
         </ul>
