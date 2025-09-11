@@ -1,0 +1,31 @@
+{% extends 'museum-plus-for-craft-cms/_settings/layout' %}
+
+{% import '_includes/forms' as forms %}
+
+{% set title = craft.museumPlus.cpTitle~' - Settings' %}
+
+{% set crumbs = [] %}
+
+{% set fullPageForm = true %}
+
+{% block content %}
+
+    <input type="hidden" name="action" value="museum-plus-for-craft-cms/settings/save">
+
+    {{ forms.textField({
+        label: 'Control Panel Title',
+        instructions: 'How the plugin will be called in the Control Panel',
+        id: 'cpTitle',
+        name: 'cpTitle',
+        value: settings['cpTitle']})
+    }}
+
+    {{ forms.lightswitchField({
+        label: 'Show Images in Index',
+        instructions: 'Enable to display images in the index view.',
+        id: 'showImagesInIndex',
+        name: 'showImagesInIndex',
+        on: settings['showImagesInIndex'] ?? true
+    }) }}
+
+{% endblock %}

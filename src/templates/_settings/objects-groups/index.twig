@@ -1,0 +1,28 @@
+{% extends 'museum-plus-for-craft-cms/_settings/layout' %}
+
+{% import '_includes/forms' as forms %}
+
+{% set title = craft.museumPlus.cpTitle~' - Settings' %}
+
+{% set crumbs = [] %}
+
+{% set fullPageForm = true %}
+
+{% block content %}
+
+    <input type="hidden" name="action" value="museum-plus-for-craft-cms/settings/save">
+
+    <div class="field">
+        <div class="heading"><label id="settings-objectGroups-label" for="settings-objectGroups">Object Groups</label></div>
+        <div id="settings-objectGroups-instructions" class="instructions"><p>Select the Object Groups you want to import</p></div>
+
+        {{ forms.checkboxSelect({
+            id: 'objectGroups',
+            name: 'objectGroups',
+            options: craft.museumPlus.getObjectGroups(),
+            values: settings['objectGroups']})
+        }}
+
+    </div>
+
+{% endblock %}

@@ -422,14 +422,19 @@ class MuseumPlusItem  extends Element
 
     protected static function defineTableAttributes(): array
     {
-        return [
+        $settings = $settings = MuseumPlusForCraftCms::getInstance()->getSettings();
+        $cols = [
             'inventoryNumber' => 'Inventory Number',
             'collectionId' => 'MuseumPlus Id',
-            'assetId' => 'Main Image',
-            'multimedia' => 'Media',
             'id' => ['label' => Craft::t('app', 'ID')],
             'frontendLink' => ['label' => Craft::t('app', 'Link'), 'icon' => 'world'],
         ];
+
+        if($settings['showImagesInIndex']) {
+            $cols["assetId"] = 'Main Image';
+            $cols["multimedia"] = 'Media';
+        }
+        return $cols;
     }
 
     protected static function defineDefaultTableAttributes(string $source): array

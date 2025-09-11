@@ -14,7 +14,9 @@ use craft\events\DefineAttributeKeywordsEvent;
 use craft\events\IndexKeywordsEvent;
 use craft\events\RegisterElementSearchableAttributesEvent;
 use craft\helpers\App;
+use craft\helpers\UrlHelper;
 use craft\services\Search;
+use craft\web\Response;
 use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\services\MuseumPlusService;
 use furbo\museumplusforcraftcms\variables\MuseumPlusForCraftCmsVariable;
@@ -246,9 +248,6 @@ class MuseumPlusForCraftCms extends Plugin
                 if ($attribute == 'data') {
 
                     $data = "";
-
-                    
-                    
                     
                     try {
 
@@ -367,20 +366,11 @@ class MuseumPlusForCraftCms extends Plugin
         return new Settings();
     }
 
-    /**
-     * Returns the rendered settings HTML, which will be inserted into the content
-     * block on the settings page.
-     *
-     * @return string The rendered settings HTML
-     */
-    protected function settingsHtml(): ?string
+    public function getSettingsResponse(): Response
     {
-        return Craft::$app->view->renderTemplate(
-            'museum-plus-for-craft-cms/settings',
-            [
-                'settings' => $this->getSettings()
-            ]
-        );
+        $url = UrlHelper::cpUrl('museum-plus-for-craft-cms/settings');
+
+        return Craft::$app->getResponse()->redirect($url);
     }
 
     protected function getCpRoutes(): array
@@ -391,6 +381,13 @@ class MuseumPlusForCraftCms extends Plugin
             'museum-plus-for-craft-cms/collection/<itemId:\d+>' => 'museum-plus-for-craft-cms/collection/edit',
             'museum-plus-for-craft-cms/vocabularies' => ['template' => 'museum-plus-for-craft-cms/vocabularies'],
             'museum-plus-for-craft-cms/vocabularies/<vocabularyId:\d+>' => 'museum-plus-for-craft-cms/vocabularies/edit',
+            'museum-plus-for-craft-cms/settings' => 'museum-plus-for-craft-cms/settings/index',
+            'museum-plus-for-craft-cms/settings/general' => 'museum-plus-for-craft-cms/settings/edit-general',
+            'museum-plus-for-craft-cms/settings/sites' => 'museum-plus-for-craft-cms/settings/edit-sites',
+            'museum-plus-for-craft-cms/settings/api' => 'museum-plus-for-craft-cms/settings/edit-api',
+            'museum-plus-for-craft-cms/settings/attachments' => 'museum-plus-for-craft-cms/settings/edit-attachments',
+            'museum-plus-for-craft-cms/settings/objects-groups' => 'museum-plus-for-craft-cms/settings/edit-objects-groups',
+            'museum-plus-for-craft-cms/settings/field-layout' => 'museum-plus-for-craft-cms/settings/edit-field-layout',
         ];
     }
 
@@ -419,6 +416,7 @@ class MuseumPlusForCraftCms extends Plugin
 
         $cpNavItem['subnav']['items'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Items'), 'url' => 'museum-plus-for-craft-cms/collection'];
         if (Craft::$app->getUser()->getIsAdmin()) {
+            $cpNavItem['subnav']['settings'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Settings'), 'url' => 'museum-plus-for-craft-cms/settings'];
             //$cpNavItem['subnav']['vocabularies'] = ['label' => Craft::t('museum-plus-for-craft-cms', 'Vocabularies'), 'url' => 'museum-plus-for-craft-cms/vocabularies'];
         }
 

@@ -210,6 +210,18 @@ class CollectionController extends Controller
 
     public function actionDeleteRemovedItems()
     {
+        dd(1);
+        $objectIds = [];
+        foreach ($this->settings['objectGroups'] as $objectGroupId) {
+            $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
+            foreach ($objects as $o) {
+                $objectIds[$o->id] = $o->id;
+            }
+        }
+
+        $itemIds = MuseumPlusItem::find()->collectionId(['not', $objectIds]);
+
+
         $queue = Craft::$app->queue;
         echo 'Deleting removed items - job sent to queue'.PHP_EOL;
         $jobId = $queue->push(new DeleteRemovedItemsJob([

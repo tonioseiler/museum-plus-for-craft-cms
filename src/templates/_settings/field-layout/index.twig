@@ -1,0 +1,21 @@
+{% extends 'museum-plus-for-craft-cms/_settings/layout' %}
+
+{% import '_includes/forms' as forms %}
+
+{% set title = craft.museumPlus.cpTitle~' - Settings' %}
+
+{% set crumbs = [] %}
+
+{% set fullPageForm = true %}
+
+{% block content %}
+
+    <input type="hidden" name="action" value="museum-plus-for-craft-cms/settings/save">
+
+    {{ forms.fieldLayoutDesignerField({
+        fieldLayout: craft.app.fields.getLayoutByType(
+            'furbo\\museumplusforcraftcms\\elements\\MuseumPlusItem'
+        ),
+    }) }}
+
+{% endblock %}

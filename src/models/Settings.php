@@ -41,6 +41,8 @@ class Settings extends Model
      */
     public $cpTitle = 'Collection';
 
+    public bool $showImagesInIndex = true;
+
     public $classifier = '';
 
     public $hostname = '';

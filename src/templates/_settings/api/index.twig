@@ -1,0 +1,63 @@
+{% extends 'museum-plus-for-craft-cms/_settings/layout' %}
+
+{% import '_includes/forms' as forms %}
+
+{% set title = craft.museumPlus.cpTitle~' - Settings' %}
+
+{% set crumbs = [] %}
+
+{% set fullPageForm = true %}
+
+{% block content %}
+
+    <input type="hidden" name="action" value="museum-plus-for-craft-cms/settings/save">
+    {{ forms.textField({
+        label: 'Classifier',
+        instructions: '',
+        id: 'classifier',
+        name: 'classifier',
+        value: settings['classifier']})
+    }}
+
+    {{ forms.textField({
+        label: 'Hostname',
+        instructions: '',
+        id: 'hostname',
+        name: 'hostname',
+        value: settings['hostname']})
+    }}
+
+    {{ forms.textField({
+        label: 'Username',
+        instructions: '',
+        id: 'username',
+        name: 'username',
+        value: settings['username']})
+    }}
+
+    {{ forms.textField({
+        label: 'Password',
+        instructions: '',
+        id: 'password',
+        name: 'password',
+        type: 'password',
+        value: settings['password']})
+    }}
+
+    {{ forms.textField({
+        label: 'Language Header',
+        instructions: '',
+        id: 'languageHeader',
+        name: 'languageHeader',
+        value: settings['languageHeader']})
+    }}
+
+    {{ forms.textField({
+        label: 'Google Gemini API Key (Gemini 1.0 Pro with billing account linked)',
+        instructions: 'The api key can be created <a href="https://aistudio.google.com/app/apikey" target="_blank">here</a>',
+        id: 'googleGeminiApiKey',
+        name: 'googleGeminiApiKey',
+        value: settings['googleGeminiApiKey']})
+    }}
+
+{% endblock %}

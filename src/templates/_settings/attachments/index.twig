@@ -1,0 +1,35 @@
+{% extends 'museum-plus-for-craft-cms/_settings/layout' %}
+
+{% import '_includes/forms' as forms %}
+
+{% set title = craft.museumPlus.cpTitle~' - Settings' %}
+
+{% set crumbs = [] %}
+
+{% set fullPageForm = true %}
+
+{% block content %}
+
+    <input type="hidden" name="action" value="museum-plus-for-craft-cms/settings/save">
+    <div class="field">
+        <div class="heading"><label id="settings-attachmentVolumeId-label" for="settings-attachmentVolumeId">Save Attachments</label></div>
+        <div id="settings-attachmentVolumeId-instructions" class="instructions"><p>Where the items attachments should be saved.</p></div>
+        {{ forms.select({
+            id: 'attachmentVolumeId',
+            name: 'attachmentVolumeId',
+            options: craft.museumPlus.getVolumes(),
+            value: settings['attachmentVolumeId']})
+        }}
+
+        {{ forms.textField({
+            label: 'Attachment file types',
+            instructions: 'File extensions comma separated, e.g. jpg, jpeg, gif, pdf etc. Leave empty to allow all files.',
+            id: 'attachmentFileTypes',
+            name: 'attachmentFileTypes',
+            value: settings['attachmentFileTypes']})
+        }}
+
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends '_layouts/cp' %}
+
+{% set selectedSubnavItem = 'settings' %}
+{% set baseCrumbs = [
+    { label: 'Settings'|t('museum-plus-for-craft-cms'), url: url('museum-plus-for-craft-cms/settings') }
+] %}
+{% set crumbs = crumbs is defined ? baseCrumbs|merge(crumbs) : [] %}
+{% set segment3 = craft.app.request.getSegment(3) %}
+
+
+{% block sidebar %}
+
+    <nav class="last">
+        <ul>
+            <li>
+                <a class="{{ segment3 == 'general' ? 'sel' }}" href="{{ url('museum-plus-for-craft-cms/settings/general') }}">
+                    {{ 'General'|t('museum-plus-for-craft-cms') }}
+                </a>
+            </li>
+            <li>
+                <a class="{{ segment3 == 'sites' ? 'sel' }}" href="{{ url('museum-plus-for-craft-cms/settings/sites') }}">
+                    {{ 'Sites'|t('museum-plus-for-craft-cms') }}
+                </a>
+            </li>
+            <li>
+                <a class="{{ segment3 == 'api' ? 'sel' }}" href="{{ url('museum-plus-for-craft-cms/settings/api') }}">
+                    {{ 'Api'|t('museum-plus-for-craft-cms') }}
+                </a>
+            </li>
+            <li>
+                <a class="{{ segment3 == 'attachments' ? 'sel' }}" href="{{ url('museum-plus-for-craft-cms/settings/attachments') }}">
+                    {{ 'Attachments'|t('museum-plus-for-craft-cms') }}
+                </a>
+            </li>
+            <li>
+                <a class="{{ segment3 == 'objects-groups' ? 'sel' }}" href="{{ url('museum-plus-for-craft-cms/settings/objects-groups') }}">
+                    {{ 'Objects Groups'|t('museum-plus-for-craft-cms') }}
+                </a>
+            </li>
+            <li>
+                <a class="{{ segment3 == 'field-layout' ? 'sel' }}" href="{{ url('museum-plus-for-craft-cms/settings/field-layout') }}">
+                    {{ 'Field Layout'|t('museum-plus-for-craft-cms') }}
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+{% endblock %}
