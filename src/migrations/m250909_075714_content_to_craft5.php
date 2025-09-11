@@ -41,7 +41,7 @@ class m250909_075714_content_to_craft5 extends BaseContentRefactorMigration
      */
     public function safeDown(): bool
     {
-        echo "m250909_075714_content_to_craft5 cannot be reverted.\n";
+        echo "Cannot be reverted.\n";
         return false;
     }
 }

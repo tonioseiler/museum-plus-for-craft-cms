@@ -44,26 +44,22 @@ class DeleteRemovedItemsJob extends BaseJob
                 $objectIds[$o->id] = $o->id;
             }
         }
-        $itemIds = MuseumPlusItem::find()->ids();
-        $this->logger->info('Number of items from MuseumPlus: ' . count($objectIds));
-        $this->logger->info('Number of items from db: ' . count($itemIds));
-        if (floatval(count($objectIds)) / floatval(count($itemIds)) < 0.9) {
-            $this->logger->info('Less than 90% came from the MuseumPlus server Skipping delete.');
-            throw new  \Exception('Less than 90% came from the MuseumPlus server Skipping delete.');
-        }
+
+        $items = MuseumPlusItem::find()->collectionId(['not', $objectIds]);
+
         $progressIndex = 0;
-        foreach ($itemIds as $itemId) {
-            $item = MuseumPlusItem::find()
-                ->id($itemId)
-                ->one();
+        foreach ($items as $item){
             $progressIndex++;
-            $progressPercent = floatval($progressIndex) / floatval(count($itemIds));
-            $this->setProgress($this->queue, $progressPercent, 'Checking item: ' . $item->id);
-            if (!isset($objectIds[$item->collectionId])) {
-                $success = Craft::$app->elements->deleteElement($item);
+            $progressPercent = floatval($progressIndex) / floatval(count($items));
+            $this->setProgress($this->queue, $progressPercent, 'Deleting item: ' . $item->id);
+            if(Craft::$app->elements->deleteElement($item)){
                 $this->logger->info('Item deleted: ' . $item->title . ' (' . $item->id . ')');
             }
+
         }
+
+        $this->setProgress($this->queue, 1);
+
         $this->logger->info('---- Deleting removed items END ---------');
     }
 }
