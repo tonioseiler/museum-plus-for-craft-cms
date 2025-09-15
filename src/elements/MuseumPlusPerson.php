@@ -32,22 +32,22 @@ class MuseumPlusPerson extends Element
 
     public static function displayName(): string
     {
-        return Craft::t('museum-plus-for-craft-cms', 'Museum plus person');
+        return Craft::t('museum-plus-for-craft-cms', 'Person');
     }
 
     public static function lowerDisplayName(): string
     {
-        return Craft::t('museum-plus-for-craft-cms', 'museum plus person');
+        return Craft::t('museum-plus-for-craft-cms', 'person');
     }
 
     public static function pluralDisplayName(): string
     {
-        return Craft::t('museum-plus-for-craft-cms', 'Museum plus people');
+        return Craft::t('museum-plus-for-craft-cms', 'People');
     }
 
     public static function pluralLowerDisplayName(): string
     {
-        return Craft::t('museum-plus-for-craft-cms', 'museum plus people');
+        return Craft::t('museum-plus-for-craft-cms', 'people');
     }
 
     public static function refHandle(): ?string
