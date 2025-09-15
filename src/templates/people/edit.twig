@@ -31,24 +31,20 @@
 {% set fieldLayout = person.getFieldLayout() %}
 {% set form = fieldLayout.createForm(person) %}
 {% set firstTabs = {
+    "tab--museumplusforcraftcms-person": {
+        "tabId": "tab-tab--museumplusforcraftcms-person",
+        "label": "Person",
+        "url": "#tab--museumplusforcraftcms-person",
+        "class": null
+    },
     "tab--museumplusforcraftcms-data": {
         "tabId": "tab-tab--museumplusforcraftcms-data",
         "label": "Data",
         "url": "#tab--museumplusforcraftcms-data",
         "class": null
     },
-} %}
-
-{% if currentUser.admin %}
-    {% set firstTabs = {
-        "tab--museumplusforcraftcms-data": {
-            "tabId": "tab-tab--museumplusforcraftcms-data",
-            "label": "Data",
-            "url": "#tab--museumplusforcraftcms-data",
-            "class": null
-        },
-    } %}
-{% endif %}
+}
+%}
 
 {% set tabs = firstTabs|merge(form.getTabMenu()) %}
 {% set fieldsHtml = form.render(false) %}
@@ -81,10 +77,12 @@
 
 {% block content %}
 
+    {{ actionInput('museum-plus-for-craft-cms/people/update') }}
+    {{ redirectInput( person.getCpEditUrl() ) }}
+    <input type="hidden" name="personId" value="{{ person.id }}" />
 
-        <div id="tab--museumplusforcraftcms-data" class="flex-fields" data-id="tab--museumplusforcraftcms-data" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-data">
-
-            <fieldset id="fields-item-data" class="field width-50">
+        <div id="tab--museumplusforcraftcms-person" class="flex-fields" data-id="tab--museumplusforcraftcms-person" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-multimedia">
+            <fieldset id="fields-item-data" class="field">
                 <div class="field" data-attribute="title">
                     <div class="heading">
                         <label id="fields-title-label" for="fields-title">{{ 'Title'|t('museum-plus-for-craft-cms') }}</label>
@@ -92,12 +90,108 @@
                     </div>
                     <div class="input ltr">
                         {{ person.title }}
-                        {#
-                        <input type="text" id="fields-title" disabled="disabled" class="disabled nicetext text fullwidth" name="fields[title]" autocomplete="off" placeholder="" dir="ltr" data-show-chars-left="" value="{{ item.title }}">
-                        #}
                     </div>
                 </div>
             </fieldset>
+
+            <fieldset id="fields-item-refs" class="field">
+                <div class="field" data-attribute="attachment">
+                    <h2>Digital Assets</h2>
+                    <div class="input ltr">
+                        {% for myAsset in person.getAssets() %}
+                            {% if myAsset %}
+                                {% if myAsset.kind == 'image' %}
+                                    {% set thumb = {
+                                        width: 300,
+                                        quality: 75
+                                    } %}
+                                    {% set myAssetUrl = myAsset.getUrl(thumb) %}
+
+                                    <a href="{{ myAsset.getCpEditUrl() }}">
+                                        <img src="{{ myAssetUrl }}" width="150"/>
+                                    </a>
+                                {% else %}
+                                    <p>
+                                        <a href="{{ myAsset.getCpEditUrl() }}">
+                                            {{ myAsset.filename }}
+                                        </a>
+                                    </p>
+                                {% endif %}
+                                {% else %}
+                                    <p>No asset selected</p>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset id="fields-item-refs" class="field">
+                <div class="field" data-attribute="attachment">
+                    {% set items = person.getItems() %}
+                    <h2>Collection ({{ items|length }} items)</h2>
+                    <div class="input ltr">
+
+                        <table id="contact-activity" class="display nowrap data fullwidth collapsible">
+                            <thead>
+                            <tr><th scope="col">Title</th>
+                                <th scope="col">Inventory Number</th>
+                            </tr></thead>
+                            <tbody>
+                            {% for item in items %}
+                                <tr>
+                                    <th scope="row" data-title="Email">
+                                        <a href="{{ item.getCpEditUrl() }}">{{ item.title }}</a>
+                                    </th>
+                                    <td>
+                                        {{ item.inventoryNumber }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset id="fields-item-refs" class="field">
+                <div class="field" data-attribute="attachment">
+                    {% set ownerships = person.getOwnerships() %}
+                    <h2>Ownerships ({{ ownerships|length }})</h2>
+                    <div class="input ltr">
+
+                        <table id="contact-activity" class="display nowrap data fullwidth collapsible">
+                            <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Title</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for ownership in ownerships %}
+                                <tr>
+                                    <td>
+                                        {{ ownership.id }}
+                                    </td>
+                                    <td scope="row">
+                                        {{ ownership.title }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </fieldset>
+
+        </div>
+
+        <div id="tab--museumplusforcraftcms-data" class="flex-fields hidden" data-id="tab--museumplusforcraftcms-data" role="tabpanel" aria-labelledby="tab-tab--museumplusforcraftcms-data">
+
+
 
             {% for key,value in person.getDataAttributes() %}
 

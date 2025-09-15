@@ -4,6 +4,7 @@ namespace furbo\museumplusforcraftcms\elements;
 
 use Craft;
 use craft\base\Element;
+use craft\db\Query;
 use craft\elements\User;
 use craft\elements\conditions\ElementConditionInterface;
 use craft\elements\db\ElementQueryInterface;
@@ -12,6 +13,7 @@ use craft\models\FieldLayout;
 use craft\web\CpScreenResponseBehavior;
 use furbo\museumplusforcraftcms\elements\conditions\MuseumPlusPersonCondition;
 use furbo\museumplusforcraftcms\elements\db\MuseumPlusPersonQuery;
+use furbo\museumplusforcraftcms\records\OwnershipRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
 use yii\web\Response;
 
@@ -85,12 +87,7 @@ class MuseumPlusPerson extends Element
 
     public static function find(): ElementQueryInterface
     {
-        return Craft::createObject(MuseumPlusPersonQuery::class, [static::class]);
-    }
-
-    public static function createCondition(): ElementConditionInterface
-    {
-        return Craft::createObject(MuseumPlusPersonCondition::class, [static::class]);
+        return new MuseumPlusPersonQuery(static::class);
     }
 
     protected static function defineSources(string $context): array
@@ -273,6 +270,65 @@ class MuseumPlusPerson extends Element
         $personRecord->save(false);
 
         parent::afterSave($isNew);
+    }
+
+    public function getItems(): array
+    {
+        $items = [];
+        $collection = (new Query())
+            ->from('{{%museumplus_items_people}}')
+            ->where(['personId' => $this->id])
+            ->orderBy(['id' => SORT_ASC])->all();
+
+        foreach ($collection as $item){
+            $_item = MuseumPlusItem::find()
+                ->id($item['itemId'])
+                ->one();
+            if($_item){
+                $items[] = $_item;
+            }
+        }
+
+        return $items;
+
+    }
+
+    public function getOwnerships(): array
+    {
+        $ownerships = [];
+        $ownershipsQuery = (new Query())
+            ->from('{{%museumplus_ownerships_people}}')
+            ->where(['personId' => $this->id])
+            ->orderBy(['id' => SORT_ASC])->all();
+
+        foreach ($ownershipsQuery as $ownership){
+            $_ownership = OwnershipRecord::find()
+                ->where(['id' => $ownership['ownershipId']])
+                ->one();
+            if($_ownership){
+                $ownerships[] = $_ownership;
+            }
+        }
+
+        return $ownerships;
+
+    }
+
+    public function getAssets(): array
+    {
+        $assets = [];
+        $multiMedia = (new Query())
+            ->select(['assetId'])
+            ->from('{{%museumplus_people_assets}}')
+            ->where(['peopleId' => $this->id])
+            ->orderBy(['id' => SORT_ASC])
+            ->all();
+
+        foreach($multiMedia as $asset){
+            $assets[] = Craft::$app->assets->getAssetById($asset['assetId']);
+        }
+
+        return $assets;
     }
 
     public function getDataAttributes() {
