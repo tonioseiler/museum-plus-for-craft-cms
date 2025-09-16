@@ -25,10 +25,7 @@ class m250911_132206_people_element_2 extends Migration
            -> delete('{{%museumplus_people}}', 'id < :id', [':id' => $firstPerson->id])
             ->execute();
 
-        $schema = Craft::$app->getDb()->getSchema()->getTableSchema('{{%museum_people}}');
-        if($schema->getColumn('title')) {
-            $this->dropColumn('{{%museumplus_people}}', 'title');
-        }
+        $this->dropColumn('{{%museumplus_people}}', 'title');
 
         $this->addForeignKey(
                $this->db->getForeignKeyName(),
