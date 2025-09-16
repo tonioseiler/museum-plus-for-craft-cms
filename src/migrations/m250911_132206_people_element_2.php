@@ -4,6 +4,7 @@ namespace furbo\museumplusforcraftcms\migrations;
 
 use Craft;
 use craft\db\Migration;
+use craft\helpers\DateTimeHelper;
 use furbo\museumplusforcraftcms\elements\MuseumPlusPerson;
 
 /**
@@ -20,7 +21,9 @@ class m250911_132206_people_element_2 extends Migration
         //2.Delete the old People Records
         //3. Create the Foreign Key
 
-        $firstPerson = MuseumPlusPerson::find()->orderBy('id')->one();
+        $todayMidnight = DateTimeHelper::toDateTime(new \DateTime('today midnight'));
+
+        $firstPerson = MuseumPlusPerson::find()->orderBy('id')->dateCreated(">= {$todayMidnight->format('Y-m-d H:i:s')}")->one();
         Craft::$app->db->createCommand()
            -> delete('{{%museumplus_people}}', 'id < :id', [':id' => $firstPerson->id])
             ->execute();
