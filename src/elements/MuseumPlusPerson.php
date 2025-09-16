@@ -259,23 +259,15 @@ class MuseumPlusPerson extends Element
 
     public function getItems(): array
     {
-        $items = [];
-        $collection = (new Query())
-            ->from('{{%museumplus_items_people}}')
-            ->where(['personId' => $this->id])
-            ->orderBy(['id' => SORT_ASC])->all();
-
-        foreach ($collection as $item){
-            $_item = MuseumPlusItem::find()
-                ->id($item['itemId'])
-                ->one();
-            if($_item){
-                $items[] = $_item;
-            }
-        }
-
-        return $items;
-
+        return MuseumPlusItem::find()
+            ->innerJoin(
+                '{{%museumplus_items_people}} mip',
+                '[[mip.itemId]] = [[elements.id]]'
+            )
+            ->where(['mip.personId' => $this->id])
+            ->groupBy('mip.itemId')
+            ->limit(50)
+            ->all();
     }
 
     public function getOwnerships(): array
