@@ -13,6 +13,7 @@ use craft\models\FieldLayout;
 use craft\web\CpScreenResponseBehavior;
 use furbo\museumplusforcraftcms\elements\conditions\MuseumPlusPersonCondition;
 use furbo\museumplusforcraftcms\elements\db\MuseumPlusPersonQuery;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
 use yii\web\Response;
@@ -170,8 +171,8 @@ class MuseumPlusPerson extends Element
 
     public function getUriFormat(): ?string
     {
-        // If museum plus people should have URLs, define their URI format here
-        return null;
+        $settings = MuseumPlusForCraftCms::getInstance()->getSettings()->peoplesites;
+        return $settings[$this->site->handle]['uriFormat'];
     }
 
     public function getCpEditUrl(): ?string
@@ -187,22 +188,6 @@ class MuseumPlusPerson extends Element
     public function getPostEditUrl(): ?string
     {
         return UrlHelper::cpUrl('museum-plus-for-craft-cms/people');
-    }
-
-
-    protected function previewTargets(): array
-    {
-        $previewTargets = [];
-        $url = $this->getUrl();
-        if ($url) {
-            $previewTargets[] = [
-                'label' => Craft::t('app', 'Primary {type} page', [
-                    'type' => self::lowerDisplayName(),
-                ]),
-                'url' => $url,
-            ];
-        }
-        return $previewTargets;
     }
 
     protected function route(): array|string|null

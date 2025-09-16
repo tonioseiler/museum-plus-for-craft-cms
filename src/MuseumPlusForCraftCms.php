@@ -202,6 +202,8 @@ class MuseumPlusForCraftCms extends Plugin
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('museumPlus', MuseumPlusForCraftCmsVariable::class);
+                $variable->set('museumPlusItems', MuseumPlusItem::class);
+                $variable->set('museumPlusPeople', MuseumPlusPerson::class);
             }
         );
 

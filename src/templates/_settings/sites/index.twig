@@ -31,10 +31,63 @@
     {% endfor %}
 
     {{ forms.editableTableField({
-        label: "Url's"|t('app'),
+        label: "Items Url's"|t('app'),
         instructions: "Define URLS and template to be used to show collection items."|t('app'),
         id: 'sites',
         name: 'sites',
+        cols: {
+            heading: {
+                type: 'heading',
+                heading: "Site"|t('app'),
+                thin: true
+            },
+            uriFormat: {
+                type: 'singleline',
+                heading: "Entry URI Format"|t('app'),
+                info: "What entry URIs should look like for the site. Leave blank if entries don’t have URLs."|t('app'),
+                placeholder: 'Leave blank if entries don’t have URLs'|t('app'),
+                code: true,
+                width: 500,
+                class: ['type-channel', 'type-structure']|filter
+            },
+            template: {
+                type: 'template',
+                heading: "Template"|t('app'),
+                info: "Which template should be loaded when an entry’s URL is requested."|t('app'),
+                code: true
+            }
+        }|filter,
+        rows: siteRows,
+        fullWidth: true,
+        allowAdd: false,
+        allowDelete: false,
+        allowReorder: false
+    }) }}
+
+
+    {% set siteRows = [] %}
+
+
+    {% for site in craft.app.sites.getAllSites() %}
+        {% set siteSettings = settings['peoplesites'][site.handle] ?? null %}
+        {% set siteRows = siteRows|merge({
+            (site.handle): {
+                heading: site.name|t('site')|e,
+                uriFormat: {
+                    value: siteSettings ? siteSettings.uriFormat,
+                },
+                template: {
+                    value: siteSettings ? siteSettings.template,
+                },
+            }|filter
+        }) %}
+    {% endfor %}
+
+    {{ forms.editableTableField({
+        label: "People Url's"|t('app'),
+        instructions: "Define URLS and template to be used to show people."|t('app'),
+        id: 'peoplesites',
+        name: 'peoplesites',
         cols: {
             heading: {
                 type: 'heading',

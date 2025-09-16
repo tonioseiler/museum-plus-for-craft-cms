@@ -11,6 +11,7 @@
 namespace furbo\museumplusforcraftcms\services;
 
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
+use furbo\museumplusforcraftcms\elements\MuseumPlusPerson;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
@@ -54,14 +55,14 @@ class CollectionService extends Component
     }
 
     public function getPeopleById($id) {
-        $people = PersonRecord::find()
-            ->where(['id' => $id])
+        $people = MuseumPlusPerson::find()
+            ->id($id)
             ->one();
         return $people;
     }
 
     public function getAllPeople() {
-        $people = PersonRecord::find()
+        $people = MuseumPlusPerson::find()
             ->orderBy(['title' => SORT_ASC])
             ->all();
         return $people;

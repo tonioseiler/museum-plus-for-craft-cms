@@ -5,6 +5,7 @@ namespace furbo\museumplusforcraftcms\controllers;
 use Craft;
 use craft\web\Controller;
 use furbo\museumplusforcraftcms\elements\MuseumPlusPerson;
+use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use yii\web\Response;
 
 /**
@@ -77,6 +78,39 @@ class PeopleController extends Controller
 
         Craft::$app->getSession()->setNotice(Craft::t('museum-plus-for-craft-cms', 'Person saved.'));
 
+        return $this->redirectToPostedUrl($person);
+
+    }
+
+    public function actionSync()
+    {
+        $this->requirePostRequest();
+        $request = Craft::$app->getRequest();
+        $personId = $request->getBodyParam('personId');
+        $person = MuseumPlusPerson::find()->id($personId)->one();
+
+        $museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
+        $data = $museumPlus->getPerson($person->collectionId);
+
+        $person->data = $data;
+        if (!empty($data->PerNameTxt))
+            $person->title = $data->PerNameTxt;
+        else if (!empty($data->PerNameTxt))
+            $person->title = $data->PerPersonTxt;
+        else if (!empty($data->PerNameVrt))
+            $person->title = $data->PerNameVrt;
+        else
+            $person->title = 'Unknown';
+
+        $person->slug = $person->title;
+
+        $success = Craft::$app->elements->saveElement($person);
+
+        if($success){
+            Craft::$app->getSession()->setSuccess(Craft::t('museum-plus-for-craft-cms', "Person synced."));
+        }else{
+            Craft::$app->getSession()->setError(Craft::t('museum-plus-for-craft-cms', "Person not synced."));
+        }
         return $this->redirectToPostedUrl($person);
 
 

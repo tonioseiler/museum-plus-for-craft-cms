@@ -65,6 +65,8 @@ class Settings extends Model
 
     public $sites = [];
 
+    public $peoplesites = [];
+
     // Public Methods
     // =========================================================================
 
