@@ -81,6 +81,11 @@ class MuseumPlusItem  extends Element
         return Craft::t('museum-plus-for-craft-cms', 'Item');
     }
 
+    public static function pluralDisplayName(): string
+    {
+        return Craft::t('museum-plus-for-craft-cms', 'Items');
+    }
+
     /**
      * Returns whether elements of this type will be storing any data in the `content`
      * table (tiles or custom fields).

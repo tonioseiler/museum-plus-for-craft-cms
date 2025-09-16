@@ -113,6 +113,5 @@ class PeopleController extends Controller
         }
         return $this->redirectToPostedUrl($person);
 
-
     }
 }

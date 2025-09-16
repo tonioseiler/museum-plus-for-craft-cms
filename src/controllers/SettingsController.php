@@ -24,8 +24,45 @@ class SettingsController extends Controller
             $settings = MuseumPlusForCraftCms::$plugin->settings;
         }
 
+        if(empty($settings->sitemapSections)) {
+
+            $sitemapSections = [
+                  'furbo\museumplusforcraftcms\elements\MuseumPlusItem' => [
+                      'enabled' => "1",
+                      'changefreq' => 'weekly',
+                      'priority' => '1',
+                      'filename' => 'sitemap-collection.xml',
+                  ],
+                'furbo\museumplusforcraftcms\elements\MuseumPlusPerson' => [
+                    'enabled' => "1",
+                    'changefreq' => 'weekly',
+                    'priority' => '1',
+                    'filename' => 'sitemap-people.xml',
+                ],
+            ];
+            $settings->sitemapSections = $sitemapSections;
+            Craft::$app->getPlugins()->savePluginSettings(MuseumPlusForCraftCms::$plugin, $settings->getAttributes());
+        }
+
+        $sitemapSections = [];
+
+        array_walk($settings->sitemapSections, function ($section, $class) use (&$sitemapSections) {
+            $sitemapSections[] = [
+                'handle' => $class,
+                'heading' => $class::pluralDisplayName(),
+                'enabled' => $section['enabled'],
+                'changefreq' => $section['changefreq'],
+                'priority' => $section['priority'],
+                'filename' => $section['filename'],
+                'entries' => $class::find()->site('*')->count(),
+            ];
+        });
+
+        //dd($settings->sitemapSections, $sitemapSections);
+
         return $this->renderTemplate('museum-plus-for-craft-cms/_settings/general', [
-            'settings' => $settings
+            'settings' => $settings,
+            'sitemapSections' => $sitemapSections,
         ]);
     }
 
@@ -147,6 +184,6 @@ class SettingsController extends Controller
             return $this->asModelFailure($settings, Craft::t('museum-plus-for-craft-cms', 'Couldn’t save general settings.'), 'settings');
         }
         return $this->asSuccess(Craft::t('museum-plus-for-craft-cms', 'Settings saved.'));
-
     }
+
 }

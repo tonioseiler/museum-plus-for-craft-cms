@@ -398,7 +398,7 @@ class MuseumPlusForCraftCms extends Plugin
 
     protected function getRoutes(): array
     {
-        return [
+        $routes = [
             'search/items' => 'museum-plus-for-craft-cms/search/search-items',
             'search/autocomplete' => 'museum-plus-for-craft-cms/search/autocomplete',
             'bookmark/save' => 'museum-plus-for-craft-cms/bookmark/save',
@@ -406,6 +406,17 @@ class MuseumPlusForCraftCms extends Plugin
             'vocabularies/get-all' => 'museum-plus-for-craft-cms/vocabularies/get-all',
             'collection/get-random-item' => 'museum-plus-for-craft-cms/collection/get-random-item-by-tag',
         ];
+
+        $settings = self::$plugin->getSettings();
+        if(!empty($settings->sitemapSections)) {
+         foreach($settings->sitemapSections as $section) {
+             if($section['enabled']) {
+                 $routes[$section['filename']] = 'museum-plus-for-craft-cms/sitemap/index';
+             }
+         }
+        }
+
+        return $routes;
     }
 
     public function getCpNavItem(): ?array

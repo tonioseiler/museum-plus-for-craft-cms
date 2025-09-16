@@ -16,7 +16,7 @@ class UtilsController extends Controller
 
     public function actionResaveItems()
     {
-        $items = MuseumPlusItem::find()->all();
+        $items = MuseumPlusItem::find()->site('*')->all();
         foreach ($items as $item) {
             if(\Craft::$app->elements->saveElement($item)) {
                 echo "Saved item {$item->id}" . PHP_EOL;
@@ -28,7 +28,7 @@ class UtilsController extends Controller
 
     public function actionResavePeople()
     {
-        $people = MuseumPlusPerson::find()->all();
+        $people = MuseumPlusPerson::find()->site('*')->all();
         foreach ($people as $person) {
             if(\Craft::$app->elements->saveElement($person)){
                 echo "Saved $person->id" . PHP_EOL;

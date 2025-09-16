@@ -73,7 +73,7 @@ class MuseumPlusPerson extends Element
 
     public static function isLocalized(): bool
     {
-        return false;
+        return true;
     }
 
     public static function hasStatuses(): bool
@@ -326,5 +326,17 @@ class MuseumPlusPerson extends Element
             $this->record = PersonRecord::findOne($this->id);
         }
         return $this->record;
+    }
+    public function getSupportedSites(): array
+    {
+        $sites = MuseumPlusForCraftCms::getInstance()->getSettings()->peoplesites;
+        $filteredSites = [];
+        foreach ($sites as $siteHandle => $siteSettings) {
+            if (!empty($siteSettings['uriFormat'])) {
+                $site = \Craft::$app->sites->getSiteByHandle($siteHandle);
+                $filteredSites[] = $site->id;
+            }
+        }
+        return $filteredSites;
     }
 }
