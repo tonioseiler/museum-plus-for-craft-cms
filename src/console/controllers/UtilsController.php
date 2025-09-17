@@ -2,6 +2,7 @@
 
 namespace furbo\museumplusforcraftcms\console\controllers;
 
+use craft\helpers\App;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 use furbo\museumplusforcraftcms\elements\MuseumPlusPerson;
 use yii\console\Controller;
@@ -16,6 +17,7 @@ class UtilsController extends Controller
 
     public function actionResaveItems()
     {
+        App::maxPowerCaptain();
         $items = MuseumPlusItem::find()->site('*')->all();
         foreach ($items as $item) {
             if(\Craft::$app->elements->saveElement($item)) {
@@ -28,6 +30,7 @@ class UtilsController extends Controller
 
     public function actionResavePeople()
     {
+        App::maxPowerCaptain();
         $people = MuseumPlusPerson::find()->site('*')->all();
         foreach ($people as $person) {
             if(\Craft::$app->elements->saveElement($person)){
