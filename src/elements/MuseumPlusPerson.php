@@ -14,6 +14,7 @@ use craft\web\CpScreenResponseBehavior;
 use furbo\museumplusforcraftcms\elements\conditions\MuseumPlusPersonCondition;
 use furbo\museumplusforcraftcms\elements\db\MuseumPlusPersonQuery;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
+use furbo\museumplusforcraftcms\records\LiteratureRecord;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
 use furbo\museumplusforcraftcms\records\PersonRecord;
 use yii\web\Response;
@@ -192,13 +193,14 @@ class MuseumPlusPerson extends Element
 
     protected function route(): array|string|null
     {
-        // Define how museum plus people should be routed when their URLs are requested
+        $settings = MuseumPlusForCraftCms::getInstance()->getSettings()->peoplesites;
         return [
-            'templates/render',
-            [
-                'template' => 'site/template/path',
-                'variables' => ['museumPlusPerson' => $this],
-            ]
+            'templates/render', [
+                'template' => $settings[$this->site->handle]['template'],
+                'variables' => [
+                    'person' => $this,
+                ],
+            ],
         ];
     }
 
@@ -272,23 +274,248 @@ class MuseumPlusPerson extends Element
 
     public function getOwnerships(): array
     {
-        $ownerships = [];
-        $ownershipsQuery = (new Query())
-            ->from('{{%museumplus_ownerships_people}}')
-            ->where(['personId' => $this->id])
-            ->orderBy(['id' => SORT_ASC])->all();
+        $person = PersonRecord::find()->where(['collectionId' => $this->collectionId])->one();
 
-        foreach ($ownershipsQuery as $ownership){
-            $_ownership = OwnershipRecord::find()
-                ->where(['id' => $ownership['ownershipId']])
-                ->one();
-            if($_ownership){
-                $ownerships[] = $_ownership;
+        $maxObjects = 24;
+        $ownershipsTitlesAndObjects = [];
+        $ownershipsMoreObjects = false;
+        $ownerships = $person->getOwnerships()->all();
+        foreach ($ownerships as $ownership) {
+            $ownershipsObjects = MuseumPlusItem::find()->ownership(['id' => $ownership->id])->all();
+            foreach ($ownershipsObjects as $ownershipObject) {
+                if (count($ownershipsTitlesAndObjects) < $maxObjects) {
+                    $ownershipsTitlesAndObjects[] = $ownershipObject;
+                } else {
+                    $ownershipsMoreObjects = true;
+                    break 2;
+                }
             }
         }
 
-        return $ownerships;
+        return $ownershipsTitlesAndObjects;
 
+
+    }
+
+    public function getData(): array
+    {
+        $person = PersonRecord::find()->where(['collectionId' => $this->collectionId])->one();
+
+        $personData = [];
+
+        $personDataAttributesRepeatableGroups = $person->getDataAttribute('repeatableGroups');
+        $personDataAttributesVocabularyReferences = $person->getDataAttribute('vocabularyReferences');
+        $personDataAttributesModuleReferences = $person->getDataAttribute('moduleReferences');
+
+        $personData = [];
+
+        foreach ($personDataAttributesRepeatableGroups as $group) {
+            if ($group['name'] === 'PerFunctionsGrp') {
+                foreach ($group['items'] as $item) {
+                    if (!empty($item['TypeVoc'])) {
+                        $personData['function'][] = $item['TypeVoc'];
+                    }
+                }
+            } elseif ($group['name'] === 'PerDateGrp') {
+                // Assuming there's only one date item per person.
+                foreach ($group['items'] as $item) {
+                    $bornDate = null;
+                    $bornPlace = null;
+                    $bornCountry = null;
+                    $diedDate = null;
+                    $diedPlace = null;
+                    $diedCountry = null;
+                    if (!empty($item['DateFromTxt'])) {
+                        $bornDate = $item['DateFromTxt'];
+                    }
+                    if (!empty($item['PlaceTxt'])) {
+                        $bornPlace = trim($item['PlaceTxt']);
+                    }
+                    if (!empty($item['CountryTxt'])) {
+                        $bornCountry = trim($item['CountryTxt']);
+                    }
+                    if (!empty($item['DateToTxt'])) {
+                        $diedDate = $item['DateToTxt'];
+                    }
+                    if (!empty($item['PlaceToTxt'])) {
+                        $diedPlace = trim($item['PlaceToTxt']);
+                    }
+                    if (!empty($item['CountryToTxt'])) {
+                        $diedCountry = trim($item['CountryToTxt']);
+                    }
+                    $born = null;
+                    $died = null;
+                    $prefixFrom = null;
+                    $prefixTo = null;
+                    if (!empty($item['PrefixFromVoc']) && $item['PrefixFromVoc']!='aktiv' && $item['PrefixFromVoc']!='*') {
+                        $prefixFrom = trim($item['PrefixFromVoc']);
+                    }
+                    if (!empty($item['PrefixToVoc']) && $item['PrefixToVoc']!='aktiv') {
+                        $prefixTo = trim($item['PrefixToVoc']);
+                    }
+                    if (!empty($item['PrefixFromVoc']) && $item['PrefixFromVoc']=='aktiv') {
+                        $personData['dates']='aktiv '.$bornDate.'-'.$diedDate;
+                    } else {
+                        if(!$prefixFrom && !$prefixTo ){
+                            if ($bornDate) {
+                                $born = '*' . $bornDate;
+                                // If location data is present, append it.
+                                if ($bornPlace || $bornCountry) {
+                                    $born .= ' in';
+                                    if ($bornPlace) {
+                                        $born .= ' ' . $bornPlace;
+                                    }
+                                    if ($bornCountry) {
+                                        $born .= ', ' . $bornCountry;
+                                    }
+                                }
+                            }
+                            if ($diedDate) {
+                                $died = '†' . $diedDate;
+                                if ($diedPlace || $diedCountry) {
+                                    $died .= ' in';
+                                    if ($diedPlace) {
+                                        $died .= ' ' . $diedPlace;
+                                    }
+                                    if ($diedCountry) {
+                                        $died .= ', ' . $diedCountry;
+                                    }
+                                }
+                            }
+                            $personData['dates']=$born.'<br>'.$died;
+                        } else {
+                            if($prefixFrom != 'aktiv'){
+                                if ($bornDate) {
+                                    $born = '* ' . $prefixFrom .' '. $bornDate;
+                                    if ($bornPlace || $bornCountry) {
+                                        $born .= ' in';
+                                        if ($bornPlace) {
+                                            $born .= ' ' . $bornPlace;
+                                        }
+                                        if ($bornCountry) {
+                                            $born .= ', ' . $bornCountry;
+                                        }
+                                    }
+                                    $personData['dates']=$born;
+                                }
+                                if($prefixTo){
+                                    if ($bornDate) {
+                                        $born = '* ' . $prefixFrom .' '. $bornDate;
+                                        if ($bornPlace || $bornCountry) {
+                                            $born .= ' in';
+                                            if ($bornPlace) {
+                                                $born .= ' ' . $bornPlace;
+                                            }
+                                            if ($bornCountry) {
+                                                $born .= ', ' . $bornCountry;
+                                            }
+                                        }
+                                    }
+                                    $personData['dates']=$born.'<br>'.$died;
+                                }
+                            }
+                        }
+                    }
+                }
+            } elseif ($group['name'] === 'PerURLGrp') {
+                // Process the PerURLGrp items.
+                foreach ($group['items'] as $item) {
+                    // Only add entries that have a non-empty AddressTxt.
+                    if (!empty($item['AddressTxt'])) {
+                        $personData['weblinks'][] = [
+                            'url' => trim($item['AddressTxt']),
+                            'value' => !empty($item['TypeVoc']) ? trim($item['TypeVoc']) : null,
+                        ];
+                    }
+                }
+            } elseif ($group['name'] === 'PerBiographicalNoteGrp') {
+                // Process the PerBiographicalNoteGrp items.
+                foreach ($group['items'] as $item) {
+                    if (isset($item['TypeVoc']) && $item['TypeVoc'] === 'Kurzbiografie') {
+                        if (
+                            !isset($item['StatusVoc'])
+                            ||
+                            (isset($item['StatusVoc']) && $item['StatusVoc'] == 'aktuell')
+                        ) {
+                            $noteText = !empty($item['TextClb']) ? trim($item['TextClb']) : null;
+                            $noteDate = !empty($item['DateFromTxt']) ? trim($item['DateFromTxt']) : null;
+                            $noteSource = !empty($item['SourceTxt']) ? trim($item['SourceTxt']) : null;
+                            if ($noteText) {
+                                $personData['biographicalNotes'][] = [
+                                    'text' => $noteText,
+                                    'date' => $noteDate,
+                                    'source' => $noteSource,
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach ($personDataAttributesVocabularyReferences as $vocab) {
+            if ($vocab['name'] === 'PerGNDVoc') {
+                foreach ($vocab['items'] as $item) {
+                    // Make sure both the URL and display value are available.
+                    if (!empty($item['name']) && !empty($item['value'])) {
+                        $personData['weblinks'][] = [
+                            'url' => trim($item['name']),
+                            'value' => 'GND',
+                        ];
+                    }
+                }
+            }
+        }
+
+        foreach ($personDataAttributesModuleReferences as $moduleRef) {
+            if (($moduleRef['name'] === 'PerPersonARef') || ($moduleRef['name'] === 'PerPersonBRef')) {
+                foreach ($moduleRef['items'] as $item) {
+                    if (!empty($item['value'])) {
+                        // check if a person with the id exists
+                        if ($item['id']) {
+                            $networkPersonId = trim($item['id']);
+                            $networkPerson = PersonRecord::find()->where(['collectionId' => $networkPersonId])->one();
+                            if ($networkPerson) {
+                                $personData['network'][] = [
+                                    'id' => $networkPersonId,
+                                    'name' => trim($item['value']),
+                                ];
+                            } else {
+                                $personData['network'][] = [
+                                    'id' => null,
+                                    'name' => trim($item['value']),
+                                ];
+                            }
+                        }
+                    }
+                }
+            } else if ($moduleRef['name'] === 'PerLiteratureRef') {
+                foreach ($moduleRef['items'] as $item) {
+                    if (!empty($item['value'])) {
+                        $literature = LiteratureRecord::find()->where(['collectionId' => $item['id']])->one();
+                        if (isset($literature) && $literature->title) {
+                            $personData['literature'][] = [
+                                'name' => trim($literature->title),
+                                'id' => $literature->id,
+                            ];
+                        }
+                    }
+                }
+            } else if ($moduleRef['name'] === 'PerMultimediaRef') {
+                $multimediaAssets = $person->getMultimedia();
+                foreach ($multimediaAssets as $asset) {
+                    if (!empty($asset['id'])) {
+                        $personData['download'][] = [
+                            'id' => $asset['id'],
+                            'text' => $asset->title,
+                            'url' => $asset->url,
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $personData;
     }
 
     public function getAssets(): array
@@ -311,6 +538,11 @@ class MuseumPlusPerson extends Element
     public function getDataAttributes() {
         $rec = $this->getRecord();
         return $rec->getDataAttributes();
+    }
+
+    public function getDataAttribute($name) {
+        $rec = $this->getRecord();
+        return $rec->getDataAttribute($name);
     }
 
     public function getRecord() {
