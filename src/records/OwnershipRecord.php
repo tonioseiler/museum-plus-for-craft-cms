@@ -9,7 +9,6 @@ use craft\db\ActiveRecord;
 
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 use furbo\museumplusforcraftcms\records\DataRecord;
-use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 
 
 /*
