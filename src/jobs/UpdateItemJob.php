@@ -760,7 +760,7 @@ class UpdateItemJob extends BaseJob
                 $person->syncPersonMultimediaRelations($assetIds);
             }
         }
-        $success = $person->save();
+        $success = Craft::$app->elements->saveElement($person, false);
         return $person;
     }
 

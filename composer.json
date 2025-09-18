@@ -2,7 +2,7 @@
     "name": "furbo/museum-plus-for-craft-cms",
     "description": "Allows to import MuseumsPlus Collection data to Craft CMS and publish data.",
     "type": "craft-plugin",
-    "version": "5.0.0-beta.21",
+    "version": "5.0.0-beta.22",
     "keywords": [
         "craft",
         "cms",
