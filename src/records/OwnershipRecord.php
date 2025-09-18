@@ -5,6 +5,7 @@
 
 namespace furbo\museumplusforcraftcms\records;
 
+use Craft;
 use craft\db\ActiveRecord;
 
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
