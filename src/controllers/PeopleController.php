@@ -87,30 +87,12 @@ class PeopleController extends Controller
         $this->requirePostRequest();
         $request = Craft::$app->getRequest();
         $personId = $request->getBodyParam('personId');
-        $person = MuseumPlusPerson::find()->id($personId)->one();
 
-        $museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
-        $data = $museumPlus->getPerson($person->collectionId);
+        MuseumPlusForCraftCms::$plugin->getInstance()->controllerNamespace = 'furbo\museumplusforcraftcms\console\controllers';
+        $command = MuseumPlusForCraftCms::$plugin->getInstance()->runAction('collection/update-person', ['personId' => $personId]);
 
-        $person->data = $data;
-        if (!empty($data->PerNameTxt))
-            $person->title = $data->PerNameTxt;
-        else if (!empty($data->PerNameTxt))
-            $person->title = $data->PerPersonTxt;
-        else if (!empty($data->PerNameVrt))
-            $person->title = $data->PerNameVrt;
-        else
-            $person->title = 'Unknown';
+        Craft::$app->getSession()->setNotice(Craft::t('museum-plus-for-craft-cms', 'Sync queued. Reload page in a while to see changes.'));
 
-        $person->slug = $person->title;
-
-        $success = Craft::$app->elements->saveElement($person);
-
-        if($success){
-            Craft::$app->getSession()->setSuccess(Craft::t('museum-plus-for-craft-cms', "Person synced."));
-        }else{
-            Craft::$app->getSession()->setError(Craft::t('museum-plus-for-craft-cms', "Person not synced."));
-        }
         return $this->redirectToPostedUrl($person);
 
     }

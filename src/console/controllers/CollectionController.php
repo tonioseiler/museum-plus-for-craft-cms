@@ -346,7 +346,7 @@ class CollectionController extends Controller
             }
         }
 
-        $success = $person->save();
+        $success = Craft::$app->elements->saveElement($person, false);
         return $person;
     }
 
