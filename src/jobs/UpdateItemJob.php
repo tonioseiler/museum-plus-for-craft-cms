@@ -19,7 +19,6 @@ use furbo\museumplusforcraftcms\records\LiteratureRecord;
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
-use furbo\museumplusforcraftcms\records\PersonRecord;
 use Yii;
 
 /**
@@ -36,11 +35,8 @@ class UpdateItemJob extends BaseJob
     public $ignoreMultimedia;
     public $ignoreLiterature;
 
-    private $showDetailedLog = true;
-
     private $queue = null;
     private $logger = null;
-
 
     public function execute($queue): void
     {
@@ -54,15 +50,13 @@ class UpdateItemJob extends BaseJob
             ->where(['collectionId' => $this->collectionId])
             ->one();
         $isNewItem = !$item;
-        $this->logger->info('-------------');
         $message = $isNewItem
             ? "Creating new MuseumPlusItem (Collection ID: {$this->collectionId})."
             : "Updating MuseumPlusItem (Collection ID: {$this->collectionId}).";
-        Craft::info($message, 'museumplus');
-
         $this->logger->info($message);
+
         $this->setProgress($this->queue, 0.01, "Update initialized");
-        
+
         try {
             $this->updateItemFromMuseumPlus($this->collectionId);
             $this->triggerUpdateEvent($this->collectionId, $isNewItem);
@@ -70,13 +64,12 @@ class UpdateItemJob extends BaseJob
             $this->updateItemParentChildRelationShips($this->collectionId);
             $this->updateItemSort($this->collectionId);
             $message = "Successfully processed MuseumPlusItem (ID: {$this->collectionId}).";
-            Craft::info($message, 'museumplus');
             $this->logger->info($message);
             $this->setProgress($this->queue, 1, "Update done");
         } catch (\Throwable $e) {
             $message = "Error processing MuseumPlusItem (ID: {$this->collectionId}): " . $e->getMessage();
-            Craft::error($message, 'museumplus');
             $this->logger->error($message);
+            throw new \Exception("could not update item: " . $e->getMessage());
         }
     }
 
@@ -87,70 +80,54 @@ class UpdateItemJob extends BaseJob
 
     private function updateItemFromMuseumPlus($collectionId)
     {
-        if ($this->showDetailedLog) {
-            $message = "Running updateItemFromMuseumPlus('{$this->collectionId}').";
-            $this->logger->info($message);
-        }
-        try {
+        $message = "Running updateItemFromMuseumPlus('{$this->collectionId}').";
+        $this->logger->debug($message);
 
-            /*
-            $museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
-            $o = $museumPlus->getObjectDetail($collectionId);
-            $item = $this->createOrUpdateItem($o);
-            */
+        try {
 
             $this->setProgress($this->queue, 0.1, "Retreiving item details");
             $o = $this->museumPlus->getObjectDetail($collectionId);
-            $this->setProgress($this->queue, 0.2, "Updating item details");
+            $this->setProgress($this->queue, 0.15, "Updating item details");
             $item = $this->createOrUpdateItem($o);
 
             //add attachment
             //echo '- Main image'.PHP_EOL;
             if (!$this->ignoreAttachments) {
-                $this->setProgress($this->queue, 0.3, "Updating item attachments");
+                $this->setProgress($this->queue, 0.2, "Updating item attachments");
                 $assetId = $this->createAttachmentFromObjectId($item->collectionId);
                 if ($assetId) {
                     //echo "Attachment for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
                     $item->assetId = $assetId;
                     Craft::$app->elements->saveElement($item);
-                    if ($this->showDetailedLog) {
-                        $this->logger->info("Attachment for item " . $item->id . " AssetID: " . $assetId);
-                    }
+                    $this->logger->debug("Attachment for item " . $item->id . " AssetID: " . $assetId);
                 } else {
-                    //echo "Attachment for item " . $item->id . " AssetID: NULL" . PHP_EOL;
-                    if ($this->showDetailedLog) {
-                        $this->logger->info("Attachment for item " . $item->id . " AssetID: NULL");
-                    }
+                    $this->logger->debug("Attachment for item " . $item->id . " AssetID: NULL");
                 }
             }
 
             $moduleRefs = $item->getDataAttribute('moduleReferences');
             //add multimedia
-            //echo '- Multimedia files'.PHP_EOL;
             if (!$this->ignoreMultimedia && isset($moduleRefs['ObjMultimediaRef'])) {
-                $this->setProgress($this->queue, 0.4, "Updating item multimedia objects");
+                $this->setProgress($this->queue, 0.3, "Updating item multimedia objects");
                 $assetIds = [];
                 $refs = $moduleRefs['ObjMultimediaRef']['items'];
                 $this->sortArray($refs, 'SortLnu');
+                $count = 0;
                 foreach ($refs as $mm) {
                     $assetId = $this->createMultimediaFromId($mm['id'], $collectionId);
                     if ($assetId) {
                         $assetIds[] = $assetId;
-                        if ($this->showDetailedLog) {
-                            $this->logger->info("Asset created: AssetID: " . $assetId);
-                        }
+                        $this->logger->debug("Asset created: AssetID: " . $assetId);
 
                     }
+                    $count++;
+                    $this->setProgress($this->queue, 0.3 + ($count / (10 * count($refs))), "Updating item multimedia objects");
                 }
                 if (count($assetIds)) {
-                    if ($this->showDetailedLog) {
-                        $this->logger->info("At least one asset");
-                    }
+                    $this->logger->debug("At least one asset");
 
                     $item->syncMultimediaRelations($assetIds);
-                    if ($this->showDetailedLog) {
-                        $this->logger->info("syncMultimediaRelations() executed");
-                    }
+                    $this->logger->debug("syncMultimediaRelations() executed");
 
                     //echo "Multimedia assets for Item Id: " . $item->id . " Asset IDs: " . implode(",", $assetIds) . PHP_EOL;
                 }
@@ -160,9 +137,10 @@ class UpdateItemJob extends BaseJob
             //add literature relations
             $literatureIds = [];
             if (isset($moduleRefs['ObjLiteratureRef'])) {
-                $this->setProgress($this->queue, 0.6, "Updating item literature objects");
+                $this->setProgress($this->queue, 0.4, "Updating item literature objects");
                 $refs = $moduleRefs['ObjLiteratureRef']['items'];
                 $this->sortArray($refs, 'SortLnu');
+                $count = 0;
                 foreach ($refs as $l) {
                     try {
                         $data = $this->museumPlus->getLiterature($l['id']);
@@ -175,24 +153,24 @@ class UpdateItemJob extends BaseJob
                     } catch (\GuzzleHttp\Exception\ClientException $e) {
                         echo "WARNING: " . $e->getMessage() . PHP_EOL;
                     }
+                    $count++;
+                    $this->setProgress($this->queue, 0.4 + ($count / (10 * count($refs))), "Updating item literature objects");
                 }
             }
 
             //sync
             if (count($literatureIds)) {
                 $item->syncLiteratureRelations($literatureIds);
-                if ($this->showDetailedLog) {
-                    $this->logger->info("Literatures added");
-                }
-                //echo 'l';
+                $this->logger->debug("Literatures added");
             }
 
             //add literature assets
             if (!$this->ignoreLiterature && isset($moduleRefs['ObjLiteratureRef'])) {
-                $this->setProgress($this->queue, 0.7, "Updating item literature assets");
+                $this->setProgress($this->queue, 0.5, "Updating item literature assets");
                 $assetIds = [];
                 $refs = $moduleRefs['ObjLiteratureRef']['items'];
                 $this->sortArray($refs, 'SortLnu');
+                $count = 0;
                 foreach ($refs as $l) {
                     $assetId = $this->createLiteratureFromId($l['id']);
                     $literature = $this->museumPlus->getLiterature($l['id']);
@@ -200,51 +178,45 @@ class UpdateItemJob extends BaseJob
                         //echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId . PHP_EOL;
                         $literature->assetId = $assetId;
                         $literature->save();
-                        if ($this->showDetailedLog) {
-                            $this->logger->info("Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId);
-                        }
+                        $this->logger->debug("Literature for id " . $literature->id . " for item " . $item->id . " AssetID: " . $assetId);
 
                     } else {
                         //echo "Literature for id " . $literature->id . " for item " . $item->id . " AssetID: NULL" . PHP_EOL;
                     }
+                    $count++;
+                    $this->setProgress($this->queue, 0.5 + ($count / (10 * count($refs))), "Updating item literature assets");
                 }
             }
 
-
             //add people refs
-            $this->setProgress($this->queue, 0.8, "Updating item people");
+            $this->setProgress($this->queue, 0.6, "Updating item people");
             $peopleTypes = ['ObjAdministrationRef', 'ObjPerOwnerRef', 'ObjPerAssociationRef'];
             foreach ($peopleTypes as $peopleType) {
                 if (isset($moduleRefs[$peopleType])) {
-                    $peopleIds = [];
                     $refs = $moduleRefs[$peopleType]['items'];
                     $this->sortArray($refs, 'SortLnu');
+                    $peopleIds = [];
                     foreach ($refs as $p) {
+
                         try {
                             $data = $this->museumPlus->getPerson($p['id']);
                             $person = $this->createOrUpdatePerson($data);
-                            if ($person) {
-                                $peopleIds[] = $person->id;
-                            }
                         } catch (\GuzzleHttp\Exception\ClientException $e) {
                             echo "WARNING: " . $e->getMessage() . PHP_EOL;
                         }
+                        $peopleIds[] = $person->id;
                     }
                     //sync
                     if (count($peopleIds)) {
                         $item->syncPeopleRelations($peopleIds, $peopleType);
-                        if ($this->showDetailedLog) {
-                            $this->logger->info("People added");
-                        }
-
-                        //echo 'p';
+                        $this->logger->debug("People added to item");
                     }
                 }
             }
 
-
             //add owenrship refs
             $ownershipIds = [];
+            $this->setProgress($this->queue, 0.7, "Updating item ownerships");
             if (isset($moduleRefs['ObjOwnershipRef'])) {
                 $refs = $moduleRefs['ObjOwnershipRef']['items'];
                 $this->sortArray($refs, 'SortLnu');
@@ -254,6 +226,23 @@ class UpdateItemJob extends BaseJob
                         $ownership = $this->createOrUpdateOwnership($data);
                         if ($ownership) {
                             $ownershipIds[] = $ownership->id;
+                            $ownershipData = json_decode($ownership->data);
+                            $ownershipPersonRefs = $ownershipData->moduleReferences->OwsPersonRef->items;
+                            $peopleIds = [];
+                            foreach ($ownershipPersonRefs as $p) {
+                                try {
+                                    $data = $this->museumPlus->getPerson($p->id);
+                                    $person = $this->createOrUpdatePerson($data);
+                                    $peopleIds[] = $person->id;
+
+                                } catch (\GuzzleHttp\Exception\ClientException $e) {
+                                    echo "WARNING: " . $e->getMessage() . PHP_EOL;
+                                }
+                            }
+
+                            //sync
+                            $ownership->syncPeopleRelations($peopleIds);
+
                         }
                     } catch (\GuzzleHttp\Exception\ClientException $e) {
                         echo "WARNING: " . $e->getMessage() . PHP_EOL;
@@ -263,17 +252,15 @@ class UpdateItemJob extends BaseJob
             //sync
             if (count($ownershipIds)) {
                 $item->syncOwnershipRelations($ownershipIds);
-                if ($this->showDetailedLog) {
-                    $this->logger->info("Ownerships added");
-                }
-                //echo 'o';
+                $this->logger->debug("Ownerships added to item");
             }
 
             $this->updateVocabularyRefs($item);
 
         } catch (\Exception $e) {
             //     echo $item->id . " could not be fully updated." . PHP_EOL;
-            echo $e->getMessage() . PHP_EOL;
+            $this->logger->error($e->getMessage());
+            throw new \Exception("could not update item from museum plus: " . $e->getMessage());
         } finally {
             gc_collect_cycles(); //force garbage collection
         }
@@ -282,10 +269,7 @@ class UpdateItemJob extends BaseJob
 
     private function triggerUpdateEvent($collectionItemId, $isNewItem = false)
     {
-        if ($this->showDetailedLog) {
-            $this->logger->info('running triggerUpdateEvent()');
-        }
-
+        $this->logger->debug('running triggerUpdateEvent()');
         $this->setProgress($this->queue, 0.85, "Trigger update event");
 
         $item = MuseumPlusItem::find()
@@ -302,10 +286,7 @@ class UpdateItemJob extends BaseJob
 
     private function updateItemToItemRelationShips($collectionId)
     {
-        if ($this->showDetailedLog) {
-            $this->logger->info('running updateItemToItemRelationShips()');
-        }
-
+        $this->logger->debug('running updateItemToItemRelationShips()');
         $this->setProgress($this->queue, 0.9, "Update item to item relationships");
 
         $item = MuseumPlusItem::find()
@@ -330,7 +311,7 @@ class UpdateItemJob extends BaseJob
                 //sync
                 if (count($ids)) {
                     $item->syncItemRelations($ids);
-                    echo '.';
+                    $this->logger->debug('syncItemRelations() executed');
                 }
             }
         }
@@ -339,10 +320,7 @@ class UpdateItemJob extends BaseJob
 
     private function updateItemParentChildRelationShips($collectionId)
     {
-        if ($this->showDetailedLog) {
-            $this->logger->info('running updateItemParentChildRelationShips()');
-        }
-
+        $this->logger->debug('running updateItemParentChildRelationShips()');
         $this->setProgress($this->queue, 0.92, "Update item parent child relationships");
 
         $item = MuseumPlusItem::find()
@@ -357,6 +335,7 @@ class UpdateItemJob extends BaseJob
 
         $moduleRefs = $item->getDataAttribute('moduleReferences');
 
+        //check if there are any children
         if (isset($moduleRefs['ObjObjectPartRef']) && count($moduleRefs['ObjObjectPartRef']['items']) > 0) {
             $parts = $moduleRefs['ObjObjectPartRef']['items'];
             foreach ($parts as $part) {
@@ -369,15 +348,26 @@ class UpdateItemJob extends BaseJob
                 }
             }
         }
+
+        //check if it has a parent, if yes, update the parent
+        if (isset($moduleRefs['ObjObjectMainRef']) && count($moduleRefs['ObjObjectMainRef']['items']) > 0) {
+            $parents = $moduleRefs['ObjObjectPartRef']['items'];
+            foreach ($parents as $parent) {
+                $parentRecord = MuseumPlusItemRecord::find()
+                    ->where(['collectionId' => $parent['id']])
+                    ->one();
+                if ($parentRecord && $parentRecord->collectionId != $item->collectionId) {
+                    $this->logger->debug('Parent found: ' . $parentRecord->collectionId);
+                    $this->updateItemParentChildRelationShips($parentRecord->collectionId);
+                }
+            }
+        }
     }
 
 
     private function updateItemSort($collectionId)
     {
-        if ($this->showDetailedLog) {
-            $this->logger->info('running updateItemSort()');
-        }
-
+        $this->logger->debug('running updateItemSort()');
         $this->setProgress($this->queue, 0.95, "Update item sort");
 
         $item = MuseumPlusItem::find()
@@ -389,53 +379,42 @@ class UpdateItemJob extends BaseJob
             if ($sort) {
                 $item->sort = $sort;
                 if (Craft::$app->elements->saveElement($item)) {
-                    echo $item->id . " - " . $sort;
-                    echo "\n";
+                    $this->logger->debug($item->id . " - " . $sort);
                 } else {
-                    echo 'Could not save item';
+                    $this->logger->warning('Could not save item');
                 }
             }
         } catch (\Exception $e) {
-            echo $e->getMessage() . PHP_EOL;
+            $this->logger->warning($e->getMessage());
+            throw new \Exception("could not update item sort string");
         }
     }
 
     private function createOrUpdateItem($object)
     {
         $collectionId = $object->id;
-
-        if ($this->showDetailedLog) {
-            $this->logger->info('running createOrUpdateItem()');
-        }
+        $this->logger->debug('running createOrUpdateItem()');
 
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
 
         if (empty($item)) {
-
             //create new
+            $this->logger->info('running createOrUpdateItem(): create new item, collectionId: '.$collectionId.' - element id: not yet available');
             $item = new MuseumPlusItem();
             $item->collectionId = $collectionId;
-            
-            $this->logger->info('running createOrUpdateItem(): create new item, collectionId: '.$item->collectionId.' - element id: not yet available');
-
-
-
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
         } else {
-            if ($this->showDetailedLog) {
-                $this->logger->info('running createOrUpdateItem(): update existing item');
-            }
+            $this->logger->debug('running createOrUpdateItem(): update existing item');
 
             //update
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
 
-
         }
-//dd($item->data);
+
         $inventoryNumber = $object->ObjObjectNumberVrt ?? '';//$item->getDataAttribute('ObjObjectNumberVrt');
         if (empty($inventoryNumber))
             $inventoryNumber = $object->ObjObjectNumberTxt ?? '';
@@ -443,27 +422,14 @@ class UpdateItemJob extends BaseJob
             $item->inventoryNumber = $inventoryNumber;
         }
 
-
         $success = Craft::$app->elements->saveElement($item, false, true,true);
 
-
-        //$success = Craft::$app->elements->saveElement($item, false,false);
         if (!$success) {
             $this->logger->error('Could not save item: ' . print_r($item->getErrors(), true));
             return false;
         } else {
-            if ($this->showDetailedLog) {
-                $this->logger->info('Item successfully saved ');
-            }
+            $this->logger->debug('Item successfully saved ');
             $this->logger->info('new or already existing element id: '.$item->id.' -- collectionId: '.$item->collectionId);
-
-            /*
-            Craft::$app->getQueue()->push(new UpdateSearchIndex([
-                'elementType' => MuseumPlusItem::class,
-                'elementId' => $item->id,
-            ]));
-            */
-
         }
 
         //insert object relations if they do not exist
@@ -483,21 +449,14 @@ class UpdateItemJob extends BaseJob
 
     private function createAttachmentFromObjectId($id)
     {
-        if ($this->showDetailedLog) {
-            $this->logger->info('running createAttachmentFromObjectId()');
-        }
+        $this->logger->debug('running createAttachmentFromObjectId()');
 
-
-        $museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
-        // Paolo search this $this->museumPlus
-        $attachment = $museumPlus->getAttachmentByObjectId($id);
+        $attachment = $this->museumPlus->getAttachmentByObjectId($id);
 
         $settings = MuseumPlusForCraftCms::$plugin->getSettings();
         // $folderId = $this->settings['attachmentVolumeId'];
         $folderId = $settings['attachmentVolumeId'];
-        if ($this->showDetailedLog) {
-            $this->logger->info('attachmentVolumeId: ' . $folderId);
-        }
+        $this->logger->debug('attachmentVolumeId: ' . $folderId);
 
         $folder = $this->assets->findFolder(['id' => $folderId]);
         $parentFolder = $this->createFolder("Items");
@@ -508,9 +467,7 @@ class UpdateItemJob extends BaseJob
                 return $asset->id;
             }
         }
-        if ($this->showDetailedLog) {
-            $this->logger->info('finished createAttachmentFromObjectId()');
-        }
+        $this->logger->debug('finished createAttachmentFromObjectId()');
 
         return false;
     }
@@ -520,13 +477,13 @@ class UpdateItemJob extends BaseJob
         $volumeId = $this->settings['attachmentVolumeId'];
         $volume = Craft::$app->volumes->getVolumeById($volumeId);
         if (!$volume) {
-            Craft::error("Volume with ID {$volumeId} not found.", __METHOD__);
+            $this->logger->error("Volume with ID {$volumeId} not found.");
             return false;
         }
         // Find the root folder for this volume
         $rootFolder = Craft::$app->assets->getRootFolderByVolumeId($volumeId);
         if (!$rootFolder) {
-            Craft::error("Root folder for volume ID {$volumeId} not found.", __METHOD__);
+            $this->logger->error("Root folder for volume ID {$volumeId} not found.");
             return false;
         }
 
@@ -568,18 +525,21 @@ class UpdateItemJob extends BaseJob
 
     }
 
-    private function createAsset($id, $attachment, $parentFolder)
+    private function createAsset($id, $attachment, $parentFolder, $title=false)
     {
         $basename = pathinfo($attachment, PATHINFO_FILENAME);
         $basename = FileHelper::sanitizeFilename($basename, [true, '_']);
         $extension = pathinfo($attachment, PATHINFO_EXTENSION);
         $filename = $basename . '_' . $id . '.' . $extension;
-        $title = Assets::filename2Title($basename . '_' . $id);
+        if(!$title) {
+            $title = Assets::filename2Title($basename . '_' . $id);
+        }
         try {
             $asset = Asset::find()->title($title)->folderId($parentFolder->id)->one();
             if (is_null($asset)) {
                 $asset = new Asset();
             }
+            $asset->title = $title;
             $asset->tempFilePath = $attachment;
             $asset->filename = $filename;
             $asset->newFolderId = $parentFolder->id;
@@ -595,7 +555,7 @@ class UpdateItemJob extends BaseJob
                 return false;
             }
         } catch (\Throwable $e) {
-            return false;
+            throw new \Exception("could not create asset: " . $e->getMessage());
         }
         return false;
     }
@@ -735,19 +695,16 @@ class UpdateItemJob extends BaseJob
     private function createOrUpdatePerson($data)
     {
         $collectionId = $data->id;
-
         $person = MuseumPlusPerson::find()
             ->where(['collectionId' => $collectionId])
             ->one();
-
         if (empty($person)) {
-            //create new
             $person = new MuseumPlusPerson();
             $person->collectionId = $collectionId;
-
-            $success = Craft::$app->elements->saveElement($person);
+            $success = Craft::$app->elements->saveElement($person, false);
         }
         //update
+        //TODO: check last modified date if we need to update the person
         $person->data = json_encode($data);
         if (!empty($data->PerNameTxt))
             $person->title = $data->PerNameTxt;
@@ -758,32 +715,106 @@ class UpdateItemJob extends BaseJob
         else
             $person->title = 'Unknown';
 
-        $success = Craft::$app->elements->saveElement($person);
+        $moduleRefs = $person->getDataAttribute('moduleReferences');
+
+        // TODO Paolo check PerLiteratureRef, get the id, check if literature entry exists, if not create it
+
+        if (isset($moduleRefs['PerLiteratureRef'])) {
+            $refs = $moduleRefs['PerLiteratureRef']['items'];
+            //$this->sortArray($refs, 'SortLnu');
+            $count = 0;
+            foreach ($refs as $l) {
+                try {
+                    $data = $this->museumPlus->getLiterature($l['id']);
+                    if ($data) {
+                        $literature = $this->createOrUpdateLiterature($data);
+                        echo "------- createOrUpdateLiterature: " .$l['id'] . PHP_EOL;
+                        /*
+                        if ($literature) {
+                            $literatureIds[] = $literature->id;
+                        }
+                        */
+                    }
+                } catch (\GuzzleHttp\Exception\ClientException $e) {
+                    echo "WARNING: " . $e->getMessage() . PHP_EOL;
+                }
+            }
+        }
+
+
+        if (!$this->ignoreMultimedia && isset($moduleRefs['PerMultimediaRef'])) {
+            $assetIds = [];
+            $refs = $moduleRefs['PerMultimediaRef']['items'];
+            // $this->sortArray($refs, 'SortLnu');
+            // TODO Paolo: before deleting the old assets, we should check if they are still in the new list
+            // maybe first get an array of the current assets ids and then check with the ones ACTIVE from museum plus
+            // also check if we already have the asset in the database
+            $this->deletePersonMultimedia($person->id);
+            foreach ($refs as $mm) {
+                $assetId = $this->createPersonMultimediaFromId($mm['id'], $collectionId);
+                if ($assetId) {
+                    $assetIds[] = $assetId;
+                }
+            }
+            if (count($assetIds)) {
+                $person->syncPersonMultimediaRelations($assetIds);
+            }
+        }
+        $success = $person->save();
         return $person;
     }
 
-    public function actionUpdateItemsInventory()
+
+    private function createPersonMultimediaFromId($id, $personId = null)
     {
-        App::maxPowerCaptain();
-        $itemIds = MuseumPlusItem::find()->ids();
-        foreach ($itemIds as $itemId) {
-            $item = MuseumPlusItem::find()
-                ->id($itemId)
-                ->one();
-            echo $itemId . " => ";
-            try {
-                $this->updateItemInventory($item->collectionId);
-            } catch (\Exception $e) {
-                echo $e->getMessage() . PHP_EOL;
+
+        //$attachment = $this->museumPlus->getMultimediaById($id);
+        $attachmentWithTitle = $this->museumPlus->getCompleteMultimediaById($id);
+        if($attachmentWithTitle) {
+            $attachment = $attachmentWithTitle['file'];
+            $title = $attachmentWithTitle['title'];
+            $folderId = $this->settings['attachmentVolumeId'];
+            $folder = $this->assets->findFolder(['id' => $folderId]);
+            $parentFolder = $this->createFolder("People");
+            $itemFolder = $this->createFolder($personId, $parentFolder->id, $parentFolder->path);
+            // TODO: should we filter by file type?
+            $asset = $this->createAsset($id, $attachment, $itemFolder, $title);
+            if ($asset) {
+                return $asset->id;
             }
+            /*
+            $fileTypes = $this->settings['attachmentFileTypes'];
+            if (!empty($fileTypes)) {
+                // only allow file types defined in plugin settings.
+                $pattern = '/\.(' . str_replace(', ', '|', $fileTypes) . ')$/i';
+                if (preg_match($pattern, $attachment)) {
+                    $asset = $this->createAsset($id, $attachment, $itemFolder);
+                    if ($asset) {
+                        return $asset->id;
+                    }
+                }
+            } else {
+                // allow any file type
+                $asset = $this->createAsset($id, $attachment, $itemFolder);
+                if ($asset) {
+                    return $asset->id;
+                }
+            }
+            */
         }
+        return false;
     }
+
+    private function deletePersonMultimedia($peopleId){
+        Craft::$app->db->createCommand()
+            ->delete('{{%museumplus_people_assets}}', ['peopleId' => $peopleId])->execute();
+    }
+
 
     private function updateVocabularyRefs(MuseumPlusItem $item)
     {
         //add vocabulary refs
         $vocabularyRefs = $item->getDataAttribute('vocabularyReferences');
-        // '$vocabularyRefs:<br><textarea style="width:600px;height:500px;">'.print_r($vocabularyRefs,true).'</textarea><br>';
         $syncData = [];
         foreach ($vocabularyRefs as $vocabularyRef) {
             $ids = [];
@@ -794,17 +825,13 @@ class UpdateItemJob extends BaseJob
                     // Using the node id from above we get the vocabulary data for the entry: content, id, parentId (directly from the m+ server)
                     // this node id is not the collection id, but the id of the vocabulary node connection
                     $data = $this->museumPlus->getVocabularyNode($type, $vc['id']);
-                    //echo '<textarea style="width:600px;height:500px;">Type: '.$type.' ['.$vc['id'].'] '.print_r($data,true).'</textarea>';
                     foreach ($data as $d) {
                         $vocabularyEntry = $this->createOrUpdateVocabularyEntry($type, $d);
                         if ($vocabularyEntry) {
                             if (!empty($vocabularyEntry->id)) {
                                 $ids[] = $vocabularyEntry->id;
                             }
-                            //echo 'vocabularyEntry id: ' . $vocabularyEntry->id . ' pid: ' . $vocabularyEntry->parentId . '<br>';
                             //probaly can be remooved to get all the tree
-                            //if(($type=='GenGeoCultureVgr')||($type=='GenGeoPoliticalVgr')||($type=='GenGeoGeographyVgr')||($type=='GenGeoHistoryVgr') ){
-                            // for geo vocabularies we need the whole tree
                             $currentParentId = $vocabularyEntry->parentId;
                             $currentParentNodeId = $vc['id'];
                             $counter = 0;
@@ -827,22 +854,11 @@ class UpdateItemJob extends BaseJob
                                     $currentParentNodeId = $parentNodeId;
                                 }
                             }
-                            /*} else {
-                                // we get only the direct parent
-                                if($vocabularyEntry->parentId > 0) {
-                                    //echo 'we have a parent: '.$vocabularyEntry->parentId.'<br>';
-                                    $parentNodeId = $this->museumPlus->getVocabularyParentNodeId($type,$vc['id']);
-                                    //echo 'parentNodeId: '.$parentNodeId.'<br>';
-                                    $dataParent = $this->museumPlus->getVocabularyNode($type,$parentNodeId);
-                                    foreach ($dataParent as $dp) {
-                                        $vocabularyEntryParent = $this->createOrUpdateVocabularyEntry($type, $dp);
-                                    }
-                                }
-                            }*/
                         }
                     }
                 } catch (\GuzzleHttp\Exception\ClientException $e) {
                     echo "WARNING: " . $e->getMessage() . PHP_EOL;
+                    throw new \Exception("could not update vocabulary refs: " . $e->getMessage());
                 }
             }
             if (isset($syncData[$type])) {
@@ -855,9 +871,6 @@ class UpdateItemJob extends BaseJob
         }
         if (count($syncData)) {
             $item->syncVocabularyRelations($syncData);
-            //echo 'v';
         }
     }
-
-
 }

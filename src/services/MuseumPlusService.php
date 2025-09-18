@@ -206,6 +206,42 @@ class MuseumPlusService extends Component
             return false;
         }
     }
+
+    public function getCompleteMultimediaById($multimediaId)
+    {
+        $this->init();
+        try {
+            $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Multimedia/' . $multimediaId , $this->requestHeaders);
+            $xml = $this->getDetail($request);
+            $mmObject=$this->createDataObjectFromXML($xml);
+            $getMultimediaFile = false;
+            foreach ($mmObject->vocabularyReferences as $vocabularyReference) {
+                if ($vocabularyReference->name == 'MulInternetVoc') {
+                    if ($vocabularyReference->items[0]->value == 'ja') {
+                        $getMultimediaFile = true;
+                        $multimediaTitle = $mmObject->MulTitleTxt;
+                        break;
+                    }
+                }
+            }
+            if($getMultimediaFile) {
+                try {
+                    $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Multimedia/' . $multimediaId . '/attachment', $this->requestHeaders);
+                    return [
+                        'file' => $this->responseFile($request),
+                        'title' => $multimediaTitle,
+                    ];
+                } catch (\Exception $e) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     public function getLiteratureById($literatureId)
     {
         $this->init();
@@ -233,13 +269,14 @@ class MuseumPlusService extends Component
     {
         $res = $this->client->sendAsync($request)->wait();
         $responseXml = simplexml_load_string($res->getBody()->getContents());
-        if ($responseXml->modules->module->moduleItem->attachment->attributes()->{"name"}) {
-            $fileName = $responseXml->modules->module->moduleItem->attachment->attributes()->{"name"}->__toString();
+        $attachment = $responseXml->modules->module->moduleItem->attachment;
+        if ($attachment->attributes()->{"name"}) {
+            $fileName = $attachment->attributes()->{"name"}->__toString();
         } else {
             return false;
         }
-        if ($responseXml->modules->module->moduleItem->attachment->value) {
-            $base64 = $responseXml->modules->module->moduleItem->attachment->value->__toString();
+        if ($attachment->value) {
+            $base64 = $attachment->value->__toString();
         } else {
             return false;
         }
@@ -354,11 +391,11 @@ class MuseumPlusService extends Component
     public function getPerson($personId)
     {
         $that = $this;
-        $cacheKey = Craft::$app->cache->buildKey('museumplus.people.'.$personId);
+        $cacheKey = Craft::$app->cache->buildKey('museumplus.people1.'.$personId);
         $seconds = self::CACHE_DURATION;
         $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $personId) {
             $that->init();
-            //normal get is very slow, so do a search to limit fields
+            //$request = new Request('GET', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Person/'.$personId.'/', $that->requestHeaders);
             $body = '<?xml version="1.0" encoding="UTF-8"?>
                 <application xmlns="http://www.zetcom.com/ria/ws/module/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zetcom.com/ria/ws/module/search http://www.zetcom.com/ria/ws/module/search/search_1_1.xsd">
                   <modules>
@@ -424,17 +461,58 @@ class MuseumPlusService extends Component
                           <field fieldPath="PerUuidVrt"/>
                           <field fieldPath="PerPersonVrt"/>
                           <field fieldPath="PerURLGrp"/>
+                          <field fieldPath="PerURLGrp.repeatableGroupItem"/>
+                          <field fieldPath="PerURLGrp.AddressTxt"/>
+                          <field fieldPath="PerURLGrp.NotesClb"/>
+                          <field fieldPath="PerURLGrp.TypeVoc"/>
                           <field fieldPath="PerGeographyGrp"/>
                           <field fieldPath="PerFunctionsGrp"/>
+                          <field fieldPath="PerFunctionsGrp.repeatableGroupItem"/>
+                          <field fieldPath="PerFunctionsGrp.TypeVoc"/>
                           <field fieldPath="PerBiographicalNoteGrp"/>
+                          <field fieldPath="PerBiographicalNoteGrp.repeatableGroupItem"/>
+                          <field fieldPath="PerBiographicalNoteGrp.InternetBoo"/>
+                          <field fieldPath="PerBiographicalNoteGrp.SourceTxt"/>
+                          <field fieldPath="PerBiographicalNoteGrp.TextClb"/>
+                          <field fieldPath="PerBiographicalNoteGrp.DateFromTxt"/>
+                          <field fieldPath="PerBiographicalNoteGrp.StatusVoc"/>
+                          <field fieldPath="PerBiographicalNoteGrp.TypeVoc"/>
                           <field fieldPath="PerDateGrp"/>
+                          <field fieldPath="PerDateGrp.repeatableGroupItem"/>
+                          <field fieldPath="PerDateGrp.PlaceToTxt"/>
+                          <field fieldPath="PerDateGrp.PlaceTxt"/>
+                          <field fieldPath="PerDateGrp.CountryToTxt"/>
+                          <field fieldPath="PerDateGrp.InternetBoo"/>
+                          <field fieldPath="PerDateGrp.CountryTxt"/>
+                          <field fieldPath="PerDateGrp.DateFromTxt"/>
+                          <field fieldPath="PerDateGrp.DateToTxt"/>
+                          <field fieldPath="PerDateGrp.PrefixFromVoc"/>
+                          <field fieldPath="PerDateGrp.PrefixToVoc"/>
                           <field fieldPath="PerGroupsGrp"/>
                           <field fieldPath="PerNameOtherGrp"/>
                           <field fieldPath="PerRightsGrp"/>
+                          <field fieldPath="PerGNDVoc"/>
+                          <field fieldPath="PerGNDVoc.vocabularyReferenceItem"/>
+                          <field fieldPath="PerGNDVoc.name"/>
+                          <field fieldPath="PerGNDVoc.value"/>
+                          <field fieldPath="PerPersonARef"/>
+                          <field fieldPath="PerPersonARef.moduleReferenceItem"/>
+                          <field fieldPath="PerPersonARef.formattedValue"/>
+                          <field fieldPath="PerPersonARef.id"/>
+                          <field fieldPath="PerPersonBRef"/>
+                          <field fieldPath="PerPersonBRef.moduleReferenceItem"/>
+                          <field fieldPath="PerPersonBRef.formattedValue"/>
+                          <field fieldPath="PerPersonBRef.id"/>
+                          <field fieldPath="PerLiteratureRef"/>
+                          <field fieldPath="PerLiteratureRef.moduleReferenceItem"/>
+                          <field fieldPath="PerLiteratureRef.formattedValue"/>
+                          <field fieldPath="PerMultimediaRef"/>
+                          <field fieldPath="PerMultimediaRef.moduleReferenceItem"/>
+                          <field fieldPath="PerMultimediaRef.formattedValue"/>
                         </select>
                         <expert>
                             <and>
-                              <equalsField fieldPath="__id" operand="'.$personId.'" />
+                              <equalsField fieldPath="__id" operand="' . $personId . '" />
                             </and>
                             </expert>
                           </search>
@@ -442,12 +520,18 @@ class MuseumPlusService extends Component
                       </modules>
                     </application>';
             $request = new Request('POST', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Person/search', $that->requestHeaders, $body);
+
+
+            //$request = new Request('GET', 'https://' . $that->hostname . '/' . $that->classifier . '/ria-ws/application/module/Person/' . $personId . '/', $that->requestHeaders);
+
             $res = $that->client->sendAsync($request)->wait();
             $tmp = $that->createDataFromResponse($res);
             if ($tmp['size'] >= 1)
                 return $tmp['data'][0];
             return null;
+
         }, $seconds);
+
 
         return $tmp;
     }

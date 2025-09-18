@@ -61,6 +61,13 @@ class CollectionService extends Component
         return $people;
     }
 
+    public function getPeopleByCollectionId($id) {
+        $people = MuseumPlusPerson::find()
+            ->where(['collectionId' => $id])
+            ->one();
+        return $people;
+    }
+
     public function getAllPeople() {
         $people = MuseumPlusPerson::find()
             ->orderBy(['title' => SORT_ASC])

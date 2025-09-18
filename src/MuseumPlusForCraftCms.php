@@ -83,7 +83,7 @@ class MuseumPlusForCraftCms extends Plugin
      *
      * @var string
      */
-    public string $schemaVersion = '1.0.0';
+    public string $schemaVersion = '5.0.0';
 
     /**
      * Set to `true` if the plugin should have a settings view in the control panel.
@@ -129,7 +129,8 @@ class MuseumPlusForCraftCms extends Plugin
         if (self::$logger === null) {
             $logPath = Craft::getAlias('@storage/logs/museumplus-import-'.date('Y-m-d').'.log');
             self::$logger = new Logger('museumplus');
-            self::$logger->pushHandler(new StreamHandler($logPath, Logger::DEBUG));
+            self::$logger->pushHandler(new StreamHandler($logPath, Logger::INFO));
+            self::$logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
         }
 
         // Add in our console commands

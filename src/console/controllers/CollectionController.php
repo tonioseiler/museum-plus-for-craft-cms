@@ -18,11 +18,11 @@ use craft\helpers\App;
 
 use craft\queue\jobs\ResaveElements;
 use craft\queue\jobs\UpdateSearchIndex;
+use furbo\museumplusforcraftcms\elements\MuseumPlusPerson;
 use furbo\museumplusforcraftcms\elements\MuseumPlusVocabulary;
 use furbo\museumplusforcraftcms\MuseumPlusForCraftCms;
 use furbo\museumplusforcraftcms\elements\MuseumPlusItem;
 use furbo\museumplusforcraftcms\records\ObjectGroupRecord;
-use furbo\museumplusforcraftcms\records\PersonRecord;
 use furbo\museumplusforcraftcms\records\OwnershipRecord;
 use furbo\museumplusforcraftcms\records\LiteratureRecord;
 use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
@@ -94,6 +94,7 @@ class CollectionController extends Controller
      * @var int startId - skip all items with id before this
      */
     public $startId;
+    public $personId;
 
     // Private Properties
     private $start;
@@ -228,6 +229,7 @@ class CollectionController extends Controller
         $options[] = 'ignoreMultimedia';
         $options[] = 'ignoreLiterature';
         $options[] = 'startId';
+        $options[] = 'personId';
         return $options;
     }
 
@@ -252,6 +254,137 @@ class CollectionController extends Controller
             }
         }
         return true;
+    }
+
+    public function actionUpdatePeople()
+    {
+        $numberOfPeopleNotUpdated = 0;
+        $people = MuseumPlusPerson::find()->all();
+        foreach($people as $person) {
+            $data = $this->museumPlus->getPerson($person->collectionId);
+            if($data)
+            {
+                $this->createOrUpdatePerson($data);
+            } else {
+                $numberOfPeopleNotUpdated++;
+                echo "Person with Id:" . $person->id . " and collectionId " . $person->collectionId .' was not updated: should probably be removed'. PHP_EOL;
+            }
+        }
+        echo 'Number of people not updated that should probably be removed: '.$numberOfPeopleNotUpdated . PHP_EOL;
+        return true;
+    }
+
+    public function actionUpdatePerson()
+    {
+        // ./craft museum-plus-for-craft-cms/collection/update-person --personId=4002
+        $data = $this->museumPlus->getPerson($this->personId);
+        if($data) {
+            $this->createOrUpdatePerson($data);
+        }
+        return true;
+    }
+
+    private function createOrUpdatePerson($data)
+    {
+        $collectionId = $data->id;
+
+        $person = MuseumPlusPerson::find()
+            ->where(['collectionId' => $collectionId])
+            ->one();
+
+        if (empty($person)) {
+            //create new
+            $person = new MuseumPlusPerson();
+            $person->collectionId = $collectionId;
+
+            $success = Craft::$app->elements->saveElement($person, false);
+        }
+        //update
+        $person->data = json_encode($data);
+        if (!empty($data->PerNameTxt))
+            $person->title = $data->PerNameTxt;
+        else if (!empty($data->PerNameTxt))
+            $person->title = $data->PerPersonTxt;
+        else if (!empty($data->PerNameVrt))
+            $person->title = $data->PerNameVrt;
+        else
+            $person->title = 'Unknown';
+
+        $moduleRefs = $person->getDataAttribute('moduleReferences');
+        if (!$this->ignoreMultimedia && isset($moduleRefs['PerMultimediaRef'])) {
+            //$this->setProgress($this->queue, 0.4, "Updating item multimedia objects");
+            $assetIds = [];
+            $refs = $moduleRefs['PerMultimediaRef']['items'];
+            //$this->sortArray($refs, 'SortLnu');
+            foreach ($refs as $mm) {
+                $assetId = $this->createPersonMultimediaFromId($mm['id'], $collectionId);
+                if ($assetId) {
+                    $assetIds[] = $assetId;
+                    /*
+                    if ($this->showDetailedLog) {
+                        $this->logger->info("Asset created: AssetID: " . $assetId);
+                    }
+                    */
+                }
+            }
+            if (count($assetIds)) {
+                /*
+                if ($this->showDetailedLog) {
+                    $this->logger->info("At least one asset");
+                }
+                */
+
+                $person->syncPersonMultimediaRelations($assetIds);
+                /*
+                if ($this->showDetailedLog) {
+                    $this->logger->info("syncMultimediaRelations() executed");
+                }
+                */
+
+
+                //echo "Multimedia assets for Item Id: " . $item->id . " Asset IDs: " . implode(",", $assetIds) . PHP_EOL;
+            }
+        }
+
+        $success = $person->save();
+        return $person;
+    }
+
+
+    private function createPersonMultimediaFromId($id, $personId = null)
+    {
+        $attachment = $this->museumPlus->getMultimediaById($id);
+        $folderId = $this->settings['attachmentVolumeId'];
+        $folder = $this->assets->findFolder(['id' => $folderId]);
+        $parentFolder = $this->createFolder("People");
+        $itemFolder = $this->createFolder($personId, $parentFolder->id, $parentFolder->path);
+        if ($attachment) {
+            // TODO: should we filter by file type?
+            $asset = $this->createAsset($id, $attachment, $itemFolder);
+            if ($asset) {
+                return $asset->id;
+            }
+            /*
+            $fileTypes = $this->settings['attachmentFileTypes'];
+            if (!empty($fileTypes)) {
+                // only allow file types defined in plugin settings.
+                $pattern = '/\.(' . str_replace(', ', '|', $fileTypes) . ')$/i';
+                if (preg_match($pattern, $attachment)) {
+                    $asset = $this->createAsset($id, $attachment, $itemFolder);
+                    if ($asset) {
+                        return $asset->id;
+                    }
+                }
+            } else {
+                // allow any file type
+                $asset = $this->createAsset($id, $attachment, $itemFolder);
+                if ($asset) {
+                    return $asset->id;
+                }
+            }
+            */
+        }
+        return false;
     }
 
     public function actionUpdateSearchIndex()
@@ -323,4 +456,90 @@ class CollectionController extends Controller
         }
         echo "done\n";
     }
+
+    private function createFolder($folderName, $parentFolderId = null, $parentFolderPath = null)
+    {
+        $volumeId = $this->settings['attachmentVolumeId'];
+        $volume = Craft::$app->volumes->getVolumeById($volumeId);
+        if (!$volume) {
+            Craft::error("Volume with ID {$volumeId} not found.", __METHOD__);
+            return false;
+        }
+        // Find the root folder for this volume
+        $rootFolder = Craft::$app->assets->getRootFolderByVolumeId($volumeId);
+        if (!$rootFolder) {
+            Craft::error("Root folder for volume ID {$volumeId} not found.", __METHOD__);
+            return false;
+        }
+
+        if ($parentFolderId !== null) {
+            // Check if the folder already exists
+            $existingFolder = Craft::$app->assets->findFolder([
+                'name' => $folderName,
+                'parentId' => $parentFolderId
+            ]);
+            if ($existingFolder) {
+                return $existingFolder;
+            } else {
+                $folder = new VolumeFolder();
+                $folder->parentId = $parentFolderId;
+                $folder->name = $folderName;
+                $folder->volumeId = $volumeId;
+                $folder->path = $parentFolderPath . $folderName . '/';
+                $this->assets->createFolder($folder);
+                return $folder;
+            }
+        } else {
+// Check if the folder already exists
+            $existingFolder = Craft::$app->assets->findFolder([
+                'name' => $folderName,
+                'parentId' => $rootFolder->id
+            ]);
+            if ($existingFolder) {
+                return $existingFolder;
+            } else {
+                $folder = new VolumeFolder();
+                $folder->parentId = $rootFolder->id;
+                $folder->name = $folderName;
+                $folder->volumeId = $volumeId;
+                $folder->path = $folderName . '/';
+                $this->assets->createFolder($folder);
+                return $folder;
+            }
+        }
+
+    }
+
+    private function createAsset($id, $attachment, $parentFolder)
+    {
+        $basename = pathinfo($attachment, PATHINFO_FILENAME);
+        $basename = FileHelper::sanitizeFilename($basename, [true, '_']);
+        $extension = pathinfo($attachment, PATHINFO_EXTENSION);
+        $filename = $basename . '_' . $id . '.' . $extension;
+        $title = Assets::filename2Title($basename . '_' . $id);
+        try {
+            $asset = Asset::find()->title($title)->folderId($parentFolder->id)->one();
+            if (is_null($asset)) {
+                $asset = new Asset();
+            }
+            $asset->tempFilePath = $attachment;
+            $asset->filename = $filename;
+            $asset->newFolderId = $parentFolder->id;
+            $asset->setVolumeId($parentFolder->volumeId);
+            $asset->setScenario(Asset::SCENARIO_CREATE);
+            $asset->avoidFilenameConflicts = true;
+
+            $result = Craft::$app->getElements()->saveElement($asset);
+            if ($result) {
+                //echo '- File '.$id.PHP_EOL;
+                return $asset;
+            } else {
+                return false;
+            }
+        } catch (\Throwable $e) {
+            throw new \Exception("could not create asset: " . $e->getMessage());
+        }
+        return false;
+    }
+
 }

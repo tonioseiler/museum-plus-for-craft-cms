@@ -563,4 +563,15 @@ class MuseumPlusPerson extends Element
         }
         return $filteredSites;
     }
+
+    public function syncPersonMultimediaRelations($assetIds)
+    {
+        return $this->getRecord()->syncPersonMultimediaRelations($assetIds);
+    }
+
+    public function getMultimedia()
+    {
+        return $this->getRecord()->getMultimedia();
+    }
+
 }

@@ -372,6 +372,71 @@ class Install extends Migration
             );
         }
 
+        if (!$this->db->tableExists('{{%museumplus_people_assets}}')) {
+            $this->createTable('{{%museumplus_people_assets}}', [
+                'id' => $this->primaryKey(),
+                'peopleId' => $this->integer()->notNull(),
+                'assetId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid(),
+            ]);
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_people_assets}}', 'assetId'),
+                '{{%museumplus_people_assets}}',
+                'assetId',
+                '{{%assets}}',
+                'id',
+                'CASCADE',
+                'CASCADE'
+            );
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_people_assets}}', 'fileId'),
+                '{{%museumplus_people_assets}}',
+                'peopleId',
+                '{{%museumplus_people}}',
+                'id',
+                'CASCADE',
+                'CASCADE'
+            );
+        }
+
+        if (!$this->db->tableExists('{{%museumplus_ownerships_people}}')) {
+            $this->createTable('{{%museumplus_ownerships_people}}', [
+                'id' => $this->primaryKey(),
+                'ownershipId' => $this->integer()->notNull(),
+                'personId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid(),
+                'sort' => $this->integer()->defaultValue(0)
+            ]);
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_ownerships_people}}', 'personId'),
+                '{{%museumplus_ownerships_people}}',
+                'personId',
+                '{{%museumplus_people}}',
+                'id',
+                'CASCADE',
+                'CASCADE'
+            );
+
+            $this->addForeignKey(
+                $this->db->getForeignKeyName('{{%museumplus_ownerships_people}}', 'ownershipId'),
+                '{{%museumplus_ownerships_people}}',
+                'ownershipId',
+                '{{%museumplus_ownerships}}',
+                'id',
+                'CASCADE',
+                'CASCADE'
+            );
+
+
+        }
+
         return true;
     }
 

@@ -9,6 +9,7 @@ use craft\db\ActiveRecord;
 
 use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 use furbo\museumplusforcraftcms\records\DataRecord;
+use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 
 
 /*
@@ -28,6 +29,30 @@ class OwnershipRecord extends DataRecord
     public function getItems() {
         return $this->hasMany(MuseumPlusItemRecord::className(), ['id' => 'itemId'])
             ->viaTable('museumplus_items_ownerships', ['ownershipId' => 'id']);
+    }
+
+    public function getPeople()
+    {
+        return $this->hasMany(MuseumPlusItemRecord::className(), ['id' => 'itemId'])
+            ->viaTable('museumplus_ownerships_people', ['ownershipId' => 'id']);
+    }
+
+    public function syncPeopleRelations($peopleIds)
+    {
+        Craft::$app->db->createCommand()
+            ->delete('{{%museumplus_ownerships_people}}', ['ownershipId' => $this->id])
+            ->execute();
+
+        $sort = 1;
+        foreach ($peopleIds as $personId) {
+            Craft::$app->db->createCommand()
+                ->insert('{{%museumplus_ownerships_people}}', [
+                    'ownershipId' => $this->id,
+                    'personId' => $personId,
+                    'sort' => $sort
+                ])->execute();
+            $sort++;
+        }
     }
 
 
