@@ -91,7 +91,7 @@ class PeopleController extends Controller
         $person = MuseumPlusPerson::find()->id($personId)->one();
 
         MuseumPlusForCraftCms::$plugin->getInstance()->controllerNamespace = 'furbo\museumplusforcraftcms\console\controllers';
-        $command = MuseumPlusForCraftCms::$plugin->getInstance()->runAction('collection/update-person', ['personId' => $personId]);
+        $command = MuseumPlusForCraftCms::$plugin->getInstance()->runAction('collection/update-person', ['personId' => $person->collectionId]);
 
         Craft::$app->getSession()->setNotice(Craft::t('museum-plus-for-craft-cms', 'Sync queued. Reload page in a while to see changes.'));
 
