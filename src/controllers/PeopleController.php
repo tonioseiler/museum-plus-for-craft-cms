@@ -88,6 +88,8 @@ class PeopleController extends Controller
         $request = Craft::$app->getRequest();
         $personId = $request->getBodyParam('personId');
 
+        $person = MuseumPlusPerson::find()->id($personId)->one();
+
         MuseumPlusForCraftCms::$plugin->getInstance()->controllerNamespace = 'furbo\museumplusforcraftcms\console\controllers';
         $command = MuseumPlusForCraftCms::$plugin->getInstance()->runAction('collection/update-person', ['personId' => $personId]);
 
