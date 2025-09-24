@@ -44,16 +44,17 @@ class SitemapController extends Controller
             $dom = new \DOMDocument('1.0', 'utf-8');
             $dom->formatOutput = true;
 
-            $urlset = $dom->createElementNS('http://www.sitemaps.org/schemas/sitemap/0.9', 'urlset');
-            $urlset->setAttributeNS(
-                'http://www.w3.org/2000/xmlns/',
-                'xmlns:xhtml',
-                'http://www.w3.org/1999/xhtml'
-            );
-            $dom->appendChild($urlset);
 
             $params = Craft::$app->getRequest()->getQueryParams();
             if (isset($params['page'])) {
+                $urlset = $dom->createElementNS('http://www.sitemaps.org/schemas/sitemap/0.9', 'urlset');
+                $urlset->setAttributeNS(
+                    'http://www.w3.org/2000/xmlns/',
+                    'xmlns:xhtml',
+                    'http://www.w3.org/1999/xhtml'
+                );
+                $dom->appendChild($urlset);
+
                 $offset = self::LIMIT * ($params['page'] - 1);
                 foreach ($query->limit(self::LIMIT)->offset($offset)->all() as $element) {
                     $url = $dom->createElement('url');
@@ -64,11 +65,19 @@ class SitemapController extends Controller
                     $url->appendChild($dom->createElement('lastmod', $element->dateUpdated->format(\DateTime::ATOM)));
                 }
             }else{
+                $sitemapindex = $dom->createElementNS('http://www.sitemaps.org/schemas/sitemap/0.9', 'sitemapindex');
+                $sitemapindex->setAttributeNS(
+                    'http://www.w3.org/2000/xmlns/',
+                    'xmlns:xhtml',
+                    'http://www.w3.org/1999/xhtml'
+                );
+                $dom->appendChild($sitemapindex);
+
                 $pages = intval(ceil($query->count() / self::LIMIT));
                 $firstElement  = $query->orderBy('dateUpdated DESC')->one();
                 for ($i = 1; $i <= $pages; $i++) {
                     $sitemap = $dom->createElement('sitemap');
-                    $urlset->appendChild($sitemap);
+                    $sitemapindex->appendChild($sitemap);
                     $sitemap->appendChild($dom->createElement('loc', Craft::$app->request->absoluteUrl . "?page=" . $i));
                     $sitemap->appendChild($dom->createElement('lastmod', $firstElement->dateUpdated->format(\DateTime::ATOM)));
                 }
