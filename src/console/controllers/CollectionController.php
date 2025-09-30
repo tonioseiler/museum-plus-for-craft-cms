@@ -29,7 +29,6 @@ use furbo\museumplusforcraftcms\events\ItemUpdatedFromMuseumPlusEvent;
 
 use craft\queue\Queue;
 use furbo\museumplusforcraftcms\jobs\UpdateItemJob;
-use furbo\museumplusforcraftcms\jobs\DeleteRemovedItemsJob;
 use furbo\museumplusforcraftcms\jobs\UpdateItemParentChildRelationsJob;
 
 use Craft;
@@ -211,11 +210,29 @@ class CollectionController extends Controller
 
     public function actionDeleteRemovedItems()
     {
-        $queue = Craft::$app->queue;
+        App::maxPowerCaptain();
+
         echo 'Deleting removed items - job sent to queue'.PHP_EOL;
-        $jobId = $queue->push(new DeleteRemovedItemsJob([
-            'description' => 'Deleting removed items',
-        ]));
+
+        $museumPlus = MuseumPlusForCraftCms::$plugin->museumPlus;
+        $settings = MuseumPlusForCraftCms::$plugin->getSettings();
+
+        $objectIds = [];
+        foreach ($settings['objectGroups'] as $objectGroupId) {
+            $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
+            foreach ($objects as $o) {
+                $objectIds[$o->id] = $o->id;
+            }
+        }
+
+        $items = MuseumPlusItem::find()->collectionId(['not', $objectIds]);
+
+        foreach ($items as $item){
+            if(Craft::$app->elements->deleteElement($item)){
+                echo 'Item deleted: ' . $item->title . ' (' . $item->id . ')' . PHP_EOL;
+            }
+        }
+
         
         return true;
     }
