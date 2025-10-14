@@ -148,6 +148,10 @@ class MuseumPlusForCraftCmsVariable
         return MuseumPlusForCraftCms::$plugin->collection->getAllObjectGroups();
     }
 
+    public function searchPeople($params, $limit = 10, $offset = 0) {
+        return MuseumPlusForCraftCms::$plugin->collection->searchPeople($params, $limit, $offset);
+    }
+
     public function searchItems($params, $limit = 10, $offset = 0) {
         return MuseumPlusForCraftCms::$plugin->collection->searchItems($params, $limit, $offset);
     }

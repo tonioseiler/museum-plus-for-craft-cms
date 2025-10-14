@@ -202,6 +202,11 @@ class CollectionController extends Controller
         return MuseumPlusForCraftCms::$plugin->collection->getItemsById($ids);
     }
 
+    public function actionSearchPeople($params = [])
+    {
+        return MuseumPlusForCraftCms::$plugin->collection->searchPeople($params);
+    }
+
     public function actionSearchItems($params = [])
     {
         return MuseumPlusForCraftCms::$plugin->collection->searchItems($params);

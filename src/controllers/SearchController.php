@@ -11,6 +11,27 @@ class SearchController extends Controller
 {
     protected array|int|bool $allowAnonymous = ['search-items', 'autocomplete'];
 
+    public function actionSearchPeople()
+    {
+        $searchString = Craft::$app->getRequest()->getQueryParam('searchString');
+        $searchString = str_replace(array(".", "-"), "* *", $searchString);
+        $query = MuseumPlusPerson::find()
+            ->search($searchString)
+            //->where(['like', 'title', $searchString])
+            // ->orderBy('sort')
+            ->limit(10)
+            ->all();
+        $items = [];
+        foreach ($query as $item) {
+            $items[] = [
+                'id' => $item->id,
+                'title' => $item->title,
+                'url' => $item->url
+            ];
+        }
+        return $this->asJson($items);
+    }
+
     public function actionSearchItems()
     {
         $searchString = Craft::$app->getRequest()->getQueryParam('searchString');

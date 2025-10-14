@@ -119,6 +119,36 @@ class CollectionService extends Component
         return $items;
     }
 
+    public function searchPeople($params, $limit = 10, $offset = 0)
+    {
+        $criteria = [];
+        $items = MuseumPlusPerson::find();
+        //$items->orderBy(['sort' => SORT_ASC]);
+        if (isset($params['search'])) {
+            $searchTermsArray = preg_split('/[\s,;]+/', $params['search']);
+            $searchTermsArrayWithAsterisks = array_map(function ($item) {
+                return '*' . $item . '*';
+            }, $searchTermsArray);
+            //$searchTermsString = implode(' OR ', $searchTermsArrayWithAsterisks);
+            $searchTermsString = implode(' ', $searchTermsArrayWithAsterisks); // AND
+            $items = $items->search($searchTermsString);
+
+            /*
+            $this->search = implode(' OR ', $searchTerms);
+            $params['search'] = str_replace(array(".", "-"), "* *", $params['search']);
+            $items = $items->search("*" . $params['search'] . "*");
+            */
+            $criteria['search'] = $params['search'];
+        }
+
+        $items = $items->limit($limit)->offset($offset);
+        return $items;
+
+    }
+
+
+
+
 
     public function searchItems($params, $limit = 10, $offset = 0) {
         $criteria = [];

@@ -14,7 +14,7 @@ use yii\web\Response;
 class PeopleController extends Controller
 {
     public $defaultAction = 'index';
-    protected array|int|bool $allowAnonymous = self::ALLOW_ANONYMOUS_NEVER;
+    protected array|int|bool $allowAnonymous = ['index','search-people'];
 
     /**
      * museum-plus-for-craft-cms/people action
@@ -98,4 +98,10 @@ class PeopleController extends Controller
         return $this->redirectToPostedUrl($person);
 
     }
+
+    public function actionSearchPeople($params = [])
+    {
+        return MuseumPlusForCraftCms::$plugin->people->searchPeople($params);
+    }
+
 }
