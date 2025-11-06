@@ -268,33 +268,93 @@ class MuseumPlusPerson extends Element
             )
             ->where(['mip.personId' => $this->id])
             ->groupBy('mip.itemId')
-            ->limit(50)
+            ->limit(12)
             ->all();
     }
 
-    public function getOwnerships(): array
+    public function getOwnerships($limit = 24, $offset = 0)
     {
-        $person = PersonRecord::find()->where(['collectionId' => $this->collectionId])->one();
+        // Create cache key
+        $cacheKey = "person_ownerships_{$this->collectionId}_limit_{$limit}_offset_{$offset}";
+        $cacheDuration = 86400; // 1 day
 
-        $maxObjects = 24;
-        $ownershipsTitlesAndObjects = [];
-        $ownershipsMoreObjects = false;
-        $ownerships = $person->getOwnerships()->all();
-        foreach ($ownerships as $ownership) {
-            $ownershipsObjects = MuseumPlusItem::find()->ownership(['id' => $ownership->id])->all();
-            foreach ($ownershipsObjects as $ownershipObject) {
-                if (count($ownershipsTitlesAndObjects) < $maxObjects) {
-                    $ownershipsTitlesAndObjects[] = $ownershipObject;
-                } else {
-                    $ownershipsMoreObjects = true;
-                    break 2;
-                }
-            }
+        $cachedData = \Craft::$app->getCache()->get($cacheKey);
+        if ($cachedData !== false) {
+            return $cachedData;
         }
 
-        return $ownershipsTitlesAndObjects;
+        $person = PersonRecord::find()->where(['collectionId' => $this->collectionId])->one();
+
+        // Get all ownership records at once (this relationship works)
+        $ownerships = $person->getOwnerships()->all();
+
+        if (empty($ownerships)) {
+            $result = [];
+            \Craft::$app->getCache()->set($cacheKey, $result, $cacheDuration);
+            return $result;
+        }
+
+        // Extract all ownership IDs
+        $ownershipIds = array_map(function($ownership) {
+            return $ownership->id;
+        }, $ownerships);
+
+        // Single query to get all ownership objects with pagination
+        // This uses the existing working relationship but more efficiently
+        $ownershipItems = MuseumPlusItem::find()
+            ->innerJoin(
+                '{{%museumplus_items_ownerships}} mio',
+                '[[mio.itemId]] = [[elements.id]]'
+            )
+            ->where(['in', 'mio.ownershipId', $ownershipIds])
+            ->groupBy('elements.id')
+            ->offset($offset)
+            ->limit($limit)
+            ->all();
+
+        \Craft::$app->getCache()->set($cacheKey, $ownershipItems, $cacheDuration);
+        return $ownershipItems;
+    }
+
+// Optimized count method using existing relationships
+    public function getTotalOwnershipsCount()
+    {
+        $cacheKey = "person_ownerships_total_{$this->collectionId}";
+        $cacheDuration = 86400; // 1 day
+
+        $cachedCount = \Craft::$app->getCache()->get($cacheKey);
+        if ($cachedCount !== false) {
+            return $cachedCount;
+        }
+
+        $person = PersonRecord::find()->where(['collectionId' => $this->collectionId])->one();
+        $ownerships = $person->getOwnerships()->all();
+
+        if (empty($ownerships)) {
+            \Craft::$app->getCache()->set($cacheKey, 0, $cacheDuration);
+            return 0;
+        }
+
+        $ownershipIds = array_map(function($ownership) {
+            return $ownership->id;
+        }, $ownerships);
+
+        // Count total items across all ownerships
+        $totalCount = (new \craft\db\Query())
+            ->select(['COUNT(DISTINCT mio.itemId)'])
+            ->from('{{%museumplus_items_ownerships}} mio')
+            ->where(['in', 'mio.ownershipId', $ownershipIds])
+            ->scalar();
+
+        \Craft::$app->getCache()->set($cacheKey, (int)$totalCount, $cacheDuration);
+        return (int)$totalCount;
+    }
 
 
+// Add this method to check if there are more ownerships (for backward compatibility)
+    public function hasMoreOwnerships($currentCount = 24)
+    {
+        return $this->getTotalOwnershipsCount() > $currentCount;
     }
 
     public function getData(): array
