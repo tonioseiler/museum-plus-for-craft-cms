@@ -39,6 +39,7 @@ class MuseumPlusService extends Component
     const QUERY_LIMIT = 100;
     const MAX_ITEMS = 10000000;
     const CACHE_DURATION = 24*60*60;
+    //const CACHE_DURATION = 60;
     private $client = null;
 
     private $classifier = null;
@@ -51,7 +52,7 @@ class MuseumPlusService extends Component
     public function getObjectDetail($objectId)
     {
         $this->init();
-        $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Object/'.$objectId.'/', $this->requestHeaders);
+        $request = new Request('GET', 'https://'.$this->hostname.'/ria-ws/application/module/Object/'.$objectId.'/', $this->requestHeaders);
         $xml = $this->getDetail($request);
         return $this->createDataObjectFromXML($xml);
     }
@@ -63,7 +64,7 @@ class MuseumPlusService extends Component
         $seconds = self::CACHE_DURATION;
         $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupName, $nodeId) {
             $this->init();
-            $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application//vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
+            $request = new Request('GET', 'https://'.$this->hostname.'/ria-ws/application/vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
             $res = $that->client->sendAsync($request)->wait();
             $responseXml = simplexml_load_string($res->getBody()->getContents());
             $terms = json_decode(json_encode($responseXml->terms), true);
@@ -110,7 +111,7 @@ class MuseumPlusService extends Component
         $seconds = self::CACHE_DURATION;
         $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupName, $nodeId) {
             $this->init();
-            $request = new Request('GET', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application//vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
+            $request = new Request('GET', 'https://'.$this->hostname.'/ria-ws/application/vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
             $res = $that->client->sendAsync($request)->wait();
             $responseXml = simplexml_load_string($res->getBody()->getContents());
             $parents = json_decode(json_encode($responseXml->parents), true);
@@ -169,7 +170,7 @@ class MuseumPlusService extends Component
                             </module>
                         </modules>
                     </application>';
-                $request = new Request('POST', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Object/search/', $that->requestHeaders, $body);
+                $request = new Request('POST', 'https://'.$that->hostname.'/ria-ws/application/module/Object/search/', $that->requestHeaders, $body);
                 $res = $that->client->sendAsync($request)->wait();
                 $tmp = $that->createDataFromResponse($res);
                 foreach($tmp['data'] as $d) {
@@ -189,7 +190,7 @@ class MuseumPlusService extends Component
     {
         $this->init();
         try {
-            $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Object/' . $objectId . '/attachment', $this->requestHeaders);
+            $request = new Request('GET', 'https://' . $this->hostname .'/ria-ws/application/module/Object/' . $objectId . '/attachment', $this->requestHeaders);
             return $this->responseFile($request);
         } catch (\Exception $e) {
             return false;
@@ -200,7 +201,7 @@ class MuseumPlusService extends Component
     {
         $this->init();
         try {
-            $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Multimedia/' . $multimediaId . '/attachment', $this->requestHeaders);
+            $request = new Request('GET', 'https://' . $this->hostname .  '/ria-ws/application/module/Multimedia/' . $multimediaId . '/attachment', $this->requestHeaders);
             return $this->responseFile($request);
         } catch (\Exception $e) {
             return false;
@@ -211,7 +212,7 @@ class MuseumPlusService extends Component
     {
         $this->init();
         try {
-            $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Multimedia/' . $multimediaId , $this->requestHeaders);
+            $request = new Request('GET', 'https://' . $this->hostname . '/ria-ws/application/module/Multimedia/' . $multimediaId , $this->requestHeaders);
             $xml = $this->getDetail($request);
             $mmObject=$this->createDataObjectFromXML($xml);
             $getMultimediaFile = false;
@@ -226,7 +227,7 @@ class MuseumPlusService extends Component
             }
             if($getMultimediaFile) {
                 try {
-                    $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Multimedia/' . $multimediaId . '/attachment', $this->requestHeaders);
+                    $request = new Request('GET', 'https://' . $this->hostname . '/ria-ws/application/module/Multimedia/' . $multimediaId . '/attachment', $this->requestHeaders);
                     return [
                         'file' => $this->responseFile($request),
                         'title' => $multimediaTitle,
@@ -246,7 +247,7 @@ class MuseumPlusService extends Component
     {
         $this->init();
         try {
-            $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Literature/' . $literatureId . '/attachment', $this->requestHeaders);
+            $request = new Request('GET', 'https://' . $this->hostname . '/ria-ws/application/module/Literature/' . $literatureId . '/attachment', $this->requestHeaders);
             return $this->responseFile($request);
         } catch (\Exception $e) {
             return false;
@@ -257,7 +258,7 @@ class MuseumPlusService extends Component
     {
         $this->init();
         try{
-            $request = new Request('GET', 'https://' . $this->hostname . '/' . $this->classifier . '/ria-ws/application/module/Multimedia/' . $multimediaId, $this->requestHeaders);
+            $request = new Request('GET', 'https://' . $this->hostname . '/ria-ws/application/module/Multimedia/' . $multimediaId, $this->requestHeaders);
             $object = $this->getDetail($request);
             return $object->systemField[2]->value->__toString();
         }catch (\Exception $e){
@@ -320,7 +321,7 @@ class MuseumPlusService extends Component
                     </module>
                   </modules>
                 </application>';
-            $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/ObjectGroup/search', $this->requestHeaders, $body);
+            $request = new Request('POST', 'https://'.$this->hostname.'/ria-ws/application/module/ObjectGroup/search', $this->requestHeaders, $body);
             $res = $this->client->sendAsync($request)->wait();
             $tmp = $this->createDataFromResponse($res);
             // $objectGroups = $objectGroups + $tmp['data'];
@@ -368,7 +369,7 @@ class MuseumPlusService extends Component
                     </module>
                   </modules>
                 </application>';
-            $request = new Request('POST', 'https://'.$this->hostname.'/'.$this->classifier.'/ria-ws/application/module/Exhibition/search', $this->requestHeaders, $body);
+            $request = new Request('POST', 'https://'.$this->hostname.'/ria-ws/application/module/Exhibition/search', $this->requestHeaders, $body);
             $res = $this->client->sendAsync($request)->wait();
             $tmp = $this->createDataFromResponse($res);
             $exhibitions = $tmp['data'];
@@ -519,7 +520,7 @@ class MuseumPlusService extends Component
                         </module>
                       </modules>
                     </application>';
-            $request = new Request('POST', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Person/search', $that->requestHeaders, $body);
+            $request = new Request('POST', 'https://'.$that->hostname.'/ria-ws/application/module/Person/search', $that->requestHeaders, $body);
 
 
             //$request = new Request('GET', 'https://' . $that->hostname . '/' . $that->classifier . '/ria-ws/application/module/Person/' . $personId . '/', $that->requestHeaders);
@@ -544,7 +545,7 @@ class MuseumPlusService extends Component
         $seconds = self::CACHE_DURATION;
         $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $ownershipId) {
             $that->init();
-            $request = new Request('GET', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Ownership/'.$ownershipId.'/', $that->requestHeaders);
+            $request = new Request('GET', 'https://'.$that->hostname.'/ria-ws/application/module/Ownership/'.$ownershipId.'/', $that->requestHeaders);
             $res = $that->client->sendAsync($request)->wait();
             $tmp = $that->createDataFromResponse($res);
             if ($tmp['size'] >= 1)
@@ -561,7 +562,7 @@ class MuseumPlusService extends Component
         $seconds = self::CACHE_DURATION;
         $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $literatureId) {
             $that->init();
-            $request = new Request('GET', 'https://'.$that->hostname.'/'.$that->classifier.'/ria-ws/application/module/Literature/'.$literatureId.'/', $that->requestHeaders);
+            $request = new Request('GET', 'https://'.$that->hostname.'/ria-ws/application/module/Literature/'.$literatureId.'/', $that->requestHeaders);
             $res = $that->client->sendAsync($request)->wait();
             $tmp = $that->createDataFromResponse($res);
             if ($tmp['size'] >= 1)
