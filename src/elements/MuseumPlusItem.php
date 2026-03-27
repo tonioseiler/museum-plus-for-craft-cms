@@ -33,6 +33,7 @@ use craft\elements\db\ElementQueryInterface;
 use craft\models\FieldLayout;
 use craft\models\TagGroup;
 use craft\helpers\Db;
+use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 
 /**
  *  Element MuseumPlusItem
@@ -44,6 +45,10 @@ use craft\helpers\Db;
  */
 class MuseumPlusItem  extends Element
 {
+
+    // static property
+    private static $vocabularyTypes = [];
+
 
     // Public Properties
     // =========================================================================
@@ -457,10 +462,43 @@ class MuseumPlusItem  extends Element
         ];
     }
 
+    protected static function getVocabularyTypes():array {
+        if (empty(self::$vocabularyTypes)) {
+            $types = VocabularyEntryRecord::find()
+                ->select(['type'])
+                ->distinct()
+                ->column();
+            self::$vocabularyTypes = $types;
+        }
+        return self::$vocabularyTypes;
+    }
 
     protected static function defineSearchableAttributes(): array
     {
-        return ['data'];
+        $attributes = self::getVocabularyTypes();
+        $attributes[] = 'data';
+        return $attributes;
+    }
+
+    public function getSearchKeywords(string $attribute): string
+    {
+
+        $vocabularyTypes = self::getVocabularyTypes();
+
+        if (in_array($attribute, $vocabularyTypes)) {
+            $tmp = [];
+            $ves = $this->getVocabularyEntries()->where(['type' => $attribute])->all();
+            foreach($ves as $ve) {
+                $v = $ve->getDataAttribute('content');
+                if (!empty($v)) {
+                    $tmp[] = $v;
+                }
+            }
+            $ret = implode(' ', $tmp);
+            return $ret;
+        } else {
+            return parent::getSearchKeywords($attribute);
+        }
     }
 
     public function __toString(): string
@@ -555,6 +593,7 @@ class MuseumPlusItem  extends Element
     public function getVocabularyEntriesByType($type) {
         $rec = $this->getRecord();
         $vcs = $rec->getVocabularyEntriesByType($type);
+        return $vcs;
     }
 
     public function getRecord() {
@@ -691,10 +730,6 @@ class MuseumPlusItem  extends Element
         }
         return implode(", ", $metaKeywords);
     }
-
-
-
-
 
     public function getSupportedSites(): array
     {

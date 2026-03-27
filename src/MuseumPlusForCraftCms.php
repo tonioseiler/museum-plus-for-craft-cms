@@ -235,87 +235,87 @@ class MuseumPlusForCraftCms extends Plugin
             }
         );
 
-        Event::on(
-            Search::class,
-            Search::EVENT_BEFORE_INDEX_KEYWORDS,
-            function (IndexKeywordsEvent $e) {
-                // Element being indexed:
-                $element = $e->element;
+        // Event::on(
+        //     Search::class,
+        //     Search::EVENT_BEFORE_INDEX_KEYWORDS,
+        //     function (IndexKeywordsEvent $e) {
+        //         // Element being indexed:
+        //         $element = $e->element;
 
-                // Current attribute name:
-                $attribute = $e->attribute;
+        //         // Current attribute name:
+        //         $attribute = $e->attribute;
 
-                if ($attribute == 'data') {
+        //         if ($attribute == 'data') {
 
-                    $data = "";
+        //             $data = "";
                     
-                    try {
+        //             try {
 
-                        //ids
-                        $data .= $element->collectionId.' ';
-                        $data .= $element->inventoryNumber.' ';
+        //                 //ids
+        //                 $data .= $element->collectionId.' ';
+        //                 $data .= $element->inventoryNumber.' ';
 
-                        if (!empty($element->extraTitle))
-                            $data .= $element->extraTitle.' ';
+        //                 if (!empty($element->extraTitle))
+        //                     $data .= $element->extraTitle.' ';
 
-                        if (!empty($element->extraDescription))
-                            $data .= $element->extraDescription.' ';
+        //                 if (!empty($element->extraDescription))
+        //                     $data .= $element->extraDescription.' ';
 
-                        foreach ($element->getAssociationPeople()->all() as $person) {
-                            if (is_array($person->getDataAttribute('PerPersonTxt'))) {
-                                foreach ($person->getDataAttribute('PerPersonTxt') as $personTxt) {
-                                    $data .= $personTxt . " ";
-                                }
-                            } else {
-                                $data .= $person->getDataAttribute('PerPersonTxt') . " ";
-                            }
-                        }
+        //                 foreach ($element->getAssociationPeople()->all() as $person) {
+        //                     if (is_array($person->getDataAttribute('PerPersonTxt'))) {
+        //                         foreach ($person->getDataAttribute('PerPersonTxt') as $personTxt) {
+        //                             $data .= $personTxt . " ";
+        //                         }
+        //                     } else {
+        //                         $data .= $person->getDataAttribute('PerPersonTxt') . " ";
+        //                     }
+        //                 }
 
-                        foreach ($element->getDating() as $date) {
-                            $data .= $date . " ";
-                        }
+        //                 foreach ($element->getDating() as $date) {
+        //                     $data .= $date . " ";
+        //                 }
 
-                        $data .= $element->getDataAttribute('ObjObjectNumberTxt') . " ";
+        //                 $data .= $element->getDataAttribute('ObjObjectNumberTxt') . " ";
 
-                        $data .= $element->getDataAttribute('ObjScopeContentClb') . " ";
+        //                 $data .= $element->getDataAttribute('ObjScopeContentClb') . " ";
 
-                        foreach ($element->getGeographicReferences()->all() as $geo) {
-                            $data .= $geo->title . " ";
-                        }
+        //                 foreach ($element->getGeographicReferences()->all() as $geo) {
+        //                     $data .= $geo->title . " ";
+        //                 }
 
-                        foreach ($element->getMaterial() as $material) {
-                            $data .= $material . " ";
-                        }
+        //                 foreach ($element->getMaterial() as $material) {
+        //                     $data .= $material . " ";
+        //                 }
 
-                        foreach ($element->getClassification()->all() as $classification) {
-                            $data .= $classification->title . " ";
-                        }
+        //                 foreach ($element->getClassification()->all() as $classification) {
+        //                     $data .= $classification->title . " ";
+        //                 }
 
-                        foreach ($element->getObjectGroups()->all() as $objectGroup) {
-                            $data .= $objectGroup->title . " ";
-                        }
+        //                 foreach ($element->getObjectGroups()->all() as $objectGroup) {
+        //                     $data .= $objectGroup->title . " ";
+        //                 }
 
-                        foreach ($element->getOwnerships()->all() as $ownership) {
-                            $data .= $ownership->getDataAttribute('OwsOwnershipVrt') . " ";
-                        }
+        //                 foreach ($element->getOwnerships()->all() as $ownership) {
+        //                     $data .= $ownership->getDataAttribute('OwsOwnershipVrt') . " ";
+        //                 }
 
-                        foreach ($element->getTags()->all() as $tag) {
-                            $data .= $tag->title . " ";
-                        }
+        //                 foreach ($element->getTags()->all() as $tag) {
+        //                     $data .= $tag->title . " ";
+        //                 }
 
-                        $data .= $element->getDetailText() . " ";
+        //                 $data .= $element->getDetailText() . " ";
 
-                        foreach ($element->getLiterature()->all() as $literature) {
-                            $data .= $literature->title . " ";
-                        }
-                    } catch (\Throwable $th) {
-                    }
+        //                 foreach ($element->getLiterature()->all() as $literature) {
+        //                     $data .= $literature->title . " ";
+        //                 }
+        //             } catch (\Throwable $th) {
+        //             }
 
-                    $e->keywords = $data;
+        //             $e->keywords = $data;
 
-                }
-            }
-        );
+        //         }
+        //     }
+        // );
 
         /**
          * Logging in Craft involves using one of the following methods:

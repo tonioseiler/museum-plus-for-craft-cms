@@ -18,13 +18,25 @@ class UtilsController extends Controller
     public function actionResaveItems()
     {
         App::maxPowerCaptain();
-        $items = MuseumPlusItem::find()->site('*')->all();
-        foreach ($items as $item) {
-            if(\Craft::$app->elements->saveElement($item)) {
-                echo "Saved item {$item->id}" . PHP_EOL;
-            }else{
-                echo "Failed to save item {$item->id}" . PHP_EOL;
+        //$items = MuseumPlusItem::find()->site('*')->all();
+
+        $numItems = MuseumPlusItem::find()->site('*')->count();
+        $batchSize = 100;
+        $numBatches = floor($numItems / $batchSize);
+        for ($i = 0; $i <= $numBatches; $i++) {
+            $items = MuseumPlusItem::find()->site('*')
+                ->limit($batchSize)
+                ->offset($i * $batchSize)
+                ->all();
+
+            foreach ($items as $item) {
+                if(\Craft::$app->elements->saveElement($item)) {
+                    echo "Saved item {$item->id}" . PHP_EOL;
+                }else{
+                    echo "Failed to save item {$item->id}" . PHP_EOL;
+                }
             }
+            
         }
     }
 
