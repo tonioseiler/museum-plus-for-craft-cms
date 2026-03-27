@@ -24,7 +24,7 @@ class UtilsController extends Controller
         $batchSize = 100;
         $numBatches = floor($numItems / $batchSize);
         for ($i = 0; $i <= $numBatches; $i++) {
-            $items = MuseumPlusItem::find()->site('*')
+            $items = MuseumPlusItem::find()
                 ->limit($batchSize)
                 ->offset($i * $batchSize)
                 ->all();
