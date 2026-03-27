@@ -20,7 +20,7 @@ class UtilsController extends Controller
         App::maxPowerCaptain();
         //$items = MuseumPlusItem::find()->site('*')->all();
 
-        $numItems = MuseumPlusItem::find()->site('*')->count();
+        $numItems = MuseumPlusItem::find()->count();
         $batchSize = 100;
         $numBatches = floor($numItems / $batchSize);
         for ($i = 0; $i <= $numBatches; $i++) {
