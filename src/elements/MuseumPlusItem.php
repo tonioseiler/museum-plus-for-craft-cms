@@ -28,11 +28,8 @@ use furbo\museumplusforcraftcms\records\MuseumPlusItemRecord;
 
 use Craft;
 use craft\base\Element;
-use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\models\FieldLayout;
-use craft\models\TagGroup;
-use craft\helpers\Db;
 use furbo\museumplusforcraftcms\records\VocabularyEntryRecord;
 
 /**
@@ -64,7 +61,6 @@ class MuseumPlusItem  extends Element
     public $inventoryNumber;
 
     public $sort;
-
 
     public $extraTitle;
 
@@ -475,18 +471,34 @@ class MuseumPlusItem  extends Element
 
     protected static function defineSearchableAttributes(): array
     {
-        $attributes = self::getVocabularyTypes();
+        //$attributes = self::getVocabularyTypes();
         $attributes[] = 'data';
         return $attributes;
     }
 
+    protected function flattenArray($array) {
+        $result = [];
+
+        foreach ($array as $value) {
+            if (is_array($value)) {
+                $result = array_merge($result, $this->flattenArray($value));
+            } else {
+                $result[] = $value;
+            }
+        }
+
+        return $result;
+    }
+
+
     public function getSearchKeywords(string $attribute): string
     {
 
-        $vocabularyTypes = self::getVocabularyTypes();
+        if ($attribute === 'data') {
+            $tmp = $this->flattenArray($this->getDataAttributes());
 
-        if (in_array($attribute, $vocabularyTypes)) {
-            $tmp = [];
+            //add vocabulary entries
+            $vocabularyTypes = self::getVocabularyTypes();
             $ves = $this->getVocabularyEntries()->where(['type' => $attribute])->all();
             foreach($ves as $ve) {
                 $v = $ve->getDataAttribute('content');
@@ -494,7 +506,13 @@ class MuseumPlusItem  extends Element
                     $tmp[] = $v;
                 }
             }
-            $ret = implode(' ', $tmp);
+
+            $filtered = array_filter($tmp, function ($v) {
+                return !is_numeric($v) && strlen($v) > 2 && $v != "true" && $v != "false";
+            });
+            $unique = array_unique($filtered);
+            sort($unique);
+            $ret = implode(' ', $unique);
             return $ret;
         } else {
             return parent::getSearchKeywords($attribute);
