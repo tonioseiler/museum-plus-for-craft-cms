@@ -499,11 +499,13 @@ class MuseumPlusItem  extends Element
 
             //add vocabulary entries
             $vocabularyTypes = self::getVocabularyTypes();
-            $ves = $this->getVocabularyEntries()->where(['type' => $attribute])->all();
-            foreach($ves as $ve) {
-                $v = $ve->getDataAttribute('content');
-                if (!empty($v)) {
-                    $tmp[] = $v;
+            foreach($vocabularyTypes as $vocabularyType) {
+                $ves = $this->getVocabularyEntriesByType($vocabularyType)->select('id', 'data')->all();
+                foreach($ves as $ve) {
+                    $v = $ve->getDataAttribute('content');
+                    if (!empty($v)) {
+                        $tmp[] = $v;
+                    }
                 }
             }
 
