@@ -27,6 +27,7 @@ class UtilsController extends Controller
             $items = MuseumPlusItem::find()
                 ->limit($batchSize)
                 ->offset($i * $batchSize)
+                ->orderBy('dateUpdated asc')
                 ->all();
 
             foreach ($items as $item) {
