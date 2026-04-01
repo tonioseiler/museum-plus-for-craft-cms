@@ -42,29 +42,37 @@ class MuseumPlusItemRecord extends DataRecord
     public function getOwnerships()
     {
         $tmp = $this->hasMany(OwnershipRecord::className(), ['id' => 'ownershipId'])
-            ->viaTable('museumplus_items_ownerships', ['itemId' => 'id'])
-            ->innerJoin('museumplus_items_ownerships', 'museumplus_items_ownerships.ownershipId = museumplus_ownerships.id')
-            ->where(['museumplus_items_ownerships.itemId' => $this->id])
-            ->orderBy(['museumplus_items_ownerships.sort' => SORT_ASC]);
+            ->viaTable('museumplus_items_ownerships', ['itemId' => 'id'], function ($query) {
+                $query->orderBy(['museumplus_items_ownerships.sort' => SORT_ASC]);
+            });
+            // ->innerJoin('museumplus_items_ownerships', 'museumplus_items_ownerships.ownershipId = museumplus_ownerships.id')
+            // ->where(['museumplus_items_ownerships.itemId' => $this->id])
+            // ->orderBy(['museumplus_items_ownerships.sort' => SORT_ASC]);
         return $tmp;
     }
 
     public function getLiterature()
     {
         return $this->hasMany(LiteratureRecord::className(), ['id' => 'literatureId'])
-            ->viaTable('museumplus_items_literature', ['itemId' => 'id'])
-            ->innerJoin('museumplus_items_literature', 'museumplus_items_literature.literatureId = museumplus_literature.id')
-            ->where(['museumplus_items_literature.itemId' => $this->id])
-            ->orderBy(['museumplus_items_literature.sort' => SORT_ASC]);
+            ->viaTable('museumplus_items_literature', ['itemId' => 'id'], function ($query) {
+                $query->orderBy(['museumplus_items_literature.sort' => SORT_ASC]);
+            });
+            // ->innerJoin('museumplus_items_literature', 'museumplus_items_literature.literatureId = museumplus_literature.id')
+            // ->where(['museumplus_items_literature.itemId' => $this->id])
+            // ->orderBy(['museumplus_items_literature.sort' => SORT_ASC]);
     }
 
     public function getVocabularyEntries()
     {
         return $this->hasMany(VocabularyEntryRecord::className(), ['id' => 'vocabularyId'])
-            ->viaTable('museumplus_items_vocabulary', ['itemId' => 'id'])
-            ->innerJoin('museumplus_items_vocabulary', 'museumplus_items_vocabulary.vocabularyId = museumplus_vocabulary.id')
-            ->where(['museumplus_items_vocabulary.itemId' => $this->id])
-            ->orderBy(['museumplus_items_vocabulary.sort' => SORT_ASC]);
+            ->viaTable('museumplus_items_vocabulary', ['itemId' => 'id'], function ($query) {
+                $query->orderBy(['museumplus_items_vocabulary.sort' => SORT_ASC]);
+            });
+        // return $this->hasMany(VocabularyEntryRecord::className(), ['id' => 'vocabularyId'])
+        //     ->viaTable('museumplus_items_vocabulary', ['itemId' => 'id'])
+        //     ->innerJoin('museumplus_items_vocabulary', 'museumplus_items_vocabulary.vocabularyId = museumplus_vocabulary.id')
+        //     ->where(['museumplus_items_vocabulary.itemId' => $this->id])
+        //     ->orderBy(['museumplus_items_vocabulary.sort' => SORT_ASC]);
     }
 
     public function getVocabularyEntriesByType($type)
@@ -74,26 +82,24 @@ class MuseumPlusItemRecord extends DataRecord
 
     public function getAssociationPeople()
     {
-        /*
+        
         return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
             ->viaTable('museumplus_items_people', ['itemId' => 'id'], function ($query) {
                 $query->andWhere(['type' => 'ObjPerAssociationRef']);
                 $query->orderBy(['sort' => SORT_ASC]);
             });
-        */
-        return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
-            ->viaTable('museumplus_items_people', ['itemId' => 'id'])
-            ->innerJoin('museumplus_items_people', 'museumplus_items_people.personId = museumplus_people.id')
-            ->where(['museumplus_items_people.itemId' => $this->id])
-            ->andWhere(['type' => 'ObjPerAssociationRef'])
-            ->orderBy(['museumplus_items_people.sort' => SORT_ASC]);
+        // return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
+        //     ->viaTable('museumplus_items_people', ['itemId' => 'id'])
+        //     ->innerJoin('museumplus_items_people', 'museumplus_items_people.personId = museumplus_people.id')
+        //     ->where(['museumplus_items_people.itemId' => $this->id])
+        //     ->andWhere(['type' => 'ObjPerAssociationRef'])
+        //     ->orderBy(['museumplus_items_people.sort' => SORT_ASC]);
 
 
     }
 
     public function getOwnerPeople()
     {
-        //TODO: FIX order/sort
         return $this->hasMany(PersonRecord::className(), ['id' => 'personId'])
             ->viaTable('museumplus_items_people', ['itemId' => 'id'], function ($query) {
                 $query->andWhere(['type' => 'ObjPerOwnerRef']);
@@ -113,10 +119,13 @@ class MuseumPlusItemRecord extends DataRecord
     public function getRelatedItems()
     {
         return $this->hasMany(MuseumPlusitemRecord::className(), ['id' => 'relatedItemId'])
-            ->viaTable('museumplus_items_items', ['itemId' => 'id'])
-            ->innerJoin('museumplus_items_items', 'museumplus_items_items.relatedItemId = museumplus_items.id')
-            ->where(['museumplus_items_items.itemId' => $this->id])
-            ->orderBy(['museumplus_items_items.sort' => SORT_ASC]);
+            ->viaTable('museumplus_items_items', ['itemId' => 'id'], function ($query) {
+                $query->orderBy(['museumplus_items_items.sort' => SORT_ASC]);
+            });
+            // ->viaTable('museumplus_items_items', ['itemId' => 'id'])
+            // ->innerJoin('museumplus_items_items', 'museumplus_items_items.relatedItemId = museumplus_items.id')
+            // ->where(['museumplus_items_items.itemId' => $this->id])
+            // ->orderBy(['museumplus_items_items.sort' => SORT_ASC]);
     }
 
     public function syncMultimediaRelations($assetIds)

@@ -497,28 +497,29 @@ class MuseumPlusItem  extends Element
         if ($attribute === 'data') {
             $tmp = $this->flattenArray($this->getDataAttributes());
 
-            //add vocabulary entries
+            // //add vocabulary entries
             $vocabularyTypes = self::getVocabularyTypes();
             foreach($vocabularyTypes as $vocabularyType) {
                 $ves = $this->getVocabularyEntriesByType($vocabularyType)->select('id', 'data')->all();
-                foreach($ves as $ve) {
-                    $v = $ve->getDataAttribute('content');
-                    if (!empty($v)) {
-                        $tmp[] = $v;
-                    }
-                }
+                // foreach($ves as $ve) {
+                //     $v = $ve->getDataAttribute('content');
+                //     if (!empty($v)) {
+                //         $tmp[] = $v;
+                //     }
+                // }
             }
 
-            $filtered = array_filter($tmp, function ($v) {
-                return !is_numeric($v) && strlen($v) > 2 && $v != "true" && $v != "false";
-            });
-            $unique = array_unique($filtered);
-            sort($unique);
-            $ret = implode(' ', $unique);
-            return $ret;
+            // $filtered = array_filter($tmp, function ($v) {
+            //     return !is_numeric($v) && strlen($v) > 2 && $v != "true" && $v != "false";
+            // });
+            // $unique = array_unique($filtered);
+            // sort($unique);
+            // $ret = implode(' ', $unique);
+            // return $ret;
         } else {
             return parent::getSearchKeywords($attribute);
         }
+        return "";
     }
 
     public function __toString(): string
