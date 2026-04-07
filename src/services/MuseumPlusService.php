@@ -271,18 +271,20 @@ class MuseumPlusService extends Component
         $res = $this->client->sendAsync($request)->wait();
         $responseXml = simplexml_load_string($res->getBody()->getContents());
         $attachment = $responseXml->modules->module->moduleItem->attachment;
-        if ($attachment->attributes()->{"name"}) {
-            $fileName = $attachment->attributes()->{"name"}->__toString();
-        } else {
-            return false;
+        if (!empty($attachment)) {
+            if ($attachment->attributes()->{"name"}) {
+                $fileName = $attachment->attributes()->{"name"}->__toString();
+            } else {
+                return false;
+            }
+            if ($attachment->value) {
+                $base64 = $attachment->value->__toString();
+            } else {
+                return false;
+            }
+            return $this->base64_to_file($base64, $fileName);
         }
-        if ($attachment->value) {
-            $base64 = $attachment->value->__toString();
-        } else {
-            return false;
-        }
-
-        return $this->base64_to_file($base64, $fileName);
+        return false;
     }
 
     private function base64_to_file($base64_string, $output_file) {
