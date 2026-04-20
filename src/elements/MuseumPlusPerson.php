@@ -618,7 +618,10 @@ class MuseumPlusPerson extends Element
         foreach ($sites as $siteHandle => $siteSettings) {
             if (!empty($siteSettings['uriFormat'])) {
                 $site = \Craft::$app->sites->getSiteByHandle($siteHandle);
-                $filteredSites[] = $site->id;
+                $filteredSites[] = [
+                    'siteId' => $site->id,
+                    'enabledByDefault' => true,
+                ];
             }
         }
         return $filteredSites;

@@ -586,6 +586,17 @@ class MuseumPlusItem  extends Element
         return $rec->getOwnerships();
     }
 
+    public function getOwnershipsSorted() {
+        $rec = $this->getRecord();
+        $ownerships = $rec->getOwnerships()->all();
+        $moduleRefs = $rec->getDataAttribute('moduleReferences');
+        if (!empty($moduleRefs['ObjOwnershipRef']['items'])) {
+            $sortMap = array_column($moduleRefs['ObjOwnershipRef']['items'], 'SortLnu', 'id');
+            usort($ownerships, fn($a, $b) => ($sortMap[$a->collectionId] ?? 0) <=> ($sortMap[$b->collectionId] ?? 0));
+        }
+        return $ownerships;
+    }
+
     public function getAssociationPeople() {
         $rec = $this->getRecord();
         return $rec->getAssociationPeople();
@@ -759,7 +770,10 @@ class MuseumPlusItem  extends Element
         foreach ($sites as $siteHandle => $siteSettings) {
             if (!empty($siteSettings['uriFormat'])) {
                 $site = \Craft::$app->sites->getSiteByHandle($siteHandle);
-                $filteredSites[] = $site->id;
+                $filteredSites[] = [
+                    'siteId' => $site->id,
+                    'enabledByDefault' => true,
+                ];
             }
         }
         return $filteredSites;

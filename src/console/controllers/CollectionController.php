@@ -306,7 +306,8 @@ class CollectionController extends Controller
         $collectionId = $data->id;
 
         $person = MuseumPlusPerson::find()
-            ->where(['collectionId' => $collectionId])
+            ->status(null)
+            ->collectionId($collectionId)
             ->one();
 
         if (empty($person)) {
@@ -314,7 +315,7 @@ class CollectionController extends Controller
             $person = new MuseumPlusPerson();
             $person->collectionId = $collectionId;
 
-            $success = Craft::$app->elements->saveElement($person, false);
+            Craft::$app->elements->saveElement($person, false);
         }
         //update
         $person->data = json_encode($data);
@@ -363,6 +364,9 @@ class CollectionController extends Controller
             }
         }
 
+        $person->enabled = true;
+        $person->enabledForSite = true;
+        Craft::$app->elements->setElementUri($person);
         $success = Craft::$app->elements->saveElement($person, false);
         return $person;
     }

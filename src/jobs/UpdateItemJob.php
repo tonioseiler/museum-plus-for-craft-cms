@@ -696,7 +696,8 @@ class UpdateItemJob extends BaseJob
     {
         $collectionId = $data->id;
         $person = MuseumPlusPerson::find()
-            ->where(['collectionId' => $collectionId])
+            ->status(null)
+            ->collectionId($collectionId)
             ->one();
         if (empty($person)) {
             $person = new MuseumPlusPerson();
@@ -760,6 +761,9 @@ class UpdateItemJob extends BaseJob
                 $person->syncPersonMultimediaRelations($assetIds);
             }
         }
+        $person->enabled = true;
+        $person->enabledForSite = true;
+        Craft::$app->elements->setElementUri($person);
         $success = Craft::$app->elements->saveElement($person, false);
         return $person;
     }
