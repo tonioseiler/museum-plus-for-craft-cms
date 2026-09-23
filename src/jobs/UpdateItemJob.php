@@ -462,9 +462,14 @@ class UpdateItemJob extends BaseJob
         $parentFolder = $this->createFolder("Items");
         $itemFolder = $this->createFolder($id, $parentFolder->id, $parentFolder->path);
         if ($attachment) {
-            $asset = $this->createAsset($id, $attachment, $itemFolder);
-            if ($asset) {
-                return $asset->id;
+            // TIFF images are skipped: they are huge and cannot be processed within the hosting limits
+            if (preg_match('/\.tiff?$/i', $attachment)) {
+                @unlink($attachment);
+            } else {
+                $asset = $this->createAsset($id, $attachment, $itemFolder);
+                if ($asset) {
+                    return $asset->id;
+                }
             }
         }
         $this->logger->debug('finished createAttachmentFromObjectId()');
@@ -782,9 +787,14 @@ class UpdateItemJob extends BaseJob
             $parentFolder = $this->createFolder("People");
             $itemFolder = $this->createFolder($personId, $parentFolder->id, $parentFolder->path);
             // TODO: should we filter by file type?
-            $asset = $this->createAsset($id, $attachment, $itemFolder, $title);
-            if ($asset) {
-                return $asset->id;
+            // TIFF images are skipped: they are huge and cannot be processed within the hosting limits
+            if (preg_match('/\.tiff?$/i', (string)$attachment)) {
+                @unlink($attachment);
+            } else {
+                $asset = $this->createAsset($id, $attachment, $itemFolder, $title);
+                if ($asset) {
+                    return $asset->id;
+                }
             }
             /*
             $fileTypes = $this->settings['attachmentFileTypes'];
