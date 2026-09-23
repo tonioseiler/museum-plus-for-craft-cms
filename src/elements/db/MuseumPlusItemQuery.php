@@ -217,7 +217,9 @@ class MuseumPlusItemQuery extends ElementQuery
         $this->subQuery->groupBy([
             'museumplus_items.id',
             'museumplus_items.collectionId',
-            'museumplus_items.data',
+            // not the LONGTEXT `data` column: grouping by it forced huge on-disk temp tables in MySQL
+            // ("No space left on device" in the MySQL tmpdir) and made every item query 10-100x slower
+            // 'museumplus_items.data',
             'museumplus_items.assetId',
             'museumplus_items.inventoryNumber',
             'museumplus_items.extraTitle',
