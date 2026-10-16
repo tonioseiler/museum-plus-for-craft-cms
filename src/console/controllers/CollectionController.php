@@ -70,6 +70,12 @@ class CollectionController extends Controller
     public $forceAll;
 
     /**
+     * @var string|null update-items with --forceAll: force only items not updated since this date
+     * (e.g. "2026-11-16 00:00"), so a forced re-import in batches (--limit) takes the next items each run
+     */
+    public $updatedBefore;
+
+    /**
      * @var int|null if set, script will downoad only this item.
      */
     public $collectionItemId;
@@ -193,6 +199,20 @@ class CollectionController extends Controller
             }
             $limit = (int)$this->limit;
         }
+        $updatedBefore = null;
+        if (!empty($this->updatedBefore)) {
+            if (!$this->forceAll) {
+                echo '--updatedBefore only works together with --forceAll' . PHP_EOL;
+                return ExitCode::USAGE;
+            }
+            try {
+                $updatedBefore = new \DateTime($this->updatedBefore);
+            } catch (\Exception $e) {
+                echo 'Invalid --updatedBefore "' . $this->updatedBefore . '": use e.g. "2026-11-16 00:00"' . PHP_EOL;
+                return ExitCode::USAGE;
+            }
+            echo 'Forcing items not updated since ' . $updatedBefore->format('Y-m-d H:i:s') . PHP_EOL;
+        }
         // statistics, printed at the end
         $stats = ['new' => 0, 'changed' => 0, 'upToDate' => 0, 'pendingNew' => 0, 'pendingChanged' => 0, 'beforeStartId' => 0, 'alreadyQueued' => 0];
         $queuedIds = [];
@@ -246,6 +266,9 @@ class CollectionController extends Controller
                     $itemDateUpdated = $itemDates[$o->id] ?? null;
                     //$queue = Craft::$app->queue;
                     $limitReached = $limit !== null && count($queuedIds) >= $limit;
+                    // changed in M+, or forced (--forceAll, with --updatedBefore only items not updated since then)
+                    $forced = $this->forceAll && ($updatedBefore === null || ($itemDateUpdated && $itemDateUpdated < $updatedBefore));
+                    $needsUpdate = $itemDateUpdated && ($forced || $itemDateUpdated < $objectLastModified);
                     // dates for --details: last change in M+ and last update of the local item
                     $dates = '';
                     if ($this->details) {
@@ -253,7 +276,7 @@ class CollectionController extends Controller
                         if ($itemDateUpdated) {
                             $dates .= ', local: ' . $itemDateUpdated->format('Y-m-d H:i:s');
                         }
-                        if ($itemDateUpdated && $this->forceAll) {
+                        if ($itemDateUpdated && $forced) {
                             $dates .= ' (--forceAll)';
                         }
                     }
@@ -274,12 +297,12 @@ class CollectionController extends Controller
                         echo 'Creating item (id: '.$o->id.')'.$dates.PHP_EOL;
                         $stats['new']++;
                         $queuedIds[] = $o->id;
-                    } else if (($this->forceAll || $itemDateUpdated < $objectLastModified) && $limitReached) {
+                    } else if ($needsUpdate && $limitReached) {
                         $stats['pendingChanged']++;
                         if ($this->details) {
                             echo 'Pending, changed (id: '.$o->id.')'.$dates.PHP_EOL;
                         }
-                    } else if ($this->forceAll || $itemDateUpdated < $objectLastModified) {
+                    } else if ($needsUpdate) {
                         $jobId = $queue->push(new UpdateItemJob([
                             'description' => 'Updating item (id: '.$o->id.')',
                             'collectionId' => $o->id,
@@ -384,6 +407,7 @@ class CollectionController extends Controller
     {
         $options = parent::options($actionID);
         $options[] = 'forceAll';
+        $options[] = 'updatedBefore';
         $options[] = 'collectionItemId';
         $options[] = 'ignoreAttachments';
         $options[] = 'ignoreMultimedia';

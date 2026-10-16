@@ -230,7 +230,8 @@ class UpdateItemJob extends BaseJob
                         if ($ownership) {
                             $ownershipIds[] = $ownership->id;
                             $ownershipData = json_decode($ownership->data);
-                            $ownershipPersonRefs = $ownershipData->moduleReferences->OwsPersonRef->items;
+                            // ownerships without persons have no OwsPersonRef
+                            $ownershipPersonRefs = $ownershipData->moduleReferences->OwsPersonRef->items ?? [];
                             $peopleIds = [];
                             foreach ($ownershipPersonRefs as $p) {
                                 try {
@@ -321,17 +322,27 @@ class UpdateItemJob extends BaseJob
     }
 
 
-    private function updateItemParentChildRelationShips($collectionId)
+    // $visited: objects already handled in this call, so a loop in the M+ data (two objects each other's main object)
+    // doesn't recurse forever
+    private function updateItemParentChildRelationShips($collectionId, $visited = [])
     {
+        if (in_array($collectionId, $visited)) {
+            $this->logger->warning('Parent/child loop in M+ data, stopped at ' . $collectionId . ' (' . implode(' > ', $visited) . ')');
+            return;
+        }
+        $visited[] = $collectionId;
+
         $this->logger->debug('running updateItemParentChildRelationShips()');
         $this->setProgress($this->queue, 0.92, "Update item parent child relationships");
 
         $item = MuseumPlusItem::find()
             ->where(['collectionId' => $collectionId])
             ->one();
+        if (!$item) {
+            return;
+        }
 
-        //reset, only if there is something to reset: parentId has no index, and the UPDATE locks every row it
-        //scans (~1.4 s per object), while this check is a plain read (~0.01 s)
+        //reset, only if there is something to reset
         $hasChildren = MuseumPlusItemRecord::find()
             ->where(['parentId' => $item->collectionId])
             ->exists();
@@ -367,7 +378,7 @@ class UpdateItemJob extends BaseJob
                     ->one();
                 if ($parentRecord && $parentRecord->collectionId != $item->collectionId) {
                     $this->logger->debug('Parent found: ' . $parentRecord->collectionId);
-                    $this->updateItemParentChildRelationShips($parentRecord->collectionId);
+                    $this->updateItemParentChildRelationShips($parentRecord->collectionId, $visited);
                 }
             }
         }
