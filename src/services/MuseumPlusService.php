@@ -60,9 +60,13 @@ class MuseumPlusService extends Component
     public function getVocabularyNode($groupName, $nodeId)
     {
         $that = $this;
-        $cacheKey = Craft::$app->cache->buildKey('museumplus.vocabulary.'.$groupName.'.'.$nodeId);
+        $settings = MuseumPlusForCraftCms::$plugin->getSettings();
+        $languages = $settings->getVocabularyLanguageCodes();
+        $fallbackLanguage = $settings->getVocabularyFallbackLanguageCode();
+        // the languages are part of the key, so a changed setting doesn't return old cached results
+        $cacheKey = Craft::$app->cache->buildKey('museumplus.vocabulary.'.$groupName.'.'.$nodeId.'.'.$fallbackLanguage.'.'.implode('-', $languages));
         $seconds = self::CACHE_DURATION;
-        $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupName, $nodeId) {
+        $tmp = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupName, $nodeId, $languages, $fallbackLanguage) {
             $this->init();
             $request = new Request('GET', 'https://'.$this->hostname.'/ria-ws/application/vocabulary/instances/'.$groupName.'/nodes/'.$nodeId, $this->requestHeaders);
             $res = $that->client->sendAsync($request)->wait();
@@ -81,6 +85,8 @@ class MuseumPlusService extends Component
                 }
             }
             $ret = [];
+            // preferred term per configured language, e.g. ['de' => 'Holz', 'en' => 'wood']
+            $translations = [];
             if (isset($terms['term']) && !isset($terms['term']['@attributes'])) {
                 $terms = $terms['term'];
             }
@@ -96,9 +102,19 @@ class MuseumPlusService extends Component
                 foreach ($tmp as $key => $value) {
                     $object->{$key} = $value;
                 }
-                if (!empty($object->isoLanguageCode) && $object->isoLanguageCode == 'de' && isset($object->category['@attributes']['logicalName']) && $object->category['@attributes']['logicalName'] != 'non-preferred') {
-                    $ret[] = $object;
+                if (!empty($object->isoLanguageCode) && isset($object->category['@attributes']['logicalName']) && $object->category['@attributes']['logicalName'] != 'non-preferred') {
+                    // one entry per term in the fallback language, as before; the other languages are attached to it
+                    if ($object->isoLanguageCode == $fallbackLanguage) {
+                        $ret[] = $object;
+                    }
+                    if (in_array($object->isoLanguageCode, $languages) && !isset($translations[$object->isoLanguageCode]) && is_string($object->content ?? null)) {
+                        $translations[$object->isoLanguageCode] = $object->content;
+                    }
                 }
+            }
+            foreach ($ret as $object) {
+                $object->nodeId = $nodeId;
+                $object->translations = $translations;
             }
             return $ret;
         }, $seconds);
@@ -120,7 +136,7 @@ class MuseumPlusService extends Component
                 $parentNodeId = $parents[0]['parent']['@attributes']['nodeId'];
             }
             return $parentNodeId;
-        }, 1);
+        }, $seconds);
         return $tmp;
     }
 
@@ -138,7 +154,8 @@ class MuseumPlusService extends Component
         $this->init();
 
         $that = $this;
-        $cacheKey = Craft::$app->cache->buildKey('museumplus.objects-by-object-group.'.$groupId.'.'.implode('-',$fields));
+        // the host is part of the key, so switching between M+ hosts doesn't return the other host's list
+        $cacheKey = Craft::$app->cache->buildKey('museumplus.objects-by-object-group.'.$this->hostname.'.'.$groupId.'.'.implode('-',$fields));
         $seconds = self::CACHE_DURATION;
         $objects = Craft::$app->cache->getOrSet($cacheKey, function ($cache) use ($that, $groupId, $fields) {
             $offset = 0;
@@ -182,6 +199,11 @@ class MuseumPlusService extends Component
             }
             return $objects;
         }, $seconds);
+
+        // don't keep an empty list (unknown group, no access, API problem) for the next 24 hours
+        if (empty($objects)) {
+            Craft::$app->cache->delete($cacheKey);
+        }
 
         return $objects;
     }
@@ -714,17 +736,24 @@ class MuseumPlusService extends Component
                 $vr->id = $field['@attributes']['id'];
                 $vr->items = [];
 
-                $vrItems = $field;
-                if (isset($field['vocabularyReferenceItem']))
+                // usually one item; several come as a list, none as no key
+                $vrItems = [];
+                if (isset($field['vocabularyReferenceItem']['@attributes'])) {
                     $vrItems = [$field['vocabularyReferenceItem']];
+                } elseif (isset($field['vocabularyReferenceItem']) && is_array($field['vocabularyReferenceItem'])) {
+                    $vrItems = array_values($field['vocabularyReferenceItem']);
+                }
 
                 foreach($vrItems as $vrItem) {
+                    if (!isset($vrItem['@attributes']['id'])) {
+                        continue;
+                    }
                     $vri = new \stdClass();
                     $vri->id = $vrItem['@attributes']['id'];
                     if (isset($vrItem['@attributes']['name'])){
                         $vri->name = $vrItem['@attributes']['name'];
                     }
-                    $vri->value = $vrItem['formattedValue'];
+                    $vri->value = $vrItem['formattedValue'] ?? null;
                     if (isset($vrItem['formattedValue']['@attributes']['language']))
                         $vri->language = $vrItem['formattedValue']['@attributes']['language'];
                     $vr->items[] = $vri;
@@ -774,7 +803,33 @@ class MuseumPlusService extends Component
 
                     if (!empty($vocabularyReferences)) {
                         foreach ($vocabularyReferences as $field) {
-                            $groupItemObject->{$field['@attributes']['name']} = $field['vocabularyReferenceItem']['formattedValue'];
+                            $fieldName = $field['@attributes']['name'];
+                            // usually one item; several come as a list, none as no key
+                            $vrItems = [];
+                            if (isset($field['vocabularyReferenceItem']['@attributes'])) {
+                                $vrItems = [$field['vocabularyReferenceItem']];
+                            } elseif (isset($field['vocabularyReferenceItem']) && is_array($field['vocabularyReferenceItem'])) {
+                                $vrItems = array_values($field['vocabularyReferenceItem']);
+                            }
+                            if (empty($vrItems)) {
+                                continue;
+                            }
+                            // the first item as before, so existing templates keep a single value
+                            $groupItemObject->{$fieldName} = $vrItems[0]['formattedValue'] ?? null;
+                            // node ID, to match the row to its vocabulary entry, e.g. "MaterialVocId": "248474"
+                            if (isset($vrItems[0]['@attributes']['id'])) {
+                                $groupItemObject->{$fieldName.'Id'} = $vrItems[0]['@attributes']['id'];
+                            }
+                            // all items, only if there are several, e.g. "MaterialVocItems": [{"id": …, "value": …}, …]
+                            if (count($vrItems) > 1) {
+                                $groupItemObject->{$fieldName.'Items'} = [];
+                                foreach ($vrItems as $vrItem) {
+                                    $groupItemObject->{$fieldName.'Items'}[] = [
+                                        'id' => $vrItem['@attributes']['id'] ?? null,
+                                        'value' => $vrItem['formattedValue'] ?? null,
+                                    ];
+                                }
+                            }
                         }
                     }
 

@@ -98,6 +98,9 @@ class MuseumPlusItemQuery extends ElementQuery
             'museumplus_items.inventoryNumber',
             'museumplus_items.extraTitle',
             'museumplus_items.extraDescription',
+            // needed: afterSave() writes $this->sort to the record, also for the site copies saved during
+            // propagation, which overwrote the value with null when it wasn't loaded
+            'museumplus_items.sort',
         ]);
 
         if ($this->collectionId) {

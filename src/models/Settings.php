@@ -53,6 +53,12 @@ class Settings extends Model
 
     public $languageHeader = 'en';
 
+    // vocabulary term languages to import, comma separated ISO codes (e.g. "de, en")
+    public $vocabularyLanguages = 'de';
+
+    // language of the main vocabulary title, also used for sites without a term in their language
+    public $vocabularyFallbackLanguage = 'de';
+
     public $objectGroups = [];
 
     public $exhibitions = [];
@@ -85,7 +91,53 @@ class Settings extends Model
     public function rules(): array
     {
         return [
-            ['cpTitle', 'string']
+            ['cpTitle', 'string'],
+            [['languageHeader', 'vocabularyFallbackLanguage'], 'trim'],
+            // sent as Accept-Language header: one language, not a list
+            ['languageHeader', 'required', 'message' => 'Enter one language code, e.g. "de" or "en".'],
+            ['languageHeader', 'match', 'pattern' => '/^[a-z]{2,3}(-[a-z0-9]{2,8})?$/i',
+                'message' => 'Enter one language code, e.g. "de" or "en" (not a list).'],
+            ['vocabularyFallbackLanguage', 'required', 'message' => 'Enter one language code, e.g. "de".'],
+            ['vocabularyFallbackLanguage', 'match', 'pattern' => '/^[a-z]{2,3}$/i',
+                'message' => 'Enter one language code, e.g. "de".'],
+            // inline validators skip empty values by default; an empty list must be an error
+            ['vocabularyLanguages', 'validateVocabularyLanguages', 'skipOnEmpty' => false],
         ];
+    }
+
+    public function validateVocabularyLanguages($attribute): void
+    {
+        $languages = is_array($this->$attribute) ? $this->$attribute : explode(',', (string)$this->$attribute);
+        $languages = array_filter(array_map(fn($language) => trim((string)$language), $languages), fn($language) => $language !== '');
+        if (empty($languages)) {
+            $this->addError($attribute, 'Enter at least one language code, e.g. "de" or "de, en".');
+            return;
+        }
+        foreach ($languages as $language) {
+            if (!preg_match('/^[a-z]{2,3}$/i', $language)) {
+                $this->addError($attribute, 'Enter language codes separated by commas, e.g. "de, en" ("' . $language . '" is not valid).');
+                return;
+            }
+        }
+    }
+
+    /**
+     * Vocabulary term languages to import, always including the fallback language.
+     * Accepts a comma separated string (CP field) or an array (config file).
+     *
+     * @return string[] e.g. ['de', 'en']
+     */
+    public function getVocabularyLanguageCodes(): array
+    {
+        $languages = is_array($this->vocabularyLanguages) ? $this->vocabularyLanguages : explode(',', (string)$this->vocabularyLanguages);
+        $languages[] = $this->getVocabularyFallbackLanguageCode();
+        $languages = array_map(fn($language) => strtolower(trim($language)), $languages);
+        return array_values(array_unique(array_filter($languages)));
+    }
+
+    public function getVocabularyFallbackLanguageCode(): string
+    {
+        $language = strtolower(trim((string)$this->vocabularyFallbackLanguage));
+        return $language !== '' ? $language : 'de';
     }
 }

@@ -95,6 +95,32 @@ class CollectionController extends Controller
     public $startId;
     public $personId;
 
+    /**
+     * @var int|null update-items: queue at most this many create/update jobs; the others stay pending for the next run
+     */
+    public $limit;
+
+    /**
+     * @var bool|null update-items: one line per object with the reason (new, changed with both dates, up to date,
+     * pending because of --limit); without it only the queued objects and the summary are printed
+     */
+    public $details;
+
+    /**
+     * @var bool|null update-items: the queued jobs print and log which fields of each object changed
+     * (shown by queue/run --verbose and in the museumplus log)
+     */
+    public $fullDetails;
+
+    /**
+     * @var bool|null delete-removed-items: delete even if more than MAX_DELETE_SHARE of the items would be deleted
+     */
+    public $forceDelete;
+
+    // delete-removed-items refuses to delete more than this share of the items (at least MAX_DELETE_MIN) without --forceDelete
+    const MAX_DELETE_SHARE = 0.05;
+    const MAX_DELETE_MIN = 50;
+
     // Private Properties
     private $start;
     private $settings;
@@ -159,51 +185,152 @@ class CollectionController extends Controller
         if (!empty($this->startId)) {
             $startUpdating = false;
         }
+        $limit = null;
+        if ($this->limit !== null) {
+            if (!ctype_digit((string)$this->limit) || (int)$this->limit < 1) {
+                echo 'Invalid --limit "' . $this->limit . '": use a whole number greater than 0' . PHP_EOL;
+                return ExitCode::USAGE;
+            }
+            $limit = (int)$this->limit;
+        }
+        // statistics, printed at the end
+        $stats = ['new' => 0, 'changed' => 0, 'upToDate' => 0, 'pendingNew' => 0, 'pendingChanged' => 0, 'beforeStartId' => 0, 'alreadyQueued' => 0];
+        $queuedIds = [];
         $queue = Craft::$app->queue;
+
+        // objects whose job from an earlier run is still waiting (or running): don't queue them again.
+        // Failed jobs don't count, so a failed object is tried again.
+        $waitingIds = [];
+        if ($queue instanceof Queue) {
+            $descriptions = (new \craft\db\Query())
+                ->select(['description'])
+                ->from(\craft\db\Table::QUEUE)
+                ->where(['fail' => false])
+                ->andWhere(['or',
+                    ['like', 'description', 'Updating item (id:'],
+                    ['like', 'description', 'Creating item (id:'],
+                    ['like', 'description', 'Updating MuseumPlusItem collectionId:'],
+                ])
+                ->column();
+            foreach ($descriptions as $description) {
+                if (preg_match('/(?:\(id: |collectionId: )(\d+)/', (string)$description, $matches)) {
+                    $waitingIds[$matches[1]] = true;
+                }
+            }
+        }
+        // collectionId => last local update of all items, one query instead of one per object
+        // (same filter as MuseumPlusItem::find(); 44,000 single lookups took ~7 minutes)
+        $itemDates = [];
+        foreach (MuseumPlusItem::find()->select(['museumplus_items.collectionId', 'elements.dateUpdated'])->asArray()->all() as $row) {
+            $itemDates[$row['collectionId']] = \craft\helpers\DateTimeHelper::toDateTime($row['dateUpdated']);
+        }
+
         foreach ($this->settings['objectGroups'] as $objectGroupId) {
             echo 'getObjectsByObjectGroup START'.PHP_EOL;
             $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
             echo 'getObjectsByObjectGroup END'.PHP_EOL;
             foreach ($objects as $o) {
+                // an object can be in several object groups: handle it once per run
+                if (isset($objectIds[$o->id])) {
+                    continue;
+                }
                 $objectIds[$o->id] = $o->id;
-                if ($startUpdating) {
+                if ($startUpdating && isset($waitingIds[$o->id])) {
+                    $stats['alreadyQueued']++;
+                    if ($this->details) {
+                        echo 'Skipping item, already in the queue (id: '.$o->id.')'.PHP_EOL;
+                    }
+                } else if ($startUpdating) {
                     //check if item exists and if last mod is before last mod in mplus
                     $objectLastModified = new \DateTime($o->__lastModified);
-                    $item = MuseumPlusItem::find()
-                        ->where(['collectionId' => $o->id])
-                        ->one();
+                    $itemDateUpdated = $itemDates[$o->id] ?? null;
                     //$queue = Craft::$app->queue;
-                    if (!$item) {
+                    $limitReached = $limit !== null && count($queuedIds) >= $limit;
+                    // dates for --details: last change in M+ and last update of the local item
+                    $dates = '';
+                    if ($this->details) {
+                        $dates = ' - M+: ' . $objectLastModified->format('Y-m-d H:i:s');
+                        if ($itemDateUpdated) {
+                            $dates .= ', local: ' . $itemDateUpdated->format('Y-m-d H:i:s');
+                        }
+                        if ($itemDateUpdated && $this->forceAll) {
+                            $dates .= ' (--forceAll)';
+                        }
+                    }
+                    if (!$itemDateUpdated && $limitReached) {
+                        $stats['pendingNew']++;
+                        if ($this->details) {
+                            echo 'Pending, new (id: '.$o->id.')'.$dates.PHP_EOL;
+                        }
+                    } else if (!$itemDateUpdated) {
                         $jobId = $queue->push(new UpdateItemJob([
                             'description' => 'Creating item (id: '.$o->id.')',
                             'collectionId' => $o->id,
                             'ignoreAttachments' => $this->ignoreAttachments,
                             'ignoreMultimedia' => $this->ignoreMultimedia,
                             'ignoreLiterature' => $this->ignoreLiterature,
+                            'fullDetails' => (bool)$this->fullDetails,
                         ]));
-                        echo 'Creating item (id: '.$o->id.')'.PHP_EOL;
-                    } else if ($this->forceAll || $item->dateUpdated < $objectLastModified) {
+                        echo 'Creating item (id: '.$o->id.')'.$dates.PHP_EOL;
+                        $stats['new']++;
+                        $queuedIds[] = $o->id;
+                    } else if (($this->forceAll || $itemDateUpdated < $objectLastModified) && $limitReached) {
+                        $stats['pendingChanged']++;
+                        if ($this->details) {
+                            echo 'Pending, changed (id: '.$o->id.')'.$dates.PHP_EOL;
+                        }
+                    } else if ($this->forceAll || $itemDateUpdated < $objectLastModified) {
                         $jobId = $queue->push(new UpdateItemJob([
                             'description' => 'Updating item (id: '.$o->id.')',
                             'collectionId' => $o->id,
                             'ignoreAttachments' => $this->ignoreAttachments,
                             'ignoreMultimedia' => $this->ignoreMultimedia,
                             'ignoreLiterature' => $this->ignoreLiterature,
+                            'fullDetails' => (bool)$this->fullDetails,
                         ]));
                         // TODO careful: triggerUpdateEvent should be false in this case
-                        echo 'Updating item (id: '.$o->id.')'.PHP_EOL;
+                        echo 'Updating item (id: '.$o->id.')'.$dates.PHP_EOL;
+                        $stats['changed']++;
+                        $queuedIds[] = $o->id;
                     } else {
-                        echo 'Skipping Item (id: '.$o->id.')'.PHP_EOL;
+                        if ($this->details) {
+                            echo 'Skipping item, up to date (id: '.$o->id.')'.$dates.PHP_EOL;
+                        }
+                        $stats['upToDate']++;
                     }
                 } else {
                     $startUpdating = $o->id == $this->startId;
-                    echo 'skip item '.$o->id.PHP_EOL;
+                    if ($this->details) {
+                        echo 'Skipping item, before --startId (id: '.$o->id.')'.PHP_EOL;
+                    }
+                    $stats['beforeStartId']++;
                 }
             }
         }
 
         $this->actionDeleteRemovedItems();
-        
+
+        $pending = $stats['pendingNew'] + $stats['pendingChanged'];
+        echo PHP_EOL . 'Summary' . PHP_EOL;
+        echo '  Objects in M+:          ' . count($objectIds) . PHP_EOL;
+        echo '  New, queued:            ' . $stats['new'] . PHP_EOL;
+        echo '  Changed, queued:        ' . $stats['changed'] . PHP_EOL;
+        echo '  Up to date, skipped:    ' . $stats['upToDate'] . PHP_EOL;
+        echo '  Already in the queue:   ' . $stats['alreadyQueued'] . PHP_EOL;
+        if (!empty($this->startId)) {
+            echo '  Before --startId:       ' . $stats['beforeStartId'] . PHP_EOL;
+        }
+        if ($limit !== null) {
+            echo '  Pending (--limit=' . $limit . '):  ' . $pending . ' (new: ' . $stats['pendingNew'] . ', changed: ' . $stats['pendingChanged'] . ')' . PHP_EOL;
+            if ($pending > 0) {
+                echo '  Runs left at this limit: ' . (int)ceil($pending / $limit) . PHP_EOL;
+            }
+        }
+        echo '  Peak memory:            ' . round(memory_get_peak_usage(true) / 1024 / 1024, 1) . ' MB' . PHP_EOL;
+        $usage = getrusage();
+        echo '  CPU time:               ' . round($usage['ru_utime.tv_sec'] + $usage['ru_utime.tv_usec'] / 1e6 + $usage['ru_stime.tv_sec'] + $usage['ru_stime.tv_usec'] / 1e6, 1) . ' s' . PHP_EOL;
+        echo '  (the queued jobs run later in the queue: php craft queue/run)' . PHP_EOL;
+
         return true;
     }
 
@@ -220,6 +347,11 @@ class CollectionController extends Controller
         $objectIds = [];
         foreach ($settings['objectGroups'] as $objectGroupId) {
             $objects = $this->museumPlus->getObjectsByObjectGroup($objectGroupId, ['__id', '__lastModifiedUser', '__lastModified']);
+            // an empty group means a wrong group, no access or an API problem, not "all objects removed"
+            if (empty($objects)) {
+                echo 'NOT deleting anything: M+ returned no objects for object group ' . $objectGroupId . PHP_EOL;
+                return ExitCode::UNSPECIFIED_ERROR;
+            }
             foreach ($objects as $o) {
                 $objectIds[$o->id] = $o->id;
             }
@@ -227,7 +359,18 @@ class CollectionController extends Controller
 
         $items = MuseumPlusItem::find()->collectionId(['not', $objectIds]);
 
-        foreach ($items as $item){
+        // safety net for incomplete lists: never delete a large share of the collection in one run
+        $toDelete = (clone $items)->count();
+        $total = MuseumPlusItem::find()->count();
+        $maxDelete = max(self::MAX_DELETE_MIN, (int)floor($total * self::MAX_DELETE_SHARE));
+        echo 'Items to delete: ' . $toDelete . ' of ' . $total . PHP_EOL;
+        if ($toDelete > $maxDelete && !$this->forceDelete) {
+            echo 'NOT deleting anything: more than ' . $maxDelete . ' items (' . (self::MAX_DELETE_SHARE * 100) . ' %) would be deleted.' . PHP_EOL;
+            echo 'If this is correct, run delete-removed-items --forceDelete' . PHP_EOL;
+            return ExitCode::UNSPECIFIED_ERROR;
+        }
+
+        foreach ($items->all() as $item){
             if(Craft::$app->elements->deleteElement($item)){
                 echo 'Item deleted: ' . $item->title . ' (' . $item->id . ')' . PHP_EOL;
             }
@@ -247,6 +390,10 @@ class CollectionController extends Controller
         $options[] = 'ignoreLiterature';
         $options[] = 'startId';
         $options[] = 'personId';
+        $options[] = 'limit';
+        $options[] = 'details';
+        $options[] = 'fullDetails';
+        $options[] = 'forceDelete';
         return $options;
     }
 

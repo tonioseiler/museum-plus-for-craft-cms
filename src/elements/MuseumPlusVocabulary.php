@@ -193,4 +193,33 @@ class MuseumPlusVocabulary extends Element
         return $rec->getItems();
     }
 
+    // Only the sites where items or people have URLs (plugin settings -> Url's), like MuseumPlusItem and
+    // MuseumPlusPerson; all sites if none is set yet
+    public function getSupportedSites(): array
+    {
+        $settings = MuseumPlusForCraftCms::getInstance()->getSettings();
+        $siteIds = [];
+        foreach ([$settings->sites, $settings->peoplesites] as $sites) {
+            foreach ((array)$sites as $siteHandle => $siteSettings) {
+                if (!empty($siteSettings['uriFormat'])) {
+                    $site = \Craft::$app->sites->getSiteByHandle($siteHandle);
+                    if ($site) {
+                        $siteIds[$site->id] = $site->id;
+                    }
+                }
+            }
+        }
+        if (empty($siteIds)) {
+            return parent::getSupportedSites();
+        }
+        $filteredSites = [];
+        foreach ($siteIds as $siteId) {
+            $filteredSites[] = [
+                'siteId' => $siteId,
+                'enabledByDefault' => true,
+            ];
+        }
+        return $filteredSites;
+    }
+
 }

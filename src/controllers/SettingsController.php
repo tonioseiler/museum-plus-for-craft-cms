@@ -18,7 +18,7 @@ class SettingsController extends Controller
         return $this->redirect('museum-plus-for-craft-cms/settings/general');
     }
 
-    public function actionEditGeneral(Settings $settings = null): Response
+    public function actionEditGeneral(?Settings $settings = null): Response
     {
         if(is_null($settings)){
             $settings = MuseumPlusForCraftCms::$plugin->settings;
@@ -66,7 +66,7 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function actionEditSites(Settings $settings = null): Response
+    public function actionEditSites(?Settings $settings = null): Response
     {
         if(is_null($settings)){
             $settings = MuseumPlusForCraftCms::$plugin->settings;
@@ -77,7 +77,7 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function actionEditApi(Settings $settings = null): Response
+    public function actionEditApi(?Settings $settings = null): Response
     {
         if(is_null($settings)){
             $settings = MuseumPlusForCraftCms::$plugin->settings;
@@ -88,7 +88,7 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function actionEditAttachments(Settings $settings = null): Response
+    public function actionEditAttachments(?Settings $settings = null): Response
     {
         if(is_null($settings)){
             $settings = MuseumPlusForCraftCms::$plugin->settings;
@@ -99,7 +99,7 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function actionEditObjectsGroups(Settings $settings = null): Response
+    public function actionEditObjectsGroups(?Settings $settings = null): Response
     {
         if(is_null($settings)){
             $settings = MuseumPlusForCraftCms::$plugin->settings;
@@ -110,7 +110,7 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function actionEditFieldLayout(Settings $settings = null): Response
+    public function actionEditFieldLayout(?Settings $settings = null): Response
     {
         if(is_null($settings)){
             $settings = MuseumPlusForCraftCms::$plugin->settings;
@@ -120,7 +120,7 @@ class SettingsController extends Controller
             'settings' => $settings
         ]);
     }
-    public function actionEditPersonFieldLayout(Settings $settings = null): Response
+    public function actionEditPersonFieldLayout(?Settings $settings = null): Response
     {
         if(is_null($settings)){
             $settings = MuseumPlusForCraftCms::$plugin->settings;

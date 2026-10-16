@@ -35,6 +35,9 @@ class UpdateItemJob extends BaseJob
     public $ignoreMultimedia;
     public $ignoreLiterature;
 
+    // update-items --fullDetails: print and log which fields of the object changed
+    public $fullDetails = false;
+
     private $queue = null;
     private $logger = null;
 
@@ -62,7 +65,7 @@ class UpdateItemJob extends BaseJob
             $this->triggerUpdateEvent($this->collectionId, $isNewItem);
             $this->updateItemToItemRelationShips($this->collectionId);
             $this->updateItemParentChildRelationShips($this->collectionId);
-            $this->updateItemSort($this->collectionId);
+            $this->updateItemSort($this->collectionId, $isNewItem);
             $message = "Successfully processed MuseumPlusItem (ID: {$this->collectionId}).";
             $this->logger->info($message);
             $this->setProgress($this->queue, 1, "Update done");
@@ -327,11 +330,17 @@ class UpdateItemJob extends BaseJob
             ->where(['collectionId' => $collectionId])
             ->one();
 
-        //reset
-        $db = Yii::$app->db;
-        $rowsAffected = $db->createCommand()
-            ->update('museumplus_items', ['parentId' => '0'], ['parentId' => $item->collectionId])
-            ->execute();
+        //reset, only if there is something to reset: parentId has no index, and the UPDATE locks every row it
+        //scans (~1.4 s per object), while this check is a plain read (~0.01 s)
+        $hasChildren = MuseumPlusItemRecord::find()
+            ->where(['parentId' => $item->collectionId])
+            ->exists();
+        if ($hasChildren) {
+            $db = Yii::$app->db;
+            $rowsAffected = $db->createCommand()
+                ->update('museumplus_items', ['parentId' => '0'], ['parentId' => $item->collectionId])
+                ->execute();
+        }
 
         $moduleRefs = $item->getDataAttribute('moduleReferences');
 
@@ -351,7 +360,7 @@ class UpdateItemJob extends BaseJob
 
         //check if it has a parent, if yes, update the parent
         if (isset($moduleRefs['ObjObjectMainRef']) && count($moduleRefs['ObjObjectMainRef']['items']) > 0) {
-            $parents = $moduleRefs['ObjObjectPartRef']['items'];
+            $parents = $moduleRefs['ObjObjectMainRef']['items'];
             foreach ($parents as $parent) {
                 $parentRecord = MuseumPlusItemRecord::find()
                     ->where(['collectionId' => $parent['id']])
@@ -365,7 +374,7 @@ class UpdateItemJob extends BaseJob
     }
 
 
-    private function updateItemSort($collectionId)
+    private function updateItemSort($collectionId, $isNewItem = true)
     {
         $this->logger->debug('running updateItemSort()');
         $this->setProgress($this->queue, 0.95, "Update item sort");
@@ -376,6 +385,12 @@ class UpdateItemJob extends BaseJob
 
         try {
             $sort = $item->getDataAttribute('ObjObjectNumberSortedVrt');
+            // existing items: createOrUpdateItem() already saved the sort value, so skip this second full save
+            // (all sites, search index). New items keep it, as before
+            if ($sort && !$isNewItem && (string)$item->getRecord()->sort === (string)$sort) {
+                $this->logger->debug($item->id . " - " . $sort . " (sort unchanged)");
+                return;
+            }
             if ($sort) {
                 $item->sort = $sort;
                 if (Craft::$app->elements->saveElement($item)) {
@@ -410,10 +425,21 @@ class UpdateItemJob extends BaseJob
             $this->logger->debug('running createOrUpdateItem(): update existing item');
 
             //update
+            if ($this->fullDetails) {
+                $changes = $this->getDataChanges(json_decode((string)$item->data, true) ?: [], json_decode(json_encode($object), true));
+                $message = 'Changes (id: ' . $collectionId . '): ' . (empty($changes) ? 'none' : implode('; ', $changes));
+                echo $message . PHP_EOL;
+                $this->logger->info($message);
+            }
             $item->data = json_encode($object);
             $item->title = $object->ObjObjectTitleVrt;
 
         }
+
+        // the element query doesn't load the sort column, and afterSave() writes $item->sort to the record:
+        // set it here, so the first save stores the right value (see updateItemSort())
+        // (empty M+ fields can arrive as [] instead of a string)
+        $item->sort = is_string($object->ObjObjectNumberSortedVrt ?? null) ? $object->ObjObjectNumberSortedVrt : null;
 
         $inventoryNumber = $object->ObjObjectNumberVrt ?? '';//$item->getDataAttribute('ObjObjectNumberVrt');
         if (empty($inventoryNumber))
@@ -672,6 +698,65 @@ class UpdateItemJob extends BaseJob
         return $literature;
     }
 
+    // Fields that differ between the stored and the new M+ data: plain fields by name, repeatable groups,
+    // vocabulary and module references by their name. M+ system fields (__lastModified etc.) are left out.
+    private function getDataChanges(array $old, array $new): array
+    {
+        $listKeys = ['repeatableGroups', 'vocabularyReferences', 'moduleReferences'];
+        $changed = [];
+        $added = [];
+        $removed = [];
+
+        $fields = array_unique(array_merge(array_keys($old), array_keys($new)));
+        foreach ($fields as $field) {
+            if (str_starts_with($field, '__') || in_array($field, $listKeys)) {
+                continue;
+            }
+            if (!array_key_exists($field, $old)) {
+                $added[] = $field;
+            } elseif (!array_key_exists($field, $new)) {
+                $removed[] = $field;
+            } elseif ($old[$field] != $new[$field]) {
+                $changed[] = $field;
+            }
+        }
+
+        foreach ($listKeys as $listKey) {
+            // e.g. all ObjMaterialTechniqueGrp entries, by name
+            $byName = function ($list) {
+                $ret = [];
+                foreach ((array)$list as $entry) {
+                    $name = $entry['name'] ?? '?';
+                    $ret[$name][] = $entry;
+                }
+                return $ret;
+            };
+            $oldByName = $byName($old[$listKey] ?? []);
+            $newByName = $byName($new[$listKey] ?? []);
+            foreach (array_unique(array_merge(array_keys($oldByName), array_keys($newByName))) as $name) {
+                if (!isset($oldByName[$name])) {
+                    $added[] = $name;
+                } elseif (!isset($newByName[$name])) {
+                    $removed[] = $name;
+                } elseif ($oldByName[$name] != $newByName[$name]) {
+                    $changed[] = $name;
+                }
+            }
+        }
+
+        $ret = [];
+        if ($changed) {
+            $ret[] = 'changed: ' . implode(', ', $changed);
+        }
+        if ($added) {
+            $ret[] = 'added: ' . implode(', ', $added);
+        }
+        if ($removed) {
+            $ret[] = 'removed: ' . implode(', ', $removed);
+        }
+        return $ret;
+    }
+
     private function createOrUpdateVocabularyEntry($type, $data)
     {
 
@@ -686,6 +771,14 @@ class UpdateItemJob extends BaseJob
             $vocabularyEntry->collectionId = $data->id;
             $vocabularyEntry->title = $data->content;
         } else {
+            // unchanged (same M+ term data, type and parent): nothing to save. Entries like "Holz" are shared by
+            // thousands of objects and were saved again on every object's sync, the slowest part of a sync
+            if ($vocabularyEntry->data === json_encode($data)
+                && $vocabularyEntry->type === $type
+                && (string)$vocabularyEntry->parentId === (string)$data->parentId
+                && $vocabularyEntry->title === $data->content) {
+                return $vocabularyEntry;
+            }
             //update
             $vocabularyEntry->title = $data->content;
         }
@@ -694,7 +787,31 @@ class UpdateItemJob extends BaseJob
         $vocabularyEntry->language = $data->isoLanguageCode;
         $vocabularyEntry->data = json_encode($data);
         $success = Craft::$app->elements->saveElement($vocabularyEntry, false);
+        $this->updateVocabularyEntrySiteTitles($vocabularyEntry, $data);
         return $vocabularyEntry;
+    }
+
+    // Title per site: the term in the site's language if it was imported (vocabularyLanguages setting),
+    // otherwise the main title (fallback language). Only sites whose title changes are saved.
+    private function updateVocabularyEntrySiteTitles(MuseumPlusVocabulary $vocabularyEntry, $data)
+    {
+        if (empty($vocabularyEntry->id) || empty($data->translations)) {
+            return;
+        }
+        $siteEntries = MuseumPlusVocabulary::find()
+            ->id($vocabularyEntry->id)
+            ->siteId(array_column($vocabularyEntry->getSupportedSites(), 'siteId'))
+            ->status(null)
+            ->all();
+        foreach ($siteEntries as $siteEntry) {
+            $language = substr($siteEntry->getSite()->language, 0, 2);
+            $title = $data->translations[$language] ?? $data->content;
+            if ($siteEntry->title !== $title) {
+                $siteEntry->title = $title;
+                // this site only: the save above already propagated the entry to all sites
+                Craft::$app->elements->saveElement($siteEntry, false, false);
+            }
+        }
     }
 
     private function createOrUpdatePerson($data)

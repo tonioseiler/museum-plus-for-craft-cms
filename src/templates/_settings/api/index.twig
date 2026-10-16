@@ -46,10 +46,29 @@
 
     {{ forms.textField({
         label: 'Language Header',
-        instructions: '',
+        instructions: 'Language of the formatted values in the object data (sent as `Accept-Language` to MuseumPlus). One language code, e.g. "de" or "en".',
         id: 'languageHeader',
         name: 'languageHeader',
-        value: settings['languageHeader']})
+        value: settings['languageHeader'],
+        errors: settings.getErrors('languageHeader')})
+    }}
+
+    {{ forms.textField({
+        label: 'Vocabulary Languages',
+        instructions: 'Languages of the vocabulary terms to import, comma separated ISO codes (e.g. "de, en"). After a change, clear the data caches and run a full sync (`update-items --forceAll`).',
+        id: 'vocabularyLanguages',
+        name: 'vocabularyLanguages',
+        value: settings['vocabularyLanguages'] is iterable ? settings['vocabularyLanguages']|join(', ') : settings['vocabularyLanguages'],
+        errors: settings.getErrors('vocabularyLanguages')})
+    }}
+
+    {{ forms.textField({
+        label: 'Vocabulary Fallback Language',
+        instructions: 'Language of the main vocabulary title, also used for sites without a term in their language (e.g. "de"). Vocabulary entries are identified by the term ID in this language: don\'t change it after the first import, or all entries are created again.',
+        id: 'vocabularyFallbackLanguage',
+        name: 'vocabularyFallbackLanguage',
+        value: settings['vocabularyFallbackLanguage'],
+        errors: settings.getErrors('vocabularyFallbackLanguage')})
     }}
 
     {{ forms.textField({

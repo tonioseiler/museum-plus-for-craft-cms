@@ -132,7 +132,7 @@ class MuseumPlusItem  extends Element
      * @return array The sources.
      * @see sources()
      */
-    protected static function defineSources(string $context = null): array
+    protected static function defineSources(?string $context = null): array
     {
         $sources = [
             [
@@ -675,9 +675,45 @@ class MuseumPlusItem  extends Element
         return $this->getVocabularyEntries()->where(['type' => 'ObjClassificationVgr']);
     }
 
+    /**
+     * Old M+ structure only (free text DetailsTxt per row); returns [] once DetailsTxt is gone.
+     * For the new structure use getRepeatableGroupRows('ObjMaterialTechniqueGrp').
+     */
     public function getMaterial() {
         $rec = $this->getRecord();
         return $rec->getRepeatableGroupValues('ObjMaterialTechniqueGrp', 'DetailsTxt');
+    }
+
+    /**
+     * Rows of a repeatable group, sorted by SortLnu (if the group has it), with the vocabulary entry of each
+     * vocabulary field, e.g. 'MaterialVoc' => 'Holz', 'MaterialVocId' => '248474',
+     * 'MaterialVocEntry' => VocabularyEntryRecord (title in the current site's language, id for links).
+     * Fields whose entry is not found (e.g. not re-synced since the node IDs are stored) have no ...Entry.
+     */
+    public function getRepeatableGroupRows($groupName) {
+        $rec = $this->getRecord();
+        $rows = $rec->getRepeatableGroupValues($groupName);
+
+        // the item's vocabulary entries by M+ node ID
+        $entriesByNodeId = [];
+        foreach ($rec->getVocabularyEntries()->all() as $entry) {
+            $nodeId = $entry->getDataAttribute('nodeId');
+            if (!empty($nodeId)) {
+                $entriesByNodeId[$nodeId] = $entry;
+            }
+        }
+
+        foreach ($rows as $index => $row) {
+            foreach ($row as $key => $value) {
+                if (str_ends_with($key, 'VocId') && is_string($value) && isset($entriesByNodeId[$value])) {
+                    $rows[$index][substr($key, 0, -2) . 'Entry'] = $entriesByNodeId[$value];
+                }
+            }
+        }
+
+        // SortLnu can have gaps and duplicates; usort is stable, so ties keep the M+ order
+        usort($rows, fn($a, $b) => (int)($a['SortLnu'] ?? 0) <=> (int)($b['SortLnu'] ?? 0));
+        return $rows;
     }
 
     public function getDimensions() {
